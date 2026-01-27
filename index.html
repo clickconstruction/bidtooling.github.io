@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plumbing Bid Worksheet - Click Plumbing and Electrical</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    :root {
+      --primary: #003366;
+      --secondary: #0066CC;
+      --bg: #F5F5F5;
+      --text: #333333;
+      --card-bg: #ffffff;
+      --border: #ddd;
+      --error: #c00;
+    }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--text);
+      background: var(--bg);
+      padding: 1rem;
+    }
+    .container { max-width: 960px; margin: 0 auto; }
+    h1, h2, h3 { color: var(--primary); margin-top: 0; }
+    h2 { font-size: 1.25rem; border-bottom: 2px solid var(--secondary); padding-bottom: 0.25rem; margin-bottom: 1rem; }
+    .section {
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    label { display: block; margin-bottom: 0.25rem; font-weight: 500; }
+    input[type="text"], input[type="number"], input[type="date"], select, textarea {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 2px rgba(0,102,204,0.2);
+    }
+    input.error, select.error, textarea.error { border-color: var(--error); }
+    .form-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    .form-row .field { flex: 1; min-width: 0; }
+    .fixture-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.75rem; }
+    .fixture-item { display: flex; flex-direction: column; }
+    .fixture-item label { font-size: 0.875rem; }
+    .number-input-wrap { display: flex; align-items: center; gap: 0.25rem; }
+    .number-input-wrap input { width: 4rem; text-align: center; }
+    .number-input-wrap button {
+      width: 2rem; height: 2rem;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1.25rem;
+      line-height: 1;
+      color: var(--primary);
+    }
+    .number-input-wrap button:hover { background: #e0e0e0; }
+    .takeoff-row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center; }
+    .takeoff-row .takeoff-desc { flex: 2; min-width: 0; }
+    .takeoff-row .takeoff-qty { flex: 1; min-width: 80px; }
+    .takeoff-row button { flex-shrink: 0; padding: 0.5rem; cursor: pointer; border: 1px solid var(--border); background: #fff; border-radius: 6px; color: var(--error); }
+    .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.5rem 0; }
+    .btn {
+      padding: 0.75rem 1.25rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.05s;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: #002244; }
+    .btn-secondary { background: var(--secondary); color: #fff; }
+    .btn-secondary:hover { background: #0052a3; }
+    .btn-outline { background: #fff; color: var(--primary); border: 2px solid var(--primary); }
+    .btn-outline:hover { background: var(--bg); }
+    #preview {
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 2rem;
+      margin-top: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      display: none;
+    }
+    #preview.visible { display: block; }
+    .preview-header { text-align: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid var(--primary); }
+    .preview-header h1 { font-size: 1.5rem; margin: 0; }
+    .preview-logo { width: 80px; height: 80px; background: var(--bg); border: 1px dashed var(--border); margin: 0 auto 0.5rem; border-radius: 8px; }
+    .preview-meta { font-size: 0.9rem; color: #666; }
+    .preview-section { margin-bottom: 1.25rem; }
+    .preview-section h3 { font-size: 1rem; margin-bottom: 0.5rem; color: var(--primary); }
+    .preview-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .preview-table th, .preview-table td { border: 1px solid var(--border); padding: 0.5rem 0.75rem; text-align: left; }
+    .preview-table th { background: var(--bg); font-weight: 600; }
+    .grand-total { font-size: 1.5rem; font-weight: 700; color: var(--primary); margin-top: 1rem; padding: 1rem; background: var(--bg); border-radius: 8px; text-align: right; }
+    @media (max-width: 768px) {
+      body { padding: 0.75rem; }
+      .section { padding: 1rem; }
+      .btn { min-height: 44px; padding: 0.875rem 1.25rem; }
+      .number-input-wrap button { min-width: 44px; min-height: 44px; }
+    }
+    @media (max-width: 640px) {
+      .form-row { flex-direction: column; }
+      .fixture-grid { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+      .takeoff-row { flex-wrap: wrap; }
+      .actions { flex-direction: column; }
+      .actions .btn { width: 100%; }
+    }
+    @media print {
+      body { background: #fff; padding: 0; }
+      .no-print { display: none !important; }
+      #preview { display: block !important; box-shadow: none; padding: 0; }
+      .section { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <form id="bidForm" class="no-print">
+      <div class="section">
+        <h2>Job Information</h2>
+        <div class="form-row">
+          <div class="field">
+            <label for="customerName">Customer Name *</label>
+            <input type="text" id="customerName" name="customerName" required placeholder="Customer name">
+          </div>
+          <div class="field">
+            <label for="jobAddress">Job Address *</label>
+            <input type="text" id="jobAddress" name="jobAddress" required placeholder="Street, City, State ZIP">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label for="bidDate">Bid Date *</label>
+            <input type="date" id="bidDate" name="bidDate" required>
+          </div>
+          <div class="field">
+            <label for="bidNumber">Bid Number *</label>
+            <input type="text" id="bidNumber" name="bidNumber" required placeholder="e.g. 2024-001">
+          </div>
+          <div class="field">
+            <label for="jobType">Job Type</label>
+            <select id="jobType" name="jobType">
+              <option value="Residential remodel">Residential remodel</option>
+              <option value="New construction">New construction</option>
+              <option value="Commercial">Commercial</option>
+              <option value="Service/repair">Service/repair</option>
+              <option value="Multi-family">Multi-family</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Fixture Counts</h2>
+        <p><strong>Total fixtures: <span id="totalFixtures">0</span></strong></p>
+        <h3>Bathrooms</h3>
+        <div class="fixture-grid" id="fixturesBathrooms">
+          <div class="fixture-item">
+            <label for="fixtureToilets">Toilets</label>
+            <div class="number-input-wrap">
+              <button type="button" aria-label="Decrease" data-target="fixtureToilets">−</button>
+              <input type="number" id="fixtureToilets" name="fixtureToilets" min="0" value="0">
+              <button type="button" aria-label="Increase" data-target="fixtureToilets">+</button>
+            </div>
+          </div>
+          <div class="fixture-item">
+            <label for="fixtureBathSinks">Bathroom sinks</label>
+            <div class="number-input-wrap">
+              <button type="button" aria-label="Decrease" data-target="fixtureBathSinks">−</button>
+              <input type="number" id="fixtureBathSinks" name="fixtureBathSinks" min="0" value="0">
+              <button type="button" aria-label="Increase" data-target="fixtureBathSinks">+</button>
+            </div>
+          </div>
+          <div class="fixture-item">
+            <label for="fixtureShowerTub">Shower/tub combos</label>
+            <div class="number-input-wrap">
+              <button type="button" aria-label="Decrease" data-target="fixtureShowerTub">−</button>
+              <input type="number" id="fixtureShowerTub" name="fixtureShowerTub" min="0" value="0">
+              <button type="button" aria-label="Increase" data-target="fixtureShowerTub">+</button>
+            </div>
+          </div>
+          <div class="fixture-item">
+            <label for="fixtureShowerOnly">Shower only</label>
+            <div class="number-input-wrap">
+              <button type="button" aria-label="Decrease" data-target="fixtureShowerOnly">−</button>
+              <input type="number" id="fixtureShowerOnly" name="fixtureShowerOnly" min="0" value="0">
+              <button type="button" aria-label="Increase" data-target="fixtureShowerOnly">+</button>
+            </div>
+          </div>
+          <div class="fixture-item">
+            <label for="fixtureTubs">Bathtubs</label>
+            <div class="number-input-wrap">
+              <button type="button" aria-label="Decrease" data-target="fixtureTubs">−</button>
+              <input type="number" id="fixtureTubs" name="fixtureTubs" min="0" value="0">
+              <button type="button" aria-label="Increase" data-target="fixtureTubs">+</button>
+            </div>
+          </div>
+          <div class="fixture-item">
+            <label for="fixtureUrinals">Urinals</label>
+            <div class="number-input-wrap">
+              <button type="button" aria-label="Decrease" data-target="fixtureUrinals">−</button>
+              <input type="number" id="fixtureUrinals" name="fixtureUrinals" min="0" value="0">
+              <button type="button" aria-label="Increase" data-target="fixtureUrinals">+</button>
+            </div>
+          </div>
+          <div class="fixture-item">
+            <label for="fixtureWaterClosets">Water closets</label>
+            <div class="number-input-wrap">
+              <button type="button" aria-label="Decrease" data-target="fixtureWaterClosets">−</button>
+              <input type="number" id="fixtureWaterClosets" name="fixtureWaterClosets" min="0" value="0">
+              <button type="button" aria-label="Increase" data-target="fixtureWaterClosets">+</button>
+            </div>
+          </div>
+        </div>
+        <h3>Kitchen</h3>
+        <div class="fixture-grid">
+          <div class="fixture-item">
+            <label for="fixtureKitchenSinks">Kitchen sinks</label>
+            <div class="number-input-wrap">
+              <button type="button" aria-label="Decrease" data-target="fixtureKitchenSinks">−</button>
+              <input type="number" id="fixtureKitchenSinks" name="fixtureKitchenSinks" min="0" value="0">
+              <button type="button" aria-label="Increase" data-target="fixtureKitchenSinks">+</button>
+            </div>
+          </div>
+          <div class="fixture-item">
+            <label for="fixtureDisposals">Garbage disposals</label>
+            <div class="number-input-wrap">
+              <button type="button" aria-label="Decrease" data-target="fixtureDisposals">−</button>
+              <input type="number" id="fixtureDisposals" name="fixtureDisposals" min="0" value="0">
+              <button type="button" aria-label="Increase" data-target="fixtureDisposals">+</button>
+            </div>
+          </div>
+        </div>
+        <h3>Laundry</h3>
+        <div class="fixture-grid">
+          <div class="fixture-item">
+            <label for="fixtureLaundrySinks">Laundry sinks</label>
+            <div class="number-input-wrap">
+              <button type="button" aria-label="Decrease" data-target="fixtureLaundrySinks">−</button>
+              <input type="number" id="fixtureLaundrySinks" name="fixtureLaundrySinks" min="0" value="0">
+              <button type="button" aria-label="Increase" data-target="fixtureLaundrySinks">+</button>
+            </div>
+          </div>
+        </div>
+        <h3>Plumbing Fixtures</h3>
+        <div class="fixture-grid">
+          <div class="fixture-item">
+            <label for="fixtureHoseBibs">Hose bibs</label>
+            <div class="number-input-wrap">
+              <button type="button" aria-label="Decrease" data-target="fixtureHoseBibs">−</button>
+              <input type="number" id="fixtureHoseBibs" name="fixtureHoseBibs" min="0" value="0">
+              <button type="button" aria-label="Increase" data-target="fixtureHoseBibs">+</button>
+            </div>
+          </div>
+        </div>
+        <h3>Appliances</h3>
+        <div class="fixture-grid">
+          <div class="fixture-item">
+            <label for="fixtureWHGas">Water heaters (gas)</label>
+            <div class="number-input-wrap">
+              <button type="button" aria-label="Decrease" data-target="fixtureWHGas">−</button>
+              <input type="number" id="fixtureWHGas" name="fixtureWHGas" min="0" value="0">
+              <button type="button" aria-label="Increase" data-target="fixtureWHGas">+</button>
+            </div>
+          </div>
+          <div class="fixture-item">
+            <label for="fixtureWHElectric">Water heaters (electric)</label>
+            <div class="number-input-wrap">
+              <button type="button" aria-label="Decrease" data-target="fixtureWHElectric">−</button>
+              <input type="number" id="fixtureWHElectric" name="fixtureWHElectric" min="0" value="0">
+              <button type="button" aria-label="Increase" data-target="fixtureWHElectric">+</button>
+            </div>
+          </div>
+          <div class="fixture-item">
+            <label for="fixtureWHTankless">Water heaters (tankless)</label>
+            <div class="number-input-wrap">
+              <button type="button" aria-label="Decrease" data-target="fixtureWHTankless">−</button>
+              <input type="number" id="fixtureWHTankless" name="fixtureWHTankless" min="0" value="0">
+              <button type="button" aria-label="Increase" data-target="fixtureWHTankless">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Material Takeoff Summary</h2>
+        <div id="takeoffRows">
+          <div class="takeoff-row">
+            <input type="text" placeholder="Item (e.g. Copper pipe 1/2\")" class="takeoff-desc">
+            <input type="text" placeholder="Qty" class="takeoff-qty">
+            <button type="button" class="takeoff-remove" aria-label="Remove row">Remove</button>
+          </div>
+        </div>
+        <button type="button" id="addTakeoffRow" class="btn btn-outline" style="margin-top: 0.5rem;">Add row</button>
+      </div>
+
+      <div class="section">
+        <h2>Labor Estimate</h2>
+        <div class="form-row">
+          <div class="field">
+            <label for="laborHours">Estimated Hours</label>
+            <input type="number" id="laborHours" name="laborHours" min="0" step="0.5" value="0">
+          </div>
+          <div class="field">
+            <label for="crewSize">Crew Size (1–3)</label>
+            <select id="crewSize" name="crewSize">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="daysOnSite">Days on Site</label>
+            <input type="number" id="daysOnSite" name="daysOnSite" min="0" value="0">
+          </div>
+          <div class="field">
+            <label for="laborRate">Labor Rate ($/hr)</label>
+            <input type="number" id="laborRate" name="laborRate" min="0" step="0.01" value="75">
+          </div>
+        </div>
+        <p><strong>Labor total: $<span id="laborTotal">0.00</span></strong></p>
+      </div>
+
+      <div class="section">
+        <h2>Pricing</h2>
+        <div class="form-row">
+          <div class="field">
+            <label for="materialSubtotal">Material Subtotal ($)</label>
+            <input type="number" id="materialSubtotal" name="materialSubtotal" min="0" step="0.01" value="0">
+          </div>
+          <div class="field">
+            <label for="overheadPct">Overhead %</label>
+            <input type="number" id="overheadPct" name="overheadPct" min="0" step="0.5" value="12">
+          </div>
+          <div class="field">
+            <label for="profitPct">Profit %</label>
+            <input type="number" id="profitPct" name="profitPct" min="0" step="0.5" value="18">
+          </div>
+        </div>
+        <div class="field" style="margin-top: 1rem;">
+          <label for="allowances">Allowances / Alternates</label>
+          <textarea id="allowances" name="allowances" rows="2" placeholder="Optional"></textarea>
+        </div>
+        <div class="preview-section" style="margin-top: 1rem;">
+          <table class="preview-table">
+            <tr><th>Materials</th><th>Labor</th><th>Overhead</th><th>Profit</th><th>Total</th></tr>
+            <tr>
+              <td>$<span id="calcMaterials">0.00</span></td>
+              <td>$<span id="calcLabor">0.00</span></td>
+              <td>$<span id="calcOH">0.00</span></td>
+              <td>$<span id="calcProfit">0.00</span></td>
+              <td><strong>$<span id="calcTotal">0.00</span></strong></td>
+            </tr>
+          </table>
+          <p class="grand-total">Grand Total: $<span id="grandTotal">0.00</span></p>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Scope Notes / Exclusions</h2>
+        <textarea id="scopeNotes" name="scopeNotes" rows="5" placeholder="Describe scope, exclusions, and any special notes..."></textarea>
+      </div>
+
+      <div class="actions no-print">
+        <button type="button" id="generatePreview" class="btn btn-primary">Generate Preview</button>
+        <button type="button" id="printBtn" class="btn btn-secondary">Print</button>
+        <button type="button" id="exportPdf" class="btn btn-outline">Export to PDF</button>
+        <button type="button" id="clearBtn" class="btn btn-outline">Clear All</button>
+      </div>
+    </form>
+
+    <div id="preview" class="preview-section" aria-live="polite"></div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    (function() {
+      const CREW_MULTIPLIERS = { 1: 1, 2: 1.8, 3: 2.5 };
+      const requiredIds = ['customerName', 'jobAddress', 'bidDate', 'bidNumber'];
+
+      function $(id) { return document.getElementById(id); }
+      function qs(sel, root) { return (root || document).querySelector(sel); }
+      function qsa(sel, root) { return (root || document).querySelectorAll(sel); }
+
+      function setDefaultDate() {
+        const bidDate = $('bidDate');
+        if (bidDate && !bidDate.value) bidDate.value = new Date().toISOString().slice(0, 10);
+      }
+      setDefaultDate();
+
+      var fixtureIds = [
+        'fixtureToilets', 'fixtureBathSinks', 'fixtureShowerTub', 'fixtureShowerOnly', 'fixtureTubs',
+        'fixtureUrinals', 'fixtureWaterClosets', 'fixtureKitchenSinks', 'fixtureDisposals',
+        'fixtureLaundrySinks', 'fixtureHoseBibs', 'fixtureWHGas', 'fixtureWHElectric', 'fixtureWHTankless'
+      ];
+
+      function getNum(id) { const el = $(id); return el ? (parseFloat(el.value) || 0) : 0; }
+      function getStr(id) { const el = $(id); return el ? (el.value || '').trim() : ''; }
+
+      function totalFixtures() {
+        return fixtureIds.reduce(function(sum, id) { return sum + (getNum(id) || 0); }, 0);
+      }
+
+      function calculateTotals() {
+        var materials = getNum('materialSubtotal');
+        var hours = getNum('laborHours');
+        var rate = getNum('laborRate');
+        var crew = parseInt($('crewSize').value, 10) || 1;
+        var mult = CREW_MULTIPLIERS[crew] || 1;
+        var labor = hours * rate * mult;
+        var base = materials + labor;
+        var ohPct = getNum('overheadPct') || 0;
+        var profitPct = getNum('profitPct') || 0;
+        var overhead = base * (ohPct / 100);
+        var profit = (base + overhead) * (profitPct / 100);
+        var total = base + overhead + profit;
+
+        $('totalFixtures').textContent = totalFixtures();
+        $('laborTotal').textContent = labor.toFixed(2);
+        $('calcMaterials').textContent = materials.toFixed(2);
+        $('calcLabor').textContent = labor.toFixed(2);
+        $('calcOH').textContent = overhead.toFixed(2);
+        $('calcProfit').textContent = profit.toFixed(2);
+        $('calcTotal').textContent = total.toFixed(2);
+        $('grandTotal').textContent = total.toFixed(2);
+        return { materials, labor, overhead, profit, total };
+      }
+
+      function updatePreview() {
+        var data = collectFormData();
+        var totals = calculateTotals();
+        var html = buildPreviewHtml(data, totals);
+        var preview = $('preview');
+        preview.innerHTML = html;
+        preview.classList.add('visible');
+      }
+
+      function collectFormData() {
+        var takeoff = [];
+        qsa('.takeoff-row').forEach(function(row) {
+          var desc = (row.querySelector('.takeoff-desc') || {}).value;
+          var qty = (row.querySelector('.takeoff-qty') || {}).value;
+          if (desc || qty) takeoff.push({ desc: desc, qty: qty });
+        });
+        return {
+          customerName: getStr('customerName'),
+          jobAddress: getStr('jobAddress'),
+          bidDate: getStr('bidDate'),
+          bidNumber: getStr('bidNumber'),
+          jobType: ($('jobType') || {}).value || 'Residential remodel',
+          fixtures: fixtureIds.reduce(function(o, id) {
+            var label = id.replace('fixture', '').replace(/([A-Z])/g, ' $1').trim();
+            o[label] = getNum(id);
+            return o;
+          }, {}),
+          takeoff: takeoff,
+          laborHours: getNum('laborHours'),
+          crewSize: ($('crewSize') || {}).value || '1',
+          daysOnSite: getNum('daysOnSite'),
+          laborRate: getNum('laborRate'),
+          materialSubtotal: getNum('materialSubtotal'),
+          overheadPct: getNum('overheadPct'),
+          profitPct: getNum('profitPct'),
+          allowances: getStr('allowances'),
+          scopeNotes: getStr('scopeNotes')
+        };
+      }
+
+      function buildPreviewHtml(data, totals) {
+        var f = data.fixtures || {};
+        var fixtureRows = Object.keys(f).map(function(k) {
+          var v = f[k];
+          if (v == null || v === '') return '';
+          return '<tr><td>' + escapeHtml(k) + '</td><td>' + v + '</td></tr>';
+        }).filter(Boolean).join('');
+
+        var takeoffRows = (data.takeoff || []).map(function(t) {
+          return '<tr><td>' + escapeHtml(t.desc) + '</td><td>' + escapeHtml(t.qty) + '</td></tr>';
+        }).join('') || '<tr><td colspan="2">—</td></tr>';
+
+        var labourTotal = (totals && totals.labor) || 0;
+        var labourMult = CREW_MULTIPLIERS[parseInt(data.crewSize, 10)] || 1;
+
+        return (
+          '<div class="preview-header">' +
+            '<div class="preview-logo" aria-hidden="true"></div>' +
+            '<h1>Click Plumbing and Electrical</h1>' +
+            '<p class="preview-meta">Bid # ' + escapeHtml(data.bidNumber) + ' — ' + escapeHtml(data.bidDate) + '</p>' +
+          '</div>' +
+          '<div class="preview-section">' +
+            '<h3>Customer &amp; Job</h3>' +
+            '<p><strong>' + escapeHtml(data.customerName) + '</strong><br>' + escapeHtml(data.jobAddress) + '<br>Job type: ' + escapeHtml(data.jobType) + '</p>' +
+          '</div>' +
+          '<div class="preview-section">' +
+            '<h3>Fixture Summary</h3>' +
+            '<table class="preview-table"><thead><tr><th>Item</th><th>Qty</th></tr></thead><tbody>' + fixtureRows + '</tbody></table>' +
+          '</div>' +
+          '<div class="preview-section">' +
+            '<h3>Material Highlights</h3>' +
+            '<table class="preview-table"><thead><tr><th>Item</th><th>Qty</th></tr></thead><tbody>' + takeoffRows + '</tbody></table>' +
+          '</div>' +
+          '<div class="preview-section">' +
+            '<h3>Labor Summary</h3>' +
+            '<p>Hours: ' + (data.laborHours || 0) + ' × Rate $' + (data.laborRate || 0) + '/hr × Crew ' + (data.crewSize || 1) + ' (mult ×' + labourMult + ') = $' + labourTotal.toFixed(2) + '</p>' +
+          '</div>' +
+          '<div class="preview-section">' +
+            '<h3>Pricing Breakdown</h3>' +
+            '<table class="preview-table">' +
+              '<tr><th>Materials</th><th>Labor</th><th>Overhead</th><th>Profit</th><th>Total</th></tr>' +
+              '<tr><td>$' + (totals.materials || 0).toFixed(2) + '</td><td>$' + (totals.labor || 0).toFixed(2) + '</td><td>$' + (totals.overhead || 0).toFixed(2) + '</td><td>$' + (totals.profit || 0).toFixed(2) + '</td><td><strong>$' + (totals.total || 0).toFixed(2) + '</strong></td></tr>' +
+            '</table>' +
+            (data.allowances ? '<p><strong>Allowances / Alternates:</strong> ' + escapeHtml(data.allowances) + '</p>' : '') +
+          '</div>' +
+          '<div class="preview-section">' +
+            '<p class="grand-total">Grand Total: $' + (totals.total || 0).toFixed(2) + '</p>' +
+          '</div>' +
+          (data.scopeNotes ? '<div class="preview-section"><h3>Notes / Exclusions</h3><p>' + escapeHtml(data.scopeNotes).replace(/\n/g, '<br>') + '</p></div>' : '')
+        );
+      }
+
+      function escapeHtml(s) {
+        if (s == null) return '';
+        var div = document.createElement('div');
+        div.textContent = s;
+        return div.innerHTML;
+      }
+
+      function validateForm() {
+        var ok = true;
+        requiredIds.forEach(function(id) {
+          var el = $(id);
+          if (!el) return;
+          if (!getStr(id)) { el.classList.add('error'); ok = false; } else { el.classList.remove('error'); }
+        });
+        return ok;
+      }
+
+      function onGeneratePreview() {
+        if (!validateForm()) {
+          alert('Please fill in required fields: Customer Name, Job Address, Bid Date, Bid Number.');
+          return;
+        }
+        updatePreview();
+      }
+
+      function onPrint() {
+        if (!validateForm()) {
+          alert('Please fill in required fields before printing.');
+          return;
+        }
+        updatePreview();
+        setTimeout(function() { window.print(); }, 100);
+      }
+
+      function exportToPDF() {
+        if (!validateForm()) {
+          alert('Please fill in required fields before exporting.');
+          return;
+        }
+        updatePreview();
+        try {
+          var JsPDF = window.jspdf.jsPDF;
+          var doc = new JsPDF({ orientation: 'portrait', unit: 'pt', format: 'letter' });
+          var margin = 40;
+          var maxWidth = 520;
+          var y = 40;
+          var lineHeight = 14;
+
+          doc.setFontSize(16);
+          doc.text('Click Plumbing and Electrical', margin, y);
+          y += 20;
+          doc.setFontSize(10);
+          var data = collectFormData();
+          var totals = calculateTotals();
+          doc.text('Bid # ' + data.bidNumber + ' — ' + data.bidDate, margin, y);
+          y += lineHeight + 4;
+          doc.text('Customer: ' + data.customerName, margin, y);
+          y += lineHeight;
+          doc.text('Address: ' + data.jobAddress, margin, y);
+          y += lineHeight;
+          doc.text('Job type: ' + data.jobType, margin, y);
+          y += lineHeight + 8;
+
+          doc.setFontSize(11);
+          doc.text('Pricing Summary', margin, y);
+          y += lineHeight + 2;
+          doc.setFontSize(10);
+          doc.text('Materials: $' + (totals.materials || 0).toFixed(2), margin, y);
+          y += lineHeight;
+          doc.text('Labor: $' + (totals.labor || 0).toFixed(2), margin, y);
+          y += lineHeight;
+          doc.text('Overhead: $' + (totals.overhead || 0).toFixed(2), margin, y);
+          y += lineHeight;
+          doc.text('Profit: $' + (totals.profit || 0).toFixed(2), margin, y);
+          y += lineHeight;
+          doc.setFont(undefined, 'bold');
+          doc.text('Grand Total: $' + (totals.total || 0).toFixed(2), margin, y);
+          y += lineHeight + 6;
+
+          if (data.scopeNotes) {
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(11);
+            doc.text('Notes / Exclusions', margin, y);
+            y += lineHeight + 2;
+            doc.setFontSize(10);
+            var noteLines = doc.splitTextToSize(data.scopeNotes, maxWidth);
+            noteLines.forEach(function(line) {
+              if (y > 700) { doc.addPage(); y = 40; }
+              doc.text(line, margin, y);
+              y += lineHeight;
+            });
+          }
+
+          doc.save('bid-summary-' + (getStr('bidNumber') || 'export') + '.pdf');
+        } catch (e) {
+          console.error(e);
+          alert('PDF export failed. Try printing to PDF from the Print dialog instead.');
+        }
+      }
+
+      function addTakeoffRow() {
+        var container = $('takeoffRows');
+        var row = document.createElement('div');
+        row.className = 'takeoff-row';
+        row.innerHTML = '<input type="text" placeholder="Item (e.g. Copper pipe 1/2\")" class="takeoff-desc"> <input type="text" placeholder="Qty" class="takeoff-qty"> <button type="button" class="takeoff-remove" aria-label="Remove row">Remove</button>';
+        container.appendChild(row);
+        row.querySelector('.takeoff-remove').addEventListener('click', function() {
+          if (qsa('.takeoff-row').length > 1) row.remove();
+        });
+      }
+
+      function setupIncrementDecrement() {
+        document.body.addEventListener('click', function(e) {
+          var btn = e.target;
+          if (btn.tagName !== 'BUTTON' || !btn.getAttribute('data-target')) return;
+          var id = btn.getAttribute('data-target');
+          var input = $(id);
+          if (!input || input.type !== 'number') return;
+          var step = parseFloat(input.step) || 1;
+          var val = parseFloat(input.value) || 0;
+          if (btn.getAttribute('aria-label') === 'Increase') input.value = Math.max(0, val + step);
+          else input.value = Math.max(0, val - step);
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+      }
+
+      function clearForm() {
+        document.getElementById('bidForm').reset();
+        setDefaultDate();
+        qsa('.takeoff-row').forEach(function(row, i) {
+          if (i > 0) row.remove();
+        });
+        qsa('.takeoff-desc').forEach(function(el) { el.value = ''; });
+        qsa('.takeoff-qty').forEach(function(el) { el.value = ''; });
+        requiredIds.forEach(function(id) { var el = $(id); if (el) el.classList.remove('error'); });
+        calculateTotals();
+        $('preview').classList.remove('visible');
+        $('preview').innerHTML = '';
+      }
+
+      $('generatePreview').addEventListener('click', onGeneratePreview);
+      $('printBtn').addEventListener('click', onPrint);
+      $('exportPdf').addEventListener('click', exportToPDF);
+      $('addTakeoffRow').addEventListener('click', addTakeoffRow);
+      $('clearBtn').addEventListener('click', clearForm);
+
+      qsa('input, select, textarea').forEach(function(el) {
+        el.addEventListener('input', calculateTotals);
+        el.addEventListener('change', calculateTotals);
+      });
+      setupIncrementDecrement();
+
+      document.addEventListener('DOMContentLoaded', function() {
+        calculateTotals();
+      });
+      calculateTotals();
+    })();
+  </script>
+</body>
+</html>
