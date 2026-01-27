@@ -163,6 +163,20 @@
             </select>
           </div>
         </div>
+        <div class="form-row">
+          <div class="field">
+            <label for="planName">Plan Name</label>
+            <input type="text" id="planName" name="planName" placeholder="Plan name">
+          </div>
+          <div class="field">
+            <label for="planIssueDate">Plan Issue Date</label>
+            <input type="date" id="planIssueDate" name="planIssueDate">
+          </div>
+          <div class="field">
+            <label for="planTitle">Plan Title</label>
+            <input type="text" id="planTitle" name="planTitle" placeholder="Plan title">
+          </div>
+        </div>
       </div>
 
       <div class="section">
@@ -462,6 +476,9 @@
           bidDate: getStr('bidDate'),
           bidNumber: getStr('bidNumber'),
           jobType: ($('jobType') || {}).value || 'Residential remodel',
+          planName: getStr('planName'),
+          planIssueDate: getStr('planIssueDate'),
+          planTitle: getStr('planTitle'),
           fixtures: fixtureIds.reduce(function(o, id) {
             var label = id.replace('fixture', '').replace(/([A-Z])/g, ' $1').trim();
             o[label] = getNum(id);
@@ -503,7 +520,8 @@
           '</div>' +
           '<div class="preview-section">' +
             '<h3>Customer &amp; Job</h3>' +
-            '<p><strong>' + escapeHtml(data.customerName) + '</strong><br>' + escapeHtml(data.jobAddress) + '<br>Job type: ' + escapeHtml(data.jobType) + '</p>' +
+            '<p><strong>' + escapeHtml(data.customerName) + '</strong><br>' + escapeHtml(data.jobAddress) + '<br>Job type: ' + escapeHtml(data.jobType) +
+            (data.planTitle || data.planName || data.planIssueDate ? '<br>Plans: ' + [data.planTitle, data.planName, data.planIssueDate].filter(Boolean).map(escapeHtml).join(' — ') : '') + '</p>' +
           '</div>' +
           '<div class="preview-section">' +
             '<h3>Fixture Summary</h3>' +
@@ -593,7 +611,11 @@
           doc.text('Address: ' + data.jobAddress, margin, y);
           y += lineHeight;
           doc.text('Job type: ' + data.jobType, margin, y);
-          y += lineHeight + 8;
+          y += lineHeight;
+          if (data.planTitle) { doc.text('Plan Title: ' + data.planTitle, margin, y); y += lineHeight; }
+          if (data.planName) { doc.text('Plan Name: ' + data.planName, margin, y); y += lineHeight; }
+          if (data.planIssueDate) { doc.text('Plan Issue Date: ' + data.planIssueDate, margin, y); y += lineHeight; }
+          y += 8;
 
           doc.setFontSize(11);
           doc.text('Pricing Summary', margin, y);
