@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <title>Plumbing Bid Worksheet - Click Plumbing and Electrical</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -25,6 +26,7 @@
       padding: 1rem;
     }
     .container { max-width: 960px; margin: 0 auto; }
+    .app-top-bar { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 1rem; }
     h1, h2, h3 { color: var(--primary); margin-top: 0; }
     h2 { font-size: 1.25rem; border-bottom: 2px solid var(--secondary); padding-bottom: 0.25rem; margin-bottom: 1rem; }
     .section {
@@ -71,6 +73,26 @@
     .takeoff-row .takeoff-desc { flex: 2; min-width: 0; }
     .takeoff-row .takeoff-qty { flex: 1; min-width: 80px; }
     .takeoff-row button { flex-shrink: 0; padding: 0.5rem; cursor: pointer; border: 1px solid var(--border); background: #fff; border-radius: 6px; color: var(--error); }
+    .additional-labor-row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center; }
+    .additional-labor-row .additional-labor-desc { flex: 2; min-width: 0; }
+    .additional-labor-row .additional-labor-hours { flex: 0 0 5rem; max-width: 6rem; }
+    .additional-labor-row .additional-labor-crew { flex: 0 0 4rem; max-width: 4rem; }
+    .additional-labor-row .additional-labor-rate { flex: 0 0 5.5rem; max-width: 6rem; }
+    .additional-labor-row .additional-labor-remove { flex-shrink: 0; padding: 0.5rem; cursor: pointer; border: 1px solid var(--border); background: #fff; border-radius: 6px; color: var(--error); }
+    .additional-labor-header { display: flex; gap: 0.5rem; margin-bottom: 0.25rem; align-items: center; font-size: 0.875rem; font-weight: 500; color: #555; }
+    .additional-labor-header .additional-labor-hdr-desc { flex: 2; min-width: 0; }
+    .additional-labor-header .additional-labor-hdr-hours { flex: 0 0 5rem; max-width: 6rem; text-align: center; }
+    .additional-labor-header .additional-labor-hdr-crew { flex: 0 0 4rem; max-width: 4rem; text-align: center; }
+    .additional-labor-header .additional-labor-hdr-rate { flex: 0 0 5.5rem; max-width: 6rem; text-align: center; }
+    .additional-labor-header .additional-labor-hdr-remove { flex-shrink: 0; width: 5rem; }
+    .additional-material-row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center; }
+    .additional-material-row .additional-material-desc { flex: 2; min-width: 0; }
+    .additional-material-row .additional-material-amount { flex: 0 0 6rem; max-width: 7rem; }
+    .additional-material-row .additional-material-remove { flex-shrink: 0; padding: 0.5rem; cursor: pointer; border: 1px solid var(--border); background: #fff; border-radius: 6px; color: var(--error); }
+    .additional-material-header { display: flex; gap: 0.5rem; margin-bottom: 0.25rem; align-items: center; font-size: 0.875rem; font-weight: 500; color: #555; }
+    .additional-material-header .additional-material-hdr-desc { flex: 2; min-width: 0; }
+    .additional-material-header .additional-material-hdr-amount { flex: 0 0 6rem; max-width: 7rem; text-align: center; }
+    .additional-material-header .additional-material-hdr-remove { flex-shrink: 0; width: 5rem; }
     .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.5rem 0; }
     .btn {
       padding: 0.75rem 1.25rem;
@@ -99,7 +121,8 @@
     #preview.visible { display: block; }
     .preview-header { text-align: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid var(--primary); }
     .preview-header h1 { font-size: 1.5rem; margin: 0; }
-    .preview-logo { width: 80px; height: 80px; background: var(--bg); border: 1px dashed var(--border); margin: 0 auto 0.5rem; border-radius: 8px; }
+    .preview-logo { width: 80px; height: 80px; margin: 0 auto 0.5rem; }
+    .preview-logo svg { width: 100%; height: 100%; display: block; }
     .preview-meta { font-size: 0.9rem; color: #666; }
     .preview-section { margin-bottom: 1.25rem; }
     .preview-section h3 { font-size: 1rem; margin-bottom: 0.5rem; color: var(--primary); }
@@ -107,6 +130,50 @@
     .preview-table th, .preview-table td { border: 1px solid var(--border); padding: 0.5rem 0.75rem; text-align: left; }
     .preview-table th { background: var(--bg); font-weight: 600; }
     .grand-total { font-size: 1.5rem; font-weight: 700; color: var(--primary); margin-top: 1rem; padding: 1rem; background: var(--bg); border-radius: 8px; text-align: right; }
+    .fixture-header-row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+    .fixture-header-row h2 { margin-bottom: 0; }
+    .fixture-plan-page-wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+    .fixture-plan-page-wrap label { margin-bottom: 0; margin-right: 0; }
+    .fixture-plan-page-wrap input { width: auto; min-width: 140px; max-width: 200px; }
+    .fixture-section-wrap { display: flex; gap: 1.5rem; align-items: flex-start; }
+    .fixture-form-col { flex: 1; min-width: 0; }
+    .fixture-ledger-col { flex: 0 0 280px; background: var(--bg); border-radius: 8px; padding: 1rem; border: 1px solid var(--border); }
+    .fixture-ledger-col h3 { font-size: 1rem; margin-bottom: 0.75rem; }
+    .fixture-ledger-list { max-height: 400px; overflow-y: auto; }
+    .fixture-ledger-item { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+    .fixture-ledger-item:last-child { border-bottom: none; }
+    .fixture-ledger-item-name { font-weight: 500; flex: 1 1 100%; }
+    .fixture-ledger-item-meta { font-size: 0.8rem; color: #666; margin-bottom: 0.25rem; }
+    .fixture-ledger-item-actions { display: flex; gap: 0.35rem; }
+    .fixture-ledger-item-actions .btn { padding: 0.35rem 0.6rem; font-size: 0.85rem; }
+    .fixture-ledger-empty { color: #666; font-size: 0.9rem; padding: 0.5rem 0; }
+    .fixture-price-reference { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+    .fixture-price-details { border: 1px solid var(--border); border-radius: 8px; padding: 0 0.75rem 0 0; }
+    .fixture-price-details[open] { padding-bottom: 0.75rem; }
+    .fixture-price-summary { font-size: 1rem; font-weight: 600; color: var(--primary); cursor: pointer; padding: 0.5rem 0; list-style: none; user-select: none; }
+    .fixture-price-summary::-webkit-details-marker { display: none; }
+    .fixture-price-summary::before { content: '▸ '; display: inline-block; transition: transform 0.2s; }
+    .fixture-price-details[open] .fixture-price-summary::before { transform: rotate(90deg); }
+    .fixture-price-details-content { margin-top: 0.5rem; }
+    .fixture-labor-details { border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem; }
+    .fixture-labor-summary { padding: 0; margin: 0; }
+    .fixture-labor-breakdown { margin-top: 0.5rem; font-size: 0.9rem; color: #555; }
+    .fixture-labor-breakdown p { margin: 0.25rem 0; }
+    .fixture-cost-toggle { cursor: pointer; }
+    .crew-pricing-link { background: none; border: none; padding: 0; font: inherit; color: var(--secondary); cursor: pointer; text-decoration: underline; }
+    .additional-labor-title-row .crew-pricing-link { margin-left: auto; }
+    .crew-pricing-link:hover { color: #004499; }
+    .additional-labor-title-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 1rem; margin-bottom: 0; }
+    .additional-labor-title-row > p { flex: 1; min-width: 0; }
+    .additional-labor-title-row .crew-pricing-details { flex-shrink: 0; margin: 0; }
+    #crewPricingDetails .fixture-price-details-content label { display: inline-block; min-width: 4rem; text-align: center; }
+    #crewPricingDetails summary { display: none; }
+    .fixture-price-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .fixture-price-table th, .fixture-price-table td { border: 1px solid var(--border); padding: 0.4rem 0.6rem; text-align: left; }
+    .fixture-price-table th { background: var(--bg); font-weight: 600; }
+    .fixture-price-table tbody tr:nth-child(even) { background: rgba(0,0,0,0.03); }
+    .fixture-price-input { width: 4.5rem; max-width: 100%; padding: 0.35rem 0.5rem; font-size: 0.9rem; border: 1px solid var(--border); border-radius: 6px; }
+    .fixture-price-table .fixture-price-input { box-sizing: border-box; }
     @media (max-width: 768px) {
       body { padding: 0.75rem; }
       .section { padding: 1rem; }
@@ -117,8 +184,16 @@
       .form-row { flex-direction: column; }
       .fixture-grid { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
       .takeoff-row { flex-wrap: wrap; }
+      .additional-labor-row { flex-wrap: wrap; }
+      .additional-labor-header { flex-wrap: wrap; }
+      .additional-material-row { flex-wrap: wrap; }
+      .additional-material-header { flex-wrap: wrap; }
       .actions { flex-direction: column; }
       .actions .btn { width: 100%; }
+      .fixture-section-wrap { flex-direction: column; }
+      .fixture-ledger-col { flex: 1 1 100%; max-width: none; }
+      .fixture-header-row { flex-direction: column; align-items: stretch; }
+      .fixture-plan-page-wrap input { max-width: none; }
     }
     @media print {
       body { background: #fff; padding: 0; }
@@ -130,6 +205,9 @@
 </head>
 <body>
   <div class="container">
+    <div class="app-top-bar no-print">
+      <button type="button" id="fillSample" class="btn btn-outline">Fill with sample</button>
+    </div>
     <form id="bidForm" class="no-print">
       <div class="section">
         <h2>Job Information</h2>
@@ -179,8 +257,17 @@
         </div>
       </div>
 
-      <div class="section">
-        <h2>Fixture Counts</h2>
+      <div class="section" id="fixtureCountsSection">
+        <div class="fixture-header-row">
+          <h2>Fixture Counts</h2>
+          <div class="fixture-plan-page-wrap">
+            <label for="fixturePlanPageName">Plan page:</label>
+            <input type="text" id="fixturePlanPageName" name="fixturePlanPageName" placeholder="e.g. A-101, Floor 2">
+            <button type="button" id="saveToLedger" class="btn btn-secondary">Save to ledger</button>
+          </div>
+        </div>
+        <div class="fixture-section-wrap">
+          <div class="fixture-form-col">
         <p><strong>Total fixtures: <span id="totalFixtures">0</span></strong></p>
         <h3>Bathrooms</h3>
         <div class="fixture-grid" id="fixturesBathrooms">
@@ -259,6 +346,22 @@
               <button type="button" aria-label="Increase" data-target="fixtureDisposals">+</button>
             </div>
           </div>
+          <div class="fixture-item">
+            <label for="fixtureIceMakers">Ice makers</label>
+            <div class="number-input-wrap">
+              <button type="button" aria-label="Decrease" data-target="fixtureIceMakers">−</button>
+              <input type="number" id="fixtureIceMakers" name="fixtureIceMakers" min="0" value="0">
+              <button type="button" aria-label="Increase" data-target="fixtureIceMakers">+</button>
+            </div>
+          </div>
+          <div class="fixture-item">
+            <label for="fixturePotFiller">Pot filler</label>
+            <div class="number-input-wrap">
+              <button type="button" aria-label="Decrease" data-target="fixturePotFiller">−</button>
+              <input type="number" id="fixturePotFiller" name="fixturePotFiller" min="0" value="0">
+              <button type="button" aria-label="Increase" data-target="fixturePotFiller">+</button>
+            </div>
+          </div>
         </div>
         <h3>Laundry</h3>
         <div class="fixture-grid">
@@ -270,6 +373,14 @@
               <button type="button" aria-label="Increase" data-target="fixtureLaundrySinks">+</button>
             </div>
           </div>
+          <div class="fixture-item">
+            <label for="fixtureWashingMachine">Washing machine</label>
+            <div class="number-input-wrap">
+              <button type="button" aria-label="Decrease" data-target="fixtureWashingMachine">−</button>
+              <input type="number" id="fixtureWashingMachine" name="fixtureWashingMachine" min="0" value="0">
+              <button type="button" aria-label="Increase" data-target="fixtureWashingMachine">+</button>
+            </div>
+          </div>
         </div>
         <h3>Plumbing Fixtures</h3>
         <div class="fixture-grid">
@@ -279,6 +390,30 @@
               <button type="button" aria-label="Decrease" data-target="fixtureHoseBibs">−</button>
               <input type="number" id="fixtureHoseBibs" name="fixtureHoseBibs" min="0" value="0">
               <button type="button" aria-label="Increase" data-target="fixtureHoseBibs">+</button>
+            </div>
+          </div>
+          <div class="fixture-item">
+            <label for="fixtureGasDrops">Gas drops</label>
+            <div class="number-input-wrap">
+              <button type="button" aria-label="Decrease" data-target="fixtureGasDrops">−</button>
+              <input type="number" id="fixtureGasDrops" name="fixtureGasDrops" min="0" value="0">
+              <button type="button" aria-label="Increase" data-target="fixtureGasDrops">+</button>
+            </div>
+          </div>
+          <div class="fixture-item">
+            <label for="fixtureFloorDrains">Floor drains</label>
+            <div class="number-input-wrap">
+              <button type="button" aria-label="Decrease" data-target="fixtureFloorDrains">−</button>
+              <input type="number" id="fixtureFloorDrains" name="fixtureFloorDrains" min="0" value="0">
+              <button type="button" aria-label="Increase" data-target="fixtureFloorDrains">+</button>
+            </div>
+          </div>
+          <div class="fixture-item">
+            <label for="fixtureDogWash">Dog wash</label>
+            <div class="number-input-wrap">
+              <button type="button" aria-label="Decrease" data-target="fixtureDogWash">−</button>
+              <input type="number" id="fixtureDogWash" name="fixtureDogWash" min="0" value="0">
+              <button type="button" aria-label="Increase" data-target="fixtureDogWash">+</button>
             </div>
           </div>
         </div>
@@ -308,11 +443,49 @@
               <button type="button" aria-label="Increase" data-target="fixtureWHTankless">+</button>
             </div>
           </div>
+          <div class="fixture-item">
+            <label for="fixtureWaterSoftener">Water softener</label>
+            <div class="number-input-wrap">
+              <button type="button" aria-label="Decrease" data-target="fixtureWaterSoftener">−</button>
+              <input type="number" id="fixtureWaterSoftener" name="fixtureWaterSoftener" min="0" value="0">
+              <button type="button" aria-label="Increase" data-target="fixtureWaterSoftener">+</button>
+            </div>
+          </div>
+        </div>
+          </div>
+          <div class="fixture-ledger-col">
+            <h3>Plan pages</h3>
+            <div id="fixtureLedgerList" class="fixture-ledger-list"></div>
+            <button type="button" id="exportCoverPage" class="btn btn-outline" style="margin-top: 0.75rem;">Export cover page</button>
+          </div>
+        </div>
+        <p style="margin-top: 1rem; margin-bottom: 0;">
+          <button type="button" id="clearFixtureCounts" class="btn btn-outline">Clear counts</button>
+        </p>
+        <div class="fixture-price-reference">
+          <details class="fixture-price-details">
+            <summary class="fixture-price-summary">Fixture Prices and Labor</summary>
+            <div class="fixture-price-details-content">
+          <table class="fixture-price-table" id="fixturePriceTable" aria-label="Fixture prices and labor">
+            <thead>
+              <tr>
+                <th>Fixture</th>
+                <th>Price</th>
+                <th>Rough in</th>
+                <th>Top out</th>
+                <th>Trim</th>
+              </tr>
+            </thead>
+            <tbody id="fixturePriceTableBody"></tbody>
+          </table>
+          <button type="button" id="resetFixturePrices" class="btn btn-outline" style="margin-top: 0.75rem;">Reset to default</button>
+            </div>
+          </details>
         </div>
       </div>
 
       <div class="section">
-        <h2>Material Takeoff Summary</h2>
+        <h2>Material Takeoff Summary (Under development for integration with PipeTooling.com)</h2>
         <div id="takeoffRows">
           <div class="takeoff-row">
             <input type="text" placeholder="Item (e.g. Copper pipe 1/2\")" class="takeoff-desc">
@@ -325,59 +498,82 @@
 
       <div class="section">
         <h2>Labor Estimate</h2>
-        <div class="form-row">
-          <div class="field">
-            <label for="laborHours">Estimated Hours</label>
-            <input type="number" id="laborHours" name="laborHours" min="0" step="0.5" value="0">
-          </div>
-          <div class="field">
-            <label for="crewSize">Crew Size (1–3)</label>
-            <select id="crewSize" name="crewSize">
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="daysOnSite">Days on Site</label>
-            <input type="number" id="daysOnSite" name="daysOnSite" min="0" value="0">
-          </div>
-          <div class="field">
-            <label for="laborRate">Labor Rate ($/hr)</label>
-            <input type="number" id="laborRate" name="laborRate" min="0" step="0.01" value="75">
+        <div class="fixture-labor-details" style="margin-bottom: 0.75rem;">
+          <p class="fixture-labor-heading" style="margin: 0 0 0.25rem 0; font-weight: 600;">Fixture labor</p>
+          <p class="fixture-labor-summary" style="margin: 0 0 0.5rem 0;"><strong><span id="fixtureLaborCount">0</span></strong><span id="fixtureLaborCountLabel"> Fixtures</span> / <strong><span id="fixtureLaborHours">0</span></strong> hours / <strong class="fixture-cost-toggle" id="fixtureLaborCostWrap" title="Click to toggle decimals">$<span id="fixtureLaborCost">0</span></strong></p>
+          <div class="fixture-labor-breakdown">
+            <p>Rough in: <strong><span id="fixtureLaborRoughIn">0</span></strong> hours</p>
+            <p>Top out: <strong><span id="fixtureLaborTopOut">0</span></strong> hours</p>
+            <p>Trim: <strong><span id="fixtureLaborTrim">0</span></strong> hours</p>
           </div>
         </div>
-        <p><strong>Labor total: $<span id="laborTotal">0.00</span></strong></p>
+        <div class="additional-labor-block" style="margin-bottom: 1rem;">
+          <div class="additional-labor-title-row">
+            <p style="margin: 0 0 0.5rem 0; font-weight: 500;">Additional labor (work other than fixtures)</p>
+            <details class="fixture-price-details crew-pricing-details" id="crewPricingDetails">
+              <summary class="fixture-price-summary">Crew pricing ($/hr)</summary>
+              <div class="fixture-price-details-content">
+                <p style="margin: 0.5rem 0 0.25rem 0;"><label for="crewRate1">1 Tech</label><input type="number" id="crewRate1" name="crewRate1" min="0" step="0.01" value="275" style="max-width: 6rem;"> $/hr</p>
+                <p style="margin: 0.25rem 0;"><label for="crewRate2">2 Techs</label><input type="number" id="crewRate2" name="crewRate2" min="0" step="0.01" value="350" style="max-width: 6rem;"> $/hr</p>
+                <p style="margin: 0.25rem 0 0.5rem 0;"><label for="crewRate3">3 Techs</label><input type="number" id="crewRate3" name="crewRate3" min="0" step="0.01" value="500" style="max-width: 6rem;"> $/hr</p>
+              </div>
+            </details>
+            <button type="button" class="crew-pricing-link" id="openCrewPricing" aria-expanded="false">[Crew Pricing]</button>
+          </div>
+          <div class="additional-labor-header" aria-hidden="true">
+            <span class="additional-labor-hdr-desc">Description</span>
+            <span class="additional-labor-hdr-hours">Hours</span>
+            <span class="additional-labor-hdr-crew">Crew</span>
+            <span class="additional-labor-hdr-rate">Rate</span>
+            <span class="additional-labor-hdr-remove"></span>
+          </div>
+          <div id="additionalLaborRows">
+            <div class="additional-labor-row">
+              <input type="text" class="additional-labor-desc" placeholder="Description (e.g. Demo, Underground, Prep)">
+              <input type="number" class="additional-labor-hours" min="0" step="0.5" placeholder="Hrs" title="Hours">
+              <select class="additional-labor-crew" title="Crew size">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+              </select>
+              <input type="number" class="additional-labor-rate" min="0" step="0.01" placeholder="Rate" title="Labor rate $/hr">
+              <button type="button" class="additional-labor-remove" aria-label="Remove row">Remove</button>
+            </div>
+          </div>
+          <button type="button" id="addAdditionalLaborRow" class="btn btn-outline" style="margin-top: 0.5rem;">Add row</button>
+        </div>
+        <p><strong>Labor total (Hours • Crew • Rate): $<span id="laborTotal">0.00</span></strong></p>
       </div>
 
       <div class="section">
         <h2>Pricing</h2>
-        <div class="form-row">
-          <div class="field">
-            <label for="materialSubtotal">Material Subtotal ($)</label>
-            <input type="number" id="materialSubtotal" name="materialSubtotal" min="0" step="0.01" value="0">
-          </div>
-          <div class="field">
-            <label for="overheadPct">Overhead %</label>
-            <input type="number" id="overheadPct" name="overheadPct" min="0" step="0.5" value="12">
-          </div>
-          <div class="field">
-            <label for="profitPct">Profit %</label>
-            <input type="number" id="profitPct" name="profitPct" min="0" step="0.5" value="18">
+        <p style="margin-bottom: 0.5rem; font-weight: 500;">Additional materials</p>
+        <div class="additional-material-header" aria-hidden="true">
+          <span class="additional-material-hdr-desc">Description</span>
+          <span class="additional-material-hdr-amount">Amount</span>
+          <span class="additional-material-hdr-remove"></span>
+        </div>
+        <div id="additionalMaterialRows">
+          <div class="additional-material-row">
+            <input type="text" class="additional-material-desc" placeholder="Description (e.g. Pipe, Fittings)">
+            <input type="number" class="additional-material-amount" min="0" step="0.01" placeholder="Amount" title="Amount ($)">
+            <button type="button" class="additional-material-remove" aria-label="Remove row">Remove</button>
           </div>
         </div>
-        <div class="field" style="margin-top: 1rem;">
-          <label for="allowances">Allowances / Alternates</label>
-          <textarea id="allowances" name="allowances" rows="2" placeholder="Optional"></textarea>
+        <button type="button" id="addAdditionalMaterialRow" class="btn btn-outline" style="margin-top: 0.5rem;">Add row</button>
+        <div class="form-row" style="margin-top: 1rem;">
+          <div class="field">
+            <label for="markupPct">Markup %</label>
+            <input type="number" id="markupPct" name="markupPct" min="0" step="0.5" value="30" title="Markup">
+          </div>
         </div>
         <div class="preview-section" style="margin-top: 1rem;">
           <table class="preview-table">
-            <tr><th>Materials</th><th>Labor</th><th>Overhead</th><th>Profit</th><th>Total</th></tr>
+            <tr><th>Materials</th><th>Labor</th><th>Markup</th><th>Total</th></tr>
             <tr>
               <td>$<span id="calcMaterials">0.00</span></td>
               <td>$<span id="calcLabor">0.00</span></td>
-              <td>$<span id="calcOH">0.00</span></td>
-              <td>$<span id="calcProfit">0.00</span></td>
+              <td>$<span id="calcMarkup">0.00</span></td>
               <td><strong>$<span id="calcTotal">0.00</span></strong></td>
             </tr>
           </table>
@@ -419,39 +615,204 @@
       var fixtureIds = [
         'fixtureToilets', 'fixtureBathSinks', 'fixtureShowerTub', 'fixtureShowerOnly', 'fixtureTubs',
         'fixtureUrinals', 'fixtureWaterClosets', 'fixtureKitchenSinks', 'fixtureDisposals',
-        'fixtureLaundrySinks', 'fixtureHoseBibs', 'fixtureWHGas', 'fixtureWHElectric', 'fixtureWHTankless'
+        'fixtureIceMakers', 'fixturePotFiller',
+        'fixtureLaundrySinks', 'fixtureWashingMachine',
+        'fixtureHoseBibs', 'fixtureGasDrops', 'fixtureFloorDrains', 'fixtureDogWash',
+        'fixtureWHGas', 'fixtureWHElectric', 'fixtureWHTankless', 'fixtureWaterSoftener'
       ];
 
       function getNum(id) { const el = $(id); return el ? (parseFloat(el.value) || 0) : 0; }
       function getStr(id) { const el = $(id); return el ? (el.value || '').trim() : ''; }
 
+      function formatNum(n, decimals) {
+        return (parseFloat(n) || 0).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+      }
+
+      function formatFixtureCostShort(n) {
+        var s = (parseFloat(n) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        return s.replace(/\.?0+$/, '');
+      }
+
       function totalFixtures() {
+        var ledger = getFixtureLedger();
+        if (ledger.length > 0) {
+          var fixtureLabels = fixtureIds.map(function(id) {
+            return id.replace('fixture', '').replace(/([A-Z])/g, ' $1').trim();
+          });
+          var sum = 0;
+          fixtureLabels.forEach(function(label) {
+            for (var j = 0; j < ledger.length; j++) {
+              var f = ledger[j].fixtures || {};
+              var val = f[label];
+              sum += (val != null && val !== '') ? (parseInt(val, 10) || 0) : 0;
+            }
+          });
+          return sum;
+        }
         return fixtureIds.reduce(function(sum, id) { return sum + (getNum(id) || 0); }, 0);
       }
 
-      function calculateTotals() {
-        var materials = getNum('materialSubtotal');
-        var hours = getNum('laborHours');
-        var rate = getNum('laborRate');
-        var crew = parseInt($('crewSize').value, 10) || 1;
-        var mult = CREW_MULTIPLIERS[crew] || 1;
-        var labor = hours * rate * mult;
-        var base = materials + labor;
-        var ohPct = getNum('overheadPct') || 0;
-        var profitPct = getNum('profitPct') || 0;
-        var overhead = base * (ohPct / 100);
-        var profit = (base + overhead) * (profitPct / 100);
-        var total = base + overhead + profit;
+      var fixtureLabelToId = (function() {
+        var m = {};
+        fixtureIds.forEach(function(id) {
+          var label = id.replace('fixture', '').replace(/([A-Z])/g, ' $1').trim();
+          m[label] = id;
+        });
+        return m;
+      })();
 
-        $('totalFixtures').textContent = totalFixtures();
-        $('laborTotal').textContent = labor.toFixed(2);
-        $('calcMaterials').textContent = materials.toFixed(2);
-        $('calcLabor').textContent = labor.toFixed(2);
-        $('calcOH').textContent = overhead.toFixed(2);
-        $('calcProfit').textContent = profit.toFixed(2);
-        $('calcTotal').textContent = total.toFixed(2);
-        $('grandTotal').textContent = total.toFixed(2);
-        return { materials, labor, overhead, profit, total };
+      var FIXTURE_PRICES = {
+        fixtureToilets:            { label: 'Toilet',                       price: 650,   roughIn: 1,   topOut: 1,   trim: 1 },
+        fixtureBathSinks:          { label: 'Bathroom sinks',               price: 275,   roughIn: 1,   topOut: 1,   trim: 1,   note: 'no sink included' },
+        fixtureKitchenSinks:       { label: 'Kitchen sink',                 price: 425,   roughIn: 1,   topOut: 1,   trim: 2,   note: 'no sink or faucet included' },
+        fixtureDisposals:          { label: 'Garbage Disposal',             price: 350,   roughIn: 0,   topOut: 0,   trim: 1 },
+        fixtureUrinals:            { label: 'Urinal and valve',             price: 950,   roughIn: 1,   topOut: 3,   trim: 3 },
+        fixtureTubs:               { label: 'Bath tub and valve',           price: 2000,  roughIn: 1,   topOut: 2,   trim: 1 },
+        fixtureShowerOnly:         { label: 'Shower only',                  price: 2450,  roughIn: 1,   topOut: 2.5, trim: 1 },
+        fixtureShowerTub:          { label: 'Shower tub combo',             price: 3650,  roughIn: 1,   topOut: 3,   trim: 1,   note: 'no wall kit included' },
+        fixtureLaundrySinks:       { label: 'Laundry sink',                 price: 425,   roughIn: 1,   topOut: 1,   trim: 1,   note: 'no sink or faucet included' },
+        fixtureHoseBibs:           { label: 'Hose bib',                     price: 500,   roughIn: 1,   topOut: 1,   trim: 0.5 },
+        fixtureWHGas:              { label: 'Water heater',                 price: 1200,  roughIn: 1,   topOut: 2,   trim: 2 },
+        fixtureWHElectric:         { label: 'Water heater (electric)',      price: 1200,  roughIn: 1,   topOut: 2,   trim: 2 },
+        fixtureWHTankless:         { label: 'Tankless Water Heater',        price: 3650,  roughIn: 1,   topOut: 3,   trim: 2 },
+        fixtureGasDrops:           { label: 'Gas drops',                    price: 1000,  roughIn: 3,   topOut: 1,   trim: 0 }
+      };
+      var DEFAULT_FIXTURE_PRICES = JSON.parse(JSON.stringify(FIXTURE_PRICES));
+
+      var FIXTURE_LEDGER_KEY = 'bidtoolingFixtureLedger';
+      function getFixtureLedger() {
+        try {
+          return JSON.parse(localStorage.getItem(FIXTURE_LEDGER_KEY) || '[]');
+        } catch (e) {
+          return [];
+        }
+      }
+      function setFixtureLedger(entries) {
+        localStorage.setItem(FIXTURE_LEDGER_KEY, JSON.stringify(entries));
+      }
+      function collectCurrentFixtures() {
+        return fixtureIds.reduce(function(o, id) {
+          var label = id.replace('fixture', '').replace(/([A-Z])/g, ' $1').trim();
+          o[label] = getNum(id);
+          return o;
+        }, {});
+      }
+
+      function getAdditionalLaborHours() {
+        var sum = 0;
+        qsa('.additional-labor-hours').forEach(function(el) {
+          sum += parseFloat(el.value) || 0;
+        });
+        return sum;
+      }
+
+      function getFixtureLaborTotals() {
+        var fixtureLabels = fixtureIds.map(function(id) {
+          return id.replace('fixture', '').replace(/([A-Z])/g, ' $1').trim();
+        });
+        var totalRoughIn = 0, totalTopOut = 0, totalTrim = 0;
+        var ledger = getFixtureLedger();
+        if (ledger.length > 0) {
+          fixtureLabels.forEach(function(label, idx) {
+            var priceRow = FIXTURE_PRICES[fixtureIds[idx]];
+            if (!priceRow) return;
+            var totalQty = 0;
+            for (var j = 0; j < ledger.length; j++) {
+              var f = ledger[j].fixtures || {};
+              var val = f[label];
+              totalQty += (val != null && val !== '') ? (parseInt(val, 10) || 0) : 0;
+            }
+            totalRoughIn += totalQty * priceRow.roughIn;
+            totalTopOut += totalQty * priceRow.topOut;
+            totalTrim += totalQty * priceRow.trim;
+          });
+        } else {
+          fixtureIds.forEach(function(id, idx) {
+            var priceRow = FIXTURE_PRICES[id];
+            if (!priceRow) return;
+            var qty = getNum(id) || 0;
+            totalRoughIn += qty * priceRow.roughIn;
+            totalTopOut += qty * priceRow.topOut;
+            totalTrim += qty * priceRow.trim;
+          });
+        }
+        var total = totalRoughIn + totalTopOut + totalTrim;
+        return { roughIn: totalRoughIn, topOut: totalTopOut, trim: totalTrim, total: total };
+      }
+
+      function getFixtureCostTotal() {
+        var total = 0;
+        var fixtureLabels = fixtureIds.map(function(id) {
+          return id.replace('fixture', '').replace(/([A-Z])/g, ' $1').trim();
+        });
+        var ledger = getFixtureLedger();
+        if (ledger.length > 0) {
+          fixtureLabels.forEach(function(label, idx) {
+            var priceRow = FIXTURE_PRICES[fixtureIds[idx]];
+            if (!priceRow) return;
+            var totalQty = 0;
+            for (var j = 0; j < ledger.length; j++) {
+              var f = ledger[j].fixtures || {};
+              var val = f[label];
+              totalQty += (val != null && val !== '') ? (parseInt(val, 10) || 0) : 0;
+            }
+            total += totalQty * (priceRow.price || 0);
+          });
+        } else {
+          fixtureIds.forEach(function(id) {
+            var priceRow = FIXTURE_PRICES[id];
+            if (!priceRow) return;
+            var qty = getNum(id) || 0;
+            total += qty * (priceRow.price || 0);
+          });
+        }
+        return total;
+      }
+
+      function calculateTotals() {
+        var materials = 0;
+        qsa('.additional-material-row').forEach(function(row) {
+          materials += parseFloat((row.querySelector('.additional-material-amount') || {}).value) || 0;
+        });
+        var fixtureLabor = getFixtureLaborTotals();
+        var fixtureCost = getFixtureCostTotal();
+        var additionalLaborCost = 0;
+        qsa('.additional-labor-row').forEach(function(row) {
+          var hours = parseFloat((row.querySelector('.additional-labor-hours') || {}).value) || 0;
+          var rowCrew = parseInt((row.querySelector('.additional-labor-crew') || {}).value, 10) || 1;
+          var rowRate = parseFloat((row.querySelector('.additional-labor-rate') || {}).value) || 0;
+          additionalLaborCost += hours * rowRate * (CREW_MULTIPLIERS[rowCrew] || 1);
+        });
+        var labor = additionalLaborCost;
+        var additionalHours = getAdditionalLaborHours();
+        var totalHours = fixtureLabor.total + additionalHours;
+        var base = materials + labor;
+        var markupPct = getNum('markupPct') || 0;
+        var markup = base * (markupPct / 100);
+        var total = base + markup;
+
+        var fixtureCount = totalFixtures();
+        $('totalFixtures').textContent = formatNum(fixtureCount, 0);
+        if ($('fixtureLaborCount')) $('fixtureLaborCount').textContent = formatNum(fixtureCount, 0);
+        if ($('fixtureLaborCountLabel')) $('fixtureLaborCountLabel').textContent = fixtureCount === 1 ? ' Fixture' : ' Fixtures';
+        if ($('fixtureLaborHours')) $('fixtureLaborHours').textContent = formatNum(fixtureLabor.total, 1);
+        var costEl = $('fixtureLaborCost');
+        if (costEl) {
+          var costRaw = fixtureCost;
+          costEl.setAttribute('data-raw-value', costRaw);
+          costEl.setAttribute('data-format', 'short');
+          costEl.textContent = formatFixtureCostShort(costRaw);
+        }
+        if ($('fixtureLaborRoughIn')) $('fixtureLaborRoughIn').textContent = formatNum(fixtureLabor.roughIn, 1);
+        if ($('fixtureLaborTopOut')) $('fixtureLaborTopOut').textContent = formatNum(fixtureLabor.topOut, 1);
+        if ($('fixtureLaborTrim')) $('fixtureLaborTrim').textContent = formatNum(fixtureLabor.trim, 1);
+        $('laborTotal').textContent = formatNum(labor, 2);
+        $('calcMaterials').textContent = formatNum(materials, 2);
+        $('calcLabor').textContent = formatNum(labor, 2);
+        if ($('calcMarkup')) $('calcMarkup').textContent = formatNum(markup, 2);
+        $('calcTotal').textContent = formatNum(total, 2);
+        $('grandTotal').textContent = formatNum(total, 2);
+        return { materials, labor, markup, total, totalHours, fixtureLabor, fixtureCost };
       }
 
       function updatePreview() {
@@ -470,6 +831,24 @@
           var qty = (row.querySelector('.takeoff-qty') || {}).value;
           if (desc || qty) takeoff.push({ desc: desc, qty: qty });
         });
+        var additionalLabor = [];
+        qsa('.additional-labor-row').forEach(function(row) {
+          var desc = (row.querySelector('.additional-labor-desc') || {}).value;
+          var hours = parseFloat((row.querySelector('.additional-labor-hours') || {}).value) || 0;
+          var crewSize = (row.querySelector('.additional-labor-crew') || {}).value || '1';
+          var laborRate = parseFloat((row.querySelector('.additional-labor-rate') || {}).value) || 0;
+          var rowMult = CREW_MULTIPLIERS[parseInt(crewSize, 10)] || 1;
+          var rowCost = hours * laborRate * rowMult;
+          additionalLabor.push({ desc: desc || '', hours: hours, crewSize: crewSize, laborRate: laborRate, rowCost: rowCost });
+        });
+        var additionalMaterials = [];
+        var materialSubtotalSum = 0;
+        qsa('.additional-material-row').forEach(function(row) {
+          var desc = (row.querySelector('.additional-material-desc') || {}).value;
+          var amount = parseFloat((row.querySelector('.additional-material-amount') || {}).value) || 0;
+          additionalMaterials.push({ desc: desc || '', amount: amount });
+          materialSubtotalSum += amount;
+        });
         return {
           customerName: getStr('customerName'),
           jobAddress: getStr('jobAddress'),
@@ -485,14 +864,18 @@
             return o;
           }, {}),
           takeoff: takeoff,
-          laborHours: getNum('laborHours'),
+          additionalLabor: additionalLabor,
+          laborHours: getAdditionalLaborHours(),
           crewSize: ($('crewSize') || {}).value || '1',
           daysOnSite: getNum('daysOnSite'),
-          laborRate: getNum('laborRate'),
-          materialSubtotal: getNum('materialSubtotal'),
-          overheadPct: getNum('overheadPct'),
-          profitPct: getNum('profitPct'),
-          allowances: getStr('allowances'),
+          laborRate: (function() {
+            var crew = parseInt(($('crewSize') || {}).value, 10) || 1;
+            var el = $('crewRate' + crew);
+            return (el && parseFloat(el.value)) || (getNum('laborRate') || (($('crewRate1') && parseFloat($('crewRate1').value)) || 275));
+          })(),
+          additionalMaterials: additionalMaterials,
+          materialSubtotal: materialSubtotalSum,
+          markupPct: getNum('markupPct'),
           scopeNotes: getStr('scopeNotes')
         };
       }
@@ -502,19 +885,36 @@
         var fixtureRows = Object.keys(f).map(function(k) {
           var v = f[k];
           if (v == null || v === '') return '';
+          if ((parseInt(v, 10) || 0) <= 1) return '';
           return '<tr><td>' + escapeHtml(k) + '</td><td>' + v + '</td></tr>';
         }).filter(Boolean).join('');
+        if (!fixtureRows) fixtureRows = '<tr><td colspan="2">—</td></tr>';
 
         var takeoffRows = (data.takeoff || []).map(function(t) {
           return '<tr><td>' + escapeHtml(t.desc) + '</td><td>' + escapeHtml(t.qty) + '</td></tr>';
         }).join('') || '<tr><td colspan="2">—</td></tr>';
 
-        var labourTotal = (totals && totals.labor) || 0;
-        var labourMult = CREW_MULTIPLIERS[parseInt(data.crewSize, 10)] || 1;
+        var additionalLaborRows = (data.additionalLabor || []).map(function(t) {
+          var descLabel = (t.desc != null && String(t.desc).trim() !== '') ? escapeHtml(String(t.desc).trim()) : '—';
+          var rowCost = (t.rowCost != null && !isNaN(t.rowCost)) ? formatNum(t.rowCost, 2) : '—';
+          return '<tr><td>' + descLabel + '</td><td>' + (t.hours != null ? t.hours : '').toString() + '</td><td>' + (t.crewSize != null ? escapeHtml(String(t.crewSize)) : '') + '</td><td>$' + (t.laborRate != null ? formatNum(Number(t.laborRate), 2) : '0.00') + '</td><td>$' + rowCost + '</td></tr>';
+        }).join('');
+        var additionalLaborBlock = additionalLaborRows
+          ? '<div class="preview-section"><h3>Additional Labor</h3><table class="preview-table"><thead><tr><th>Description</th><th>Hours</th><th>Crew</th><th>Team Rate / Hr</th><th>Manpower Cost</th></tr></thead><tbody>' + additionalLaborRows + '</tbody></table><p>Additional labor total: ' + formatNum(data.laborHours != null ? data.laborHours : 0, 1) + ' hours</p></div>'
+          : '';
+
+        var additionalMaterialsRows = (data.additionalMaterials || []).map(function(t) {
+          var amount = (t.amount != null && !isNaN(t.amount)) ? formatNum(Number(t.amount), 2) : '0.00';
+          return '<tr><td>' + escapeHtml(t.desc) + '</td><td>$' + amount + '</td></tr>';
+        }).join('');
+        var materialsTotal = formatNum((totals && totals.materials != null) ? totals.materials : (data.materialSubtotal != null ? Number(data.materialSubtotal) : 0), 2);
+        var additionalMaterialsBlock = additionalMaterialsRows
+          ? '<div class="preview-section"><h3>Additional Materials</h3><table class="preview-table"><thead><tr><th>Description</th><th>Amount ($)</th></tr></thead><tbody>' + additionalMaterialsRows + '</tbody></table><p>Materials total: $' + materialsTotal + '</p></div>'
+          : '';
 
         return (
           '<div class="preview-header">' +
-            '<div class="preview-logo" aria-hidden="true"></div>' +
+            '<div class="preview-logo" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" aria-hidden="true"><path fill="#E85D04" d="M541.4 162.6C549 155 561.7 156.9 565.5 166.9C572.3 184.6 576 203.9 576 224C576 312.4 504.4 384 416 384C398.5 384 381.6 381.2 365.8 376L178.9 562.9C150.8 591 105.2 591 77.1 562.9C49 534.8 49 489.2 77.1 461.1L264 274.2C258.8 258.4 256 241.6 256 224C256 135.6 327.6 64 416 64C436.1 64 455.4 67.7 473.1 74.5C483.1 78.3 484.9 91 477.4 98.6L388.7 187.3C385.7 190.3 384 194.4 384 198.6L384 240C384 248.8 391.2 256 400 256L441.4 256C445.6 256 449.7 254.3 452.7 251.3L541.4 162.6z"/></svg></div>' +
             '<h1>Click Plumbing and Electrical</h1>' +
             '<p class="preview-meta">Bid # ' + escapeHtml(data.bidNumber) + ' — ' + escapeHtml(data.bidDate) + '</p>' +
           '</div>' +
@@ -531,20 +931,41 @@
             '<h3>Material Highlights</h3>' +
             '<table class="preview-table"><thead><tr><th>Item</th><th>Qty</th></tr></thead><tbody>' + takeoffRows + '</tbody></table>' +
           '</div>' +
-          '<div class="preview-section">' +
-            '<h3>Labor Summary</h3>' +
-            '<p>Hours: ' + (data.laborHours || 0) + ' × Rate $' + (data.laborRate || 0) + '/hr × Crew ' + (data.crewSize || 1) + ' (mult ×' + labourMult + ') = $' + labourTotal.toFixed(2) + '</p>' +
-          '</div>' +
+          additionalLaborBlock +
+          additionalMaterialsBlock +
+          (function() {
+            var fl = (totals && totals.fixtureLabor) || {};
+            var flTotal = formatNum(fl.total != null ? fl.total : 0, 1);
+            var flRough = formatNum(fl.roughIn != null ? fl.roughIn : 0, 1);
+            var flTop = formatNum(fl.topOut != null ? fl.topOut : 0, 1);
+            var flTrim = formatNum(fl.trim != null ? fl.trim : 0, 1);
+            var fixtureCostVal = formatNum(totals && totals.fixtureCost != null ? totals.fixtureCost : 0, 2);
+            var addlHours = formatNum(data.laborHours != null ? data.laborHours : 0, 1);
+            var addlCost = formatNum(totals && totals.labor != null ? totals.labor : 0, 2);
+            var addlList = (data.additionalLabor || []).map(function(t) {
+              var descLabel = (t.desc != null && String(t.desc).trim() !== '') ? escapeHtml(String(t.desc).trim()) : '—';
+              var rc = (t.rowCost != null && !isNaN(t.rowCost)) ? formatNum(t.rowCost, 2) : '0.00';
+              var hrs = (t.hours != null && !isNaN(t.hours)) ? t.hours.toString() : '0';
+              return '<li>' + descLabel + ': ' + hrs + ' hrs, $' + rc + '</li>';
+            }).join('');
+            var addlBlock = addlList ? '<ul style="margin: 0.5rem 0;">' + addlList + '</ul>' : '';
+            return '<div class="preview-section">' +
+              '<h3>Labor Summary</h3>' +
+              '<h4>Fixture Labor</h4>' +
+              '<p>Total: ' + flTotal + ' hours (Rough in: ' + flRough + ', Top out: ' + flTop + ', Trim: ' + flTrim + '). Fixture labor cost: $' + fixtureCostVal + '</p>' +
+              '<h4>Additional Labor</h4>' +
+              addlBlock + '<p>' + addlHours + ' hours = $' + addlCost + '</p>' +
+            '</div>';
+          })() +
           '<div class="preview-section">' +
             '<h3>Pricing Breakdown</h3>' +
             '<table class="preview-table">' +
-              '<tr><th>Materials</th><th>Labor</th><th>Overhead</th><th>Profit</th><th>Total</th></tr>' +
-              '<tr><td>$' + (totals.materials || 0).toFixed(2) + '</td><td>$' + (totals.labor || 0).toFixed(2) + '</td><td>$' + (totals.overhead || 0).toFixed(2) + '</td><td>$' + (totals.profit || 0).toFixed(2) + '</td><td><strong>$' + (totals.total || 0).toFixed(2) + '</strong></td></tr>' +
+              '<tr><th>Materials</th><th>Labor</th><th>Total</th></tr>' +
+              '<tr><td>$' + formatNum((totals.materials || 0) + (totals.markup != null ? totals.markup : 0), 2) + '</td><td>$' + formatNum(totals.labor || 0, 2) + '</td><td><strong>$' + formatNum(totals.total || 0, 2) + '</strong></td></tr>' +
             '</table>' +
-            (data.allowances ? '<p><strong>Allowances / Alternates:</strong> ' + escapeHtml(data.allowances) + '</p>' : '') +
           '</div>' +
           '<div class="preview-section">' +
-            '<p class="grand-total">Grand Total: $' + (totals.total || 0).toFixed(2) + '</p>' +
+            '<p class="grand-total">Grand Total: $' + formatNum(totals.total || 0, 2) + '</p>' +
           '</div>' +
           (data.scopeNotes ? '<div class="preview-section"><h3>Notes / Exclusions</h3><p>' + escapeHtml(data.scopeNotes).replace(/\n/g, '<br>') + '</p></div>' : '')
         );
@@ -621,16 +1042,12 @@
           doc.text('Pricing Summary', margin, y);
           y += lineHeight + 2;
           doc.setFontSize(10);
-          doc.text('Materials: $' + (totals.materials || 0).toFixed(2), margin, y);
+          doc.text('Materials: $' + formatNum((totals.materials || 0) + (totals.markup != null ? totals.markup : 0), 2), margin, y);
           y += lineHeight;
-          doc.text('Labor: $' + (totals.labor || 0).toFixed(2), margin, y);
-          y += lineHeight;
-          doc.text('Overhead: $' + (totals.overhead || 0).toFixed(2), margin, y);
-          y += lineHeight;
-          doc.text('Profit: $' + (totals.profit || 0).toFixed(2), margin, y);
+          doc.text('Labor: $' + formatNum(totals.labor || 0, 2), margin, y);
           y += lineHeight;
           doc.setFont(undefined, 'bold');
-          doc.text('Grand Total: $' + (totals.total || 0).toFixed(2), margin, y);
+          doc.text('Grand Total: $' + formatNum(totals.total || 0, 2), margin, y);
           y += lineHeight + 6;
 
           if (data.scopeNotes) {
@@ -654,6 +1071,118 @@
         }
       }
 
+      function exportCoverPage() {
+        var ledger = getFixtureLedger();
+        if (ledger.length === 0) {
+          alert('No plan pages in the ledger. Save at least one plan page first.');
+          return;
+        }
+        try {
+          var fixtureLabels = fixtureIds.map(function(id) {
+            return id.replace('fixture', '').replace(/([A-Z])/g, ' $1').trim();
+          });
+          var numCols = ledger.length;
+          var useLandscape = numCols > 5;
+          var JsPDF = window.jspdf.jsPDF;
+          var doc = new JsPDF({
+            orientation: useLandscape ? 'landscape' : 'portrait',
+            unit: 'pt',
+            format: 'letter'
+          });
+          var margin = 32;
+          var pageW = doc.internal.pageSize.getWidth();
+          var usableWidth = pageW - margin * 2;
+          var itemColWidth = 142;
+          var laborColWidth = 52;
+          var totalColWidth = 36;
+          var dataWidth = usableWidth - itemColWidth - laborColWidth - totalColWidth;
+          var colWidth = Math.max(26, dataWidth / numCols);
+          var cellPad = 1;
+          var lineHeight = 14;
+          var y = 40;
+          var fontSize = numCols > 8 ? 9 : 10;
+          doc.setFontSize(fontSize);
+
+          doc.setFontSize(16);
+          doc.text('Fixture count by plan page', margin, y);
+          y += 24;
+          doc.setFontSize(fontSize);
+
+          function drawHeader() {
+            doc.setFont(undefined, 'bold');
+            doc.text('Total', margin + cellPad, y);
+            doc.text('Labor', margin + totalColWidth + cellPad, y);
+            doc.text('Item', margin + totalColWidth + laborColWidth + cellPad, y);
+            var x = margin + totalColWidth + laborColWidth + itemColWidth;
+            for (var i = 0; i < ledger.length; i++) {
+              var name = (ledger[i].pageName || 'Unnamed');
+              if (name.length > 14) name = name.slice(0, 11) + '...';
+              doc.text(name, x + cellPad, y);
+              x += colWidth;
+            }
+            y += lineHeight;
+            doc.setFont(undefined, 'normal');
+          }
+
+          drawHeader();
+
+          fixtureLabels.forEach(function(label, idx) {
+            if (y > 700) {
+              doc.addPage(useLandscape ? 'landscape' : 'portrait', 'letter');
+              y = 40;
+              doc.setFontSize(fontSize);
+              drawHeader();
+            }
+            var rowTotal = 0;
+            for (var j = 0; j < ledger.length; j++) {
+              var f = ledger[j].fixtures || {};
+              var val = f[label];
+              rowTotal += (val != null && val !== '') ? (parseInt(val, 10) || 0) : 0;
+            }
+            var priceRow = FIXTURE_PRICES[fixtureIds[idx]];
+            var laborStr = priceRow
+              ? '[' + priceRow.roughIn + ', ' + priceRow.topOut + ', ' + priceRow.trim + ']'
+              : '—';
+            doc.text(String(rowTotal), margin + cellPad, y);
+            doc.text(laborStr, margin + totalColWidth + cellPad, y);
+            doc.text(label, margin + totalColWidth + laborColWidth + cellPad, y);
+            var x = margin + totalColWidth + laborColWidth + itemColWidth;
+            for (var k = 0; k < ledger.length; k++) {
+              var fj = ledger[k].fixtures || {};
+              var v = fj[label];
+              var str = (v != null && v !== '') ? String(v) : '';
+              doc.text(str, x + cellPad, y);
+              x += colWidth;
+            }
+            y += lineHeight;
+          });
+
+          y += lineHeight;
+          var totalRoughIn = 0, totalTopOut = 0, totalTrim = 0;
+          fixtureLabels.forEach(function(label, idx) {
+            var priceRow = FIXTURE_PRICES[fixtureIds[idx]];
+            if (!priceRow) return;
+            var totalQty = 0;
+            for (var j = 0; j < ledger.length; j++) {
+              var f = ledger[j].fixtures || {};
+              var val = f[label];
+              totalQty += (val != null && val !== '') ? (parseInt(val, 10) || 0) : 0;
+            }
+            totalRoughIn += totalQty * priceRow.roughIn;
+            totalTopOut += totalQty * priceRow.topOut;
+            totalTrim += totalQty * priceRow.trim;
+          });
+          doc.setFont(undefined, 'bold');
+          doc.text('Total labor (est.): Rough in ' + formatNum(totalRoughIn, 1) + ', Top out ' + formatNum(totalTopOut, 1) + ', Trim ' + formatNum(totalTrim, 1), margin, y);
+          doc.setFont(undefined, 'normal');
+
+          doc.save('fixture-cover-page.pdf');
+        } catch (e) {
+          console.error(e);
+          alert('Cover page PDF export failed.');
+        }
+      }
+
       function addTakeoffRow() {
         var container = $('takeoffRows');
         var row = document.createElement('div');
@@ -663,6 +1192,39 @@
         row.querySelector('.takeoff-remove').addEventListener('click', function() {
           if (qsa('.takeoff-row').length > 1) row.remove();
         });
+      }
+
+      function addAdditionalLaborRow() {
+        var container = $('additionalLaborRows');
+        if (!container) return;
+        var row = document.createElement('div');
+        row.className = 'additional-labor-row';
+        row.innerHTML = '<input type="text" class="additional-labor-desc" placeholder="Description (e.g. Demo, Underground, Prep)"> <input type="number" class="additional-labor-hours" min="0" step="0.5" placeholder="Hrs" title="Hours"> <select class="additional-labor-crew" title="Crew size"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select> <input type="number" class="additional-labor-rate" min="0" step="0.01" placeholder="Rate" title="Labor rate $/hr"> <button type="button" class="additional-labor-remove" aria-label="Remove row">Remove</button>';
+        container.appendChild(row);
+        qsa('input, select', row).forEach(function(el) {
+          el.addEventListener('input', calculateTotals);
+          el.addEventListener('change', calculateTotals);
+        });
+        var crew = parseInt((row.querySelector('.additional-labor-crew') || {}).value, 10) || 1;
+        var rateEl = $('crewRate' + crew);
+        var rate = (rateEl && parseFloat(rateEl.value)) || 0;
+        var rateInput = row.querySelector('.additional-labor-rate');
+        if (rateInput) rateInput.value = rate;
+        calculateTotals();
+      }
+
+      function addAdditionalMaterialRow() {
+        var container = $('additionalMaterialRows');
+        if (!container) return;
+        var row = document.createElement('div');
+        row.className = 'additional-material-row';
+        row.innerHTML = '<input type="text" class="additional-material-desc" placeholder="Description (e.g. Pipe, Fittings)"> <input type="number" class="additional-material-amount" min="0" step="0.01" placeholder="Amount" title="Amount ($)"> <button type="button" class="additional-material-remove" aria-label="Remove row">Remove</button>';
+        container.appendChild(row);
+        qsa('input', row).forEach(function(el) {
+          el.addEventListener('input', calculateTotals);
+          el.addEventListener('change', calculateTotals);
+        });
+        calculateTotals();
       }
 
       function setupIncrementDecrement() {
@@ -688,17 +1250,319 @@
         });
         qsa('.takeoff-desc').forEach(function(el) { el.value = ''; });
         qsa('.takeoff-qty').forEach(function(el) { el.value = ''; });
+        qsa('.additional-labor-row').forEach(function(row, i) {
+          if (i > 0) row.remove();
+        });
+        qsa('.additional-labor-desc').forEach(function(el) { el.value = ''; });
+        qsa('.additional-labor-hours').forEach(function(el) { el.value = ''; });
+        qsa('.additional-labor-crew').forEach(function(el) { el.value = '1'; });
+        qsa('.additional-labor-rate').forEach(function(el) { el.value = ''; });
+        if ($('crewRate1')) $('crewRate1').value = '275';
+        if ($('crewRate2')) $('crewRate2').value = '350';
+        if ($('crewRate3')) $('crewRate3').value = '500';
+        qsa('.additional-material-row').forEach(function(row, i) {
+          if (i > 0) row.remove();
+        });
+        qsa('.additional-material-desc').forEach(function(el) { el.value = ''; });
+        qsa('.additional-material-amount').forEach(function(el) { el.value = ''; });
         requiredIds.forEach(function(id) { var el = $(id); if (el) el.classList.remove('error'); });
         calculateTotals();
         $('preview').classList.remove('visible');
         $('preview').innerHTML = '';
       }
 
+      function fillWithSampleData() {
+        if ($('customerName')) $('customerName').value = 'Sample Customer';
+        if ($('jobAddress')) $('jobAddress').value = '123 Main St, Portland, OR 97201';
+        if ($('bidDate')) $('bidDate').value = new Date().toISOString().slice(0, 10);
+        if ($('bidNumber')) $('bidNumber').value = '2025-SAMPLE-001';
+        if ($('jobType')) $('jobType').value = 'Residential remodel';
+        if ($('planName')) $('planName').value = 'Floor plans A';
+        if ($('planIssueDate')) $('planIssueDate').value = '2024-06-15';
+        if ($('planTitle')) $('planTitle').value = 'Main and upper';
+        if ($('fixtureToilets')) $('fixtureToilets').value = 2;
+        if ($('fixtureBathSinks')) $('fixtureBathSinks').value = 2;
+        if ($('fixtureKitchenSinks')) $('fixtureKitchenSinks').value = 1;
+        if ($('fixtureShowerOnly')) $('fixtureShowerOnly').value = 1;
+        if ($('fixturePlanPageName')) $('fixturePlanPageName').value = 'A-101';
+        var takeoffRows = qsa('.takeoff-row');
+        if (takeoffRows[0]) {
+          var desc = takeoffRows[0].querySelector('.takeoff-desc');
+          var qty = takeoffRows[0].querySelector('.takeoff-qty');
+          if (desc) desc.value = 'Copper pipe 1/2"';
+          if (qty) qty.value = '150';
+        }
+        var laborRows = qsa('.additional-labor-row');
+        if (laborRows[0]) {
+          var d = laborRows[0].querySelector('.additional-labor-desc');
+          var h = laborRows[0].querySelector('.additional-labor-hours');
+          var c = laborRows[0].querySelector('.additional-labor-crew');
+          var r = laborRows[0].querySelector('.additional-labor-rate');
+          if (d) d.value = 'Demo and prep';
+          if (h) h.value = 8;
+          if (c) c.value = '2';
+          if (r) r.value = 350;
+        }
+        var materialRows = qsa('.additional-material-row');
+        if (materialRows[0]) {
+          var md = materialRows[0].querySelector('.additional-material-desc');
+          var ma = materialRows[0].querySelector('.additional-material-amount');
+          if (md) md.value = 'Pipe and fittings';
+          if (ma) ma.value = 2500;
+        }
+        if ($('markupPct')) $('markupPct').value = 30;
+        if ($('scopeNotes')) $('scopeNotes').value = 'Sample scope: Rough-in and top-out per plans. Trim and fixture set by owner. Exclusions: owner-supplied fixtures, excavation, and final grading.';
+        requiredIds.forEach(function(id) {
+          var el = $(id);
+          if (el) el.classList.remove('error');
+        });
+        calculateTotals();
+      }
+
+      function loadLedgerEntry(entry) {
+        var planInput = $('fixturePlanPageName');
+        if (planInput) planInput.value = entry.pageName || '';
+        var f = entry.fixtures || {};
+        Object.keys(f).forEach(function(label) {
+          var id = fixtureLabelToId[label];
+          if (id) {
+            var el = $(id);
+            if (el && el.type === 'number') el.value = Math.max(0, parseInt(f[label], 10) || 0);
+          }
+        });
+        calculateTotals();
+      }
+
+      function renderLedgerList() {
+        var listEl = $('fixtureLedgerList');
+        if (!listEl) return;
+        var ledger = getFixtureLedger();
+        listEl.innerHTML = '';
+        if (ledger.length === 0) {
+          listEl.innerHTML = '<p class="fixture-ledger-empty">No saved plan pages. Enter a plan page name and fixture counts, then click Save to ledger.</p>';
+          return;
+        }
+        ledger.forEach(function(entry) {
+          var total = 0;
+          var f = entry.fixtures || {};
+          Object.keys(f).forEach(function(k) { total += (parseInt(f[k], 10) || 0); });
+          var item = document.createElement('div');
+          item.className = 'fixture-ledger-item';
+          var nameEl = document.createElement('div');
+          nameEl.className = 'fixture-ledger-item-name';
+          nameEl.textContent = entry.pageName || 'Unnamed';
+          var metaEl = document.createElement('div');
+          metaEl.className = 'fixture-ledger-item-meta';
+          metaEl.textContent = formatNum(total, 0) + ' fixture(s)';
+          var actions = document.createElement('div');
+          actions.className = 'fixture-ledger-item-actions';
+          var loadBtn = document.createElement('button');
+          loadBtn.type = 'button';
+          loadBtn.className = 'btn btn-outline';
+          loadBtn.textContent = 'Load';
+          loadBtn.addEventListener('click', function() { loadLedgerEntry(entry); });
+          var delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.className = 'btn btn-outline';
+          delBtn.textContent = 'Delete';
+          delBtn.style.color = 'var(--error)';
+          delBtn.style.borderColor = 'var(--error)';
+          delBtn.addEventListener('click', function() {
+            var next = getFixtureLedger().filter(function(e) { return e.id !== entry.id; });
+            setFixtureLedger(next);
+            renderLedgerList();
+            calculateTotals();
+          });
+          actions.appendChild(loadBtn);
+          actions.appendChild(delBtn);
+          item.appendChild(nameEl);
+          item.appendChild(metaEl);
+          item.appendChild(actions);
+          listEl.appendChild(item);
+        });
+      }
+
+      function saveToLedger() {
+        var planInput = $('fixturePlanPageName');
+        var pageName = (planInput && planInput.value) ? planInput.value.trim() : '';
+        var ledger = getFixtureLedger();
+        if (!pageName) pageName = 'Plan page ' + (ledger.length + 1);
+        var fixtures = collectCurrentFixtures();
+        var entry = {
+          id: Date.now().toString(),
+          pageName: pageName,
+          fixtures: fixtures,
+          savedAt: Date.now()
+        };
+        ledger.push(entry);
+        setFixtureLedger(ledger);
+        renderLedgerList();
+        calculateTotals();
+      }
+
+      function clearFixtureCounts() {
+        fixtureIds.forEach(function(id) {
+          var el = $(id);
+          if (el && el.type === 'number') el.value = 0;
+        });
+        calculateTotals();
+      }
+
+      function renderFixturePriceTable() {
+        var tbody = $('fixturePriceTableBody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        var ids = [
+          'fixtureToilets', 'fixtureBathSinks', 'fixtureKitchenSinks', 'fixtureDisposals',
+          'fixtureUrinals', 'fixtureTubs', 'fixtureShowerOnly', 'fixtureShowerTub',
+          'fixtureLaundrySinks', 'fixtureHoseBibs', 'fixtureWHGas', 'fixtureWHElectric',
+          'fixtureWHTankless', 'fixtureGasDrops'
+        ];
+        ids.forEach(function(id) {
+          var row = FIXTURE_PRICES[id];
+          if (!row) return;
+          var name = row.label;
+          if (row.note) name += ' (' + row.note + ')';
+          var tr = document.createElement('tr');
+          var tdName = document.createElement('td');
+          tdName.textContent = name;
+          tr.appendChild(tdName);
+          function makeInput(field, step) {
+            var input = document.createElement('input');
+            input.type = 'number';
+            input.min = 0;
+            input.step = step || 1;
+            input.className = 'fixture-price-input';
+            input.setAttribute('data-fixture-id', id);
+            input.setAttribute('data-field', field);
+            input.value = row[field];
+            var td = document.createElement('td');
+            td.appendChild(input);
+            return td;
+          }
+          tr.appendChild(makeInput('price', 1));
+          tr.appendChild(makeInput('roughIn', 0.5));
+          tr.appendChild(makeInput('topOut', 0.5));
+          tr.appendChild(makeInput('trim', 0.5));
+          tbody.appendChild(tr);
+        });
+      }
+
+      function syncFixturePriceInput(e) {
+        var el = e.target;
+        var id = el.getAttribute('data-fixture-id');
+        var field = el.getAttribute('data-field');
+        if (!id || !field || !FIXTURE_PRICES[id]) return;
+        var val = parseFloat(el.value, 10);
+        if (isNaN(val)) val = 0;
+        FIXTURE_PRICES[id][field] = val;
+      }
+
+      function resetFixturePricesToDefault() {
+        var ids = Object.keys(DEFAULT_FIXTURE_PRICES);
+        ids.forEach(function(id) {
+          var def = DEFAULT_FIXTURE_PRICES[id];
+          if (!FIXTURE_PRICES[id]) FIXTURE_PRICES[id] = {};
+          FIXTURE_PRICES[id].price = def.price;
+          FIXTURE_PRICES[id].roughIn = def.roughIn;
+          FIXTURE_PRICES[id].topOut = def.topOut;
+          FIXTURE_PRICES[id].trim = def.trim;
+        });
+        renderFixturePriceTable();
+      }
+
       $('generatePreview').addEventListener('click', onGeneratePreview);
       $('printBtn').addEventListener('click', onPrint);
       $('exportPdf').addEventListener('click', exportToPDF);
       $('addTakeoffRow').addEventListener('click', addTakeoffRow);
+      if ($('fillSample')) $('fillSample').addEventListener('click', fillWithSampleData);
+      if ($('addAdditionalLaborRow')) $('addAdditionalLaborRow').addEventListener('click', addAdditionalLaborRow);
+      if ($('addAdditionalMaterialRow')) $('addAdditionalMaterialRow').addEventListener('click', addAdditionalMaterialRow);
+      var additionalMaterialRowsEl = $('additionalMaterialRows');
+      if (additionalMaterialRowsEl) {
+        additionalMaterialRowsEl.addEventListener('click', function(e) {
+          if (e.target.classList.contains('additional-material-remove') && qsa('.additional-material-row').length > 1) {
+            e.target.closest('.additional-material-row').remove();
+            calculateTotals();
+          }
+        });
+      }
+      if ($('openCrewPricing')) {
+        $('openCrewPricing').addEventListener('click', function() {
+          var details = $('crewPricingDetails');
+          if (details) {
+            details.open = !details.open;
+            this.setAttribute('aria-expanded', details.open ? 'true' : 'false');
+            if (details.open) details.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        });
+      }
+      var crewPricingDetailsEl = $('crewPricingDetails');
+      if (crewPricingDetailsEl) {
+        crewPricingDetailsEl.addEventListener('toggle', function() {
+          var btn = $('openCrewPricing');
+          if (btn) btn.setAttribute('aria-expanded', this.open ? 'true' : 'false');
+        });
+      }
+      var additionalLaborRowsEl = $('additionalLaborRows');
+      if (additionalLaborRowsEl) {
+        additionalLaborRowsEl.addEventListener('click', function(e) {
+          if (e.target.classList.contains('additional-labor-remove') && qsa('.additional-labor-row').length > 1) {
+            e.target.closest('.additional-labor-row').remove();
+            calculateTotals();
+          }
+        });
+        additionalLaborRowsEl.addEventListener('change', function(e) {
+          if (e.target.classList.contains('additional-labor-crew')) {
+            var row = e.target.closest('.additional-labor-row');
+            if (!row) return;
+            var crew = parseInt(e.target.value, 10) || 1;
+            var rateEl = $('crewRate' + crew);
+            var rate = (rateEl && parseFloat(rateEl.value)) || 0;
+            var rateInput = row.querySelector('.additional-labor-rate');
+            if (rateInput) rateInput.value = rate;
+            calculateTotals();
+          }
+        });
+        additionalLaborRowsEl.addEventListener('input', function(e) {
+          if (e.target.classList.contains('additional-labor-desc') || e.target.classList.contains('additional-labor-hours')) {
+            var row = e.target.closest('.additional-labor-row');
+            if (!row) return;
+            var rateInput = row.querySelector('.additional-labor-rate');
+            if (!rateInput || String(rateInput.value || '').trim() !== '') return;
+            var crew = parseInt((row.querySelector('.additional-labor-crew') || {}).value, 10) || 1;
+            var rateEl = $('crewRate' + crew);
+            var rate = (rateEl && parseFloat(rateEl.value)) || 0;
+            rateInput.value = rate;
+            calculateTotals();
+          }
+        });
+      }
       $('clearBtn').addEventListener('click', clearForm);
+      if ($('fixtureLaborCostWrap')) {
+        $('fixtureLaborCostWrap').addEventListener('click', function() {
+          var costEl = $('fixtureLaborCost');
+          if (!costEl) return;
+          var raw = parseFloat(costEl.getAttribute('data-raw-value')) || 0;
+          var fmt = costEl.getAttribute('data-format') || 'short';
+          if (fmt === 'short') {
+            costEl.setAttribute('data-format', 'long');
+            costEl.textContent = raw.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          } else {
+            costEl.setAttribute('data-format', 'short');
+            costEl.textContent = formatFixtureCostShort(raw);
+          }
+        });
+      }
+      if ($('saveToLedger')) $('saveToLedger').addEventListener('click', saveToLedger);
+      if ($('exportCoverPage')) $('exportCoverPage').addEventListener('click', exportCoverPage);
+      if ($('clearFixtureCounts')) $('clearFixtureCounts').addEventListener('click', clearFixtureCounts);
+      if ($('resetFixturePrices')) $('resetFixturePrices').addEventListener('click', resetFixturePricesToDefault);
+      var fixturePriceTable = $('fixturePriceTable');
+      if (fixturePriceTable) {
+        fixturePriceTable.addEventListener('input', syncFixturePriceInput);
+        fixturePriceTable.addEventListener('change', syncFixturePriceInput);
+      }
 
       qsa('input, select, textarea').forEach(function(el) {
         el.addEventListener('input', calculateTotals);
@@ -708,8 +1572,12 @@
 
       document.addEventListener('DOMContentLoaded', function() {
         calculateTotals();
+        renderLedgerList();
+        renderFixturePriceTable();
       });
       calculateTotals();
+      renderLedgerList();
+      renderFixturePriceTable();
     })();
   </script>
 </body>
