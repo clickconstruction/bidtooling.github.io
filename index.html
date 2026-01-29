@@ -37,6 +37,13 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
     .section.section-takeoff { background: #f0f0f0; }
+    .section-rough-calculator { background: #fffde7; }
+    .section-rough-calculator.hidden { display: none; }
+    .section-rough-calculator .field.field-disabled { opacity: 0.65; color: #666; }
+    .section-rough-calculator .field.field-disabled input { cursor: not-allowed; }
+    .rough-calc-dimensions-row { align-items: flex-end; }
+    .rough-calc-op { font-size: 1.25rem; font-weight: 600; color: var(--primary); padding: 0 0.25rem; margin-bottom: 0.5rem; }
+    .section-rough-calculator .rough-calc-cost-input { width: calc((100% - 2rem - 4ch) / 3); max-width: 100%; box-sizing: border-box; }
     label { display: block; margin-bottom: 0.25rem; font-weight: 500; }
     input[type="text"], input[type="number"], input[type="date"], select, textarea {
       width: 100%;
@@ -95,6 +102,7 @@
     .additional-material-header .additional-material-hdr-amount { flex: 0 0 6rem; max-width: 7rem; text-align: center; }
     .additional-material-header .additional-material-hdr-remove { flex-shrink: 0; width: 5rem; }
     .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.5rem 0; }
+    .actions .btn-push-right { margin-left: auto; }
     .btn {
       padding: 0.75rem 1.25rem;
       border: none;
@@ -597,7 +605,7 @@
               <td>$<span id="calcMaterials">0.00</span></td>
             </tr>
             <tr>
-              <td>Materials Markup <input type="number" id="materialsMarkupPct" name="materialsMarkupPct" min="0" step="0.5" value="30" title="Materials Markup" style="width: 4rem; margin-left: 0.5rem; padding: 0.25rem 0.5rem; font-size: 0.9rem;">%</td>
+              <td>Materials Markup <input type="number" id="materialsMarkupPct" name="materialsMarkupPct" min="0" step="0.5" value="0" title="Materials Markup" style="width: 4rem; margin-left: 0.5rem; padding: 0.25rem 0.5rem; font-size: 0.9rem;">%</td>
               <td>$<span id="calcMaterialsMarkup">0.00</span></td>
             </tr>
             <tr style="font-weight: 600; border-top: 2px solid var(--border);">
@@ -609,7 +617,7 @@
               <td>$<span id="calcLabor">0.00</span></td>
             </tr>
             <tr>
-              <td>Additional Labor Markup <input type="number" id="laborMarkupPct" name="laborMarkupPct" min="0" step="0.5" value="30" title="Labor Markup" style="width: 4rem; margin-left: 0.5rem; padding: 0.25rem 0.5rem; font-size: 0.9rem;">%</td>
+              <td>Additional Labor Markup <input type="number" id="laborMarkupPct" name="laborMarkupPct" min="0" step="0.5" value="0" title="Labor Markup" style="width: 4rem; margin-left: 0.5rem; padding: 0.25rem 0.5rem; font-size: 0.9rem;">%</td>
               <td>$<span id="calcLaborMarkup">0.00</span></td>
             </tr>
             <tr style="font-weight: 600; border-top: 2px solid var(--border);">
@@ -626,11 +634,54 @@
         <textarea id="scopeNotes" name="scopeNotes" rows="5" placeholder="Describe scope, exclusions, and any special notes..."></textarea>
       </div>
 
+      <div id="roughCalculatorSection" class="section section-rough-calculator hidden" aria-hidden="true">
+        <h2>Rough Calculator</h2>
+        <div id="roughCalculatorContent">
+          <div class="form-row rough-calc-dimensions-row">
+            <div class="field">
+              <label for="roughLength">Length (ft)</label>
+              <input type="number" id="roughLength" name="roughLength" min="0" step="0.1" placeholder="0">
+            </div>
+            <span class="rough-calc-op" aria-hidden="true">*</span>
+            <div class="field">
+              <label for="roughWidth">Width (ft)</label>
+              <input type="number" id="roughWidth" name="roughWidth" min="0" step="0.1" placeholder="0">
+            </div>
+            <span class="rough-calc-op" aria-hidden="true">=</span>
+            <div class="field">
+              <label for="roughSfFromDimensions">Square footage (L × W)</label>
+              <input type="number" id="roughSfFromDimensions" name="roughSfFromDimensions" min="0" step="0.1" placeholder="Or enter SF">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label for="roughCostPerSqFt">Cost per SF before fixtures ($)</label>
+              <input type="number" id="roughCostPerSqFt" name="roughCostPerSqFt" min="0" step="0.01" placeholder="0" class="rough-calc-cost-input">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label>Fixture count (from above) = <span id="roughFixtureCount">0</span></label>
+              <input type="number" id="roughFixtureCountOverride" name="roughFixtureCountOverride" min="0" step="1" placeholder="Or enter custom amount">
+            </div>
+            <div class="field">
+              <label for="roughPricePerFixture">Price per fixture ($)</label>
+              <input type="number" id="roughPricePerFixture" name="roughPricePerFixture" min="0" step="0.01" placeholder="0">
+            </div>
+          </div>
+          <p style="margin-top: 1rem; margin-bottom: 0; font-weight: 600;">Rough Bid: $<span id="roughBidResult">0.00</span></p>
+          <div class="rough-calc-footer" style="display: flex; justify-content: flex-end; margin-top: 1rem;">
+            <button type="button" id="clearRoughCalculatorBtn" class="btn btn-outline">[clear calculator]</button>
+          </div>
+        </div>
+      </div>
+
       <div class="actions no-print">
         <button type="button" id="generatePreview" class="btn btn-primary">Generate Preview</button>
         <button type="button" id="printBtn" class="btn btn-secondary">Print</button>
         <button type="button" id="exportPdf" class="btn btn-outline">Export to PDF</button>
         <button type="button" id="clearBtn" class="btn btn-outline">Clear All</button>
+        <button type="button" id="roughCalculatorBtn" class="btn btn-outline btn-push-right" aria-expanded="false">Rough Calculator</button>
       </div>
     </form>
 
@@ -832,6 +883,44 @@
         return total;
       }
 
+      function updateRoughBid() {
+        var roughLengthEl = $('roughLength');
+        var roughWidthEl = $('roughWidth');
+        var roughSfEl = $('roughSfFromDimensions');
+        var roughLength = getNum('roughLength') || 0;
+        var roughWidth = getNum('roughWidth') || 0;
+        var roughSfEntered = roughSfEl ? (parseFloat(roughSfEl.value) || 0) : 0;
+        var roughCostPerSqFt = getNum('roughCostPerSqFt') || 0;
+        var roughPricePerFixture = getNum('roughPricePerFixture') || 0;
+        var effectiveSf = roughSfEntered > 0 ? roughSfEntered : (roughLength * roughWidth);
+        if (isNaN(effectiveSf)) effectiveSf = 0;
+        var dimensionsDisabled = roughSfEntered > 0;
+        if (roughLengthEl) {
+          roughLengthEl.disabled = dimensionsDisabled;
+          var lengthField = roughLengthEl.closest ? roughLengthEl.closest('.field') : null;
+          if (lengthField) lengthField.classList.toggle('field-disabled', dimensionsDisabled);
+        }
+        if (roughWidthEl) {
+          roughWidthEl.disabled = dimensionsDisabled;
+          var widthField = roughWidthEl.closest ? roughWidthEl.closest('.field') : null;
+          if (widthField) widthField.classList.toggle('field-disabled', dimensionsDisabled);
+        }
+        var fixtureCountFromAbove = totalFixtures();
+        var roughFixtureOverride = getNum('roughFixtureCountOverride') || 0;
+        var fixtureCount = roughFixtureOverride > 0 ? roughFixtureOverride : fixtureCountFromAbove;
+        if (isNaN(fixtureCount)) fixtureCount = fixtureCountFromAbove;
+        var buildingPart = effectiveSf * roughCostPerSqFt;
+        if (isNaN(buildingPart)) buildingPart = 0;
+        var fixturePart = fixtureCount * roughPricePerFixture;
+        if (isNaN(fixturePart)) fixturePart = 0;
+        var roughBid = buildingPart * fixturePart;
+        if (isNaN(roughBid)) roughBid = 0;
+        var fcEl = $('roughFixtureCount');
+        if (fcEl) fcEl.textContent = formatNum(fixtureCountFromAbove, 0);
+        var resultEl = $('roughBidResult');
+        if (resultEl) resultEl.textContent = formatNum(roughBid, 2);
+      }
+
       function calculateTotals() {
         var materials = 0;
         qsa('.additional-material-row').forEach(function(row) {
@@ -887,6 +976,7 @@
         if ($('calcLaborSubtotal')) $('calcLaborSubtotal').textContent = formatNum(laborSubtotal, 2);
         if ($('calcTotal')) $('calcTotal').textContent = formatNum(total, 2);
         $('grandTotal').textContent = formatNum(total, 2);
+        updateRoughBid();
         return {
           materials: materials,
           labor: labor,
@@ -1413,8 +1503,8 @@
           if (md) md.value = 'Pipe and fittings';
           if (ma) ma.value = 2500;
         }
-        if ($('materialsMarkupPct')) $('materialsMarkupPct').value = 30;
-        if ($('laborMarkupPct')) $('laborMarkupPct').value = 30;
+        if ($('materialsMarkupPct')) $('materialsMarkupPct').value = 0;
+        if ($('laborMarkupPct')) $('laborMarkupPct').value = 0;
         if ($('scopeNotes')) $('scopeNotes').value = 'Sample scope: Rough-in and top-out per plans. Trim and fixture set by owner. Exclusions: owner-supplied fixtures, excavation, and final grading.';
         requiredIds.forEach(function(id) {
           var el = $(id);
@@ -1716,6 +1806,24 @@
         });
       }
       $('clearBtn').addEventListener('click', clearForm);
+      var roughCalculatorBtn = $('roughCalculatorBtn');
+      var roughCalculatorSection = $('roughCalculatorSection');
+      if (roughCalculatorBtn && roughCalculatorSection) {
+        roughCalculatorBtn.addEventListener('click', function() {
+          var isHidden = roughCalculatorSection.classList.contains('hidden');
+          if (isHidden) {
+            roughCalculatorSection.classList.remove('hidden');
+            roughCalculatorSection.setAttribute('aria-hidden', 'false');
+            roughCalculatorBtn.setAttribute('aria-expanded', 'true');
+            roughCalculatorSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            updateRoughBid();
+          } else {
+            roughCalculatorSection.classList.add('hidden');
+            roughCalculatorSection.setAttribute('aria-hidden', 'true');
+            roughCalculatorBtn.setAttribute('aria-expanded', 'false');
+          }
+        });
+      }
       if ($('fixtureLaborCostWrap')) {
         $('fixtureLaborCostWrap').addEventListener('click', function() {
           var costEl = $('fixtureLaborCost');
@@ -1760,6 +1868,24 @@
         el.addEventListener('input', calculateTotals);
         el.addEventListener('change', calculateTotals);
       });
+      var roughCalcContent = $('roughCalculatorContent');
+      if (roughCalcContent) {
+        qsa('input', roughCalcContent).forEach(function(el) {
+          el.addEventListener('input', updateRoughBid);
+          el.addEventListener('change', updateRoughBid);
+        });
+      }
+      var clearRoughCalculatorBtn = $('clearRoughCalculatorBtn');
+      if (clearRoughCalculatorBtn) {
+        clearRoughCalculatorBtn.addEventListener('click', function() {
+          var ids = ['roughLength', 'roughWidth', 'roughSfFromDimensions', 'roughCostPerSqFt', 'roughFixtureCountOverride', 'roughPricePerFixture'];
+          ids.forEach(function(id) {
+            var el = $(id);
+            if (el && el.value !== undefined) el.value = '';
+          });
+          updateRoughBid();
+        });
+      }
       setupIncrementDecrement();
 
       function initializeFixtureMode() {
