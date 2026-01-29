@@ -543,7 +543,7 @@
           </div>
           <button type="button" id="addAdditionalLaborRow" class="btn btn-outline" style="margin-top: 0.5rem;">Add row</button>
         </div>
-        <p><strong>Labor total (Hours • Crew • Rate): $<span id="laborTotal">0.00</span></strong></p>
+        <p><strong>Labor total (Hours • Rate): $<span id="laborTotal">0.00</span></strong></p>
       </div>
 
       <div class="section">
@@ -562,20 +562,32 @@
           </div>
         </div>
         <button type="button" id="addAdditionalMaterialRow" class="btn btn-outline" style="margin-top: 0.5rem;">Add row</button>
-        <div class="form-row" style="margin-top: 1rem;">
-          <div class="field">
-            <label for="markupPct">Markup %</label>
-            <input type="number" id="markupPct" name="markupPct" min="0" step="0.5" value="30" title="Markup">
-          </div>
-        </div>
         <div class="preview-section" style="margin-top: 1rem;">
           <table class="preview-table">
-            <tr><th>Materials</th><th>Labor</th><th>Markup</th><th>Total</th></tr>
+            <tr><th>Item</th><th>Amount</th></tr>
             <tr>
+              <td>Materials</td>
               <td>$<span id="calcMaterials">0.00</span></td>
+            </tr>
+            <tr>
+              <td>Materials Markup <input type="number" id="materialsMarkupPct" name="materialsMarkupPct" min="0" step="0.5" value="30" title="Materials Markup" style="width: 4rem; margin-left: 0.5rem; padding: 0.25rem 0.5rem; font-size: 0.9rem;">%</td>
+              <td>$<span id="calcMaterialsMarkup">0.00</span></td>
+            </tr>
+            <tr style="font-weight: 600; border-top: 2px solid var(--border);">
+              <td>Materials Subtotal</td>
+              <td style="text-align: right;">$<span id="calcMaterialsSubtotal">0.00</span></td>
+            </tr>
+            <tr>
+              <td>Labor</td>
               <td>$<span id="calcLabor">0.00</span></td>
-              <td>$<span id="calcMarkup">0.00</span></td>
-              <td><strong>$<span id="calcTotal">0.00</span></strong></td>
+            </tr>
+            <tr>
+              <td>Labor Markup <input type="number" id="laborMarkupPct" name="laborMarkupPct" min="0" step="0.5" value="30" title="Labor Markup" style="width: 4rem; margin-left: 0.5rem; padding: 0.25rem 0.5rem; font-size: 0.9rem;">%</td>
+              <td>$<span id="calcLaborMarkup">0.00</span></td>
+            </tr>
+            <tr style="font-weight: 600; border-top: 2px solid var(--border);">
+              <td>Labor Subtotal</td>
+              <td style="text-align: right;">$<span id="calcLaborSubtotal">0.00</span></td>
             </tr>
           </table>
           <p class="grand-total">Grand Total: $<span id="grandTotal">0.00</span></p>
@@ -782,15 +794,17 @@
           var hours = parseFloat((row.querySelector('.additional-labor-hours') || {}).value) || 0;
           var rowCrew = parseInt((row.querySelector('.additional-labor-crew') || {}).value, 10) || 1;
           var rowRate = parseFloat((row.querySelector('.additional-labor-rate') || {}).value) || 0;
-          additionalLaborCost += hours * rowRate * (CREW_MULTIPLIERS[rowCrew] || 1);
+          additionalLaborCost += hours * rowRate;
         });
         var labor = additionalLaborCost;
         var additionalHours = getAdditionalLaborHours();
         var totalHours = fixtureLabor.total + additionalHours;
-        var base = materials + labor;
-        var markupPct = getNum('markupPct') || 0;
-        var markup = base * (markupPct / 100);
-        var total = base + markup;
+        var materialsMarkupPct = getNum('materialsMarkupPct') || 0;
+        var laborMarkupPct = getNum('laborMarkupPct') || 0;
+        var materialsMarkup = materials * (materialsMarkupPct / 100);
+        var laborMarkup = labor * (laborMarkupPct / 100);
+        var markup = materialsMarkup + laborMarkup;
+        var total = materials + labor + markup;
 
         var fixtureCount = totalFixtures();
         $('totalFixtures').textContent = formatNum(fixtureCount, 0);
@@ -810,10 +824,15 @@
         $('laborTotal').textContent = formatNum(labor, 2);
         $('calcMaterials').textContent = formatNum(materials, 2);
         $('calcLabor').textContent = formatNum(labor, 2);
-        if ($('calcMarkup')) $('calcMarkup').textContent = formatNum(markup, 2);
+        if ($('calcMaterialsMarkup')) $('calcMaterialsMarkup').textContent = formatNum(materialsMarkup, 2);
+        if ($('calcLaborMarkup')) $('calcLaborMarkup').textContent = formatNum(laborMarkup, 2);
+        var materialsSubtotal = materials + materialsMarkup;
+        var laborSubtotal = labor + laborMarkup;
+        if ($('calcMaterialsSubtotal')) $('calcMaterialsSubtotal').textContent = formatNum(materialsSubtotal, 2);
+        if ($('calcLaborSubtotal')) $('calcLaborSubtotal').textContent = formatNum(laborSubtotal, 2);
         $('calcTotal').textContent = formatNum(total, 2);
         $('grandTotal').textContent = formatNum(total, 2);
-        return { materials, labor, markup, total, totalHours, fixtureLabor, fixtureCost };
+        return { materials, labor, markup, materialsMarkup, laborMarkup, total, totalHours, fixtureLabor, fixtureCost };
       }
 
       function updatePreview() {
@@ -838,8 +857,7 @@
           var hours = parseFloat((row.querySelector('.additional-labor-hours') || {}).value) || 0;
           var crewSize = (row.querySelector('.additional-labor-crew') || {}).value || '1';
           var laborRate = parseFloat((row.querySelector('.additional-labor-rate') || {}).value) || 0;
-          var rowMult = CREW_MULTIPLIERS[parseInt(crewSize, 10)] || 1;
-          var rowCost = hours * laborRate * rowMult;
+          var rowCost = hours * laborRate;
           additionalLabor.push({ desc: desc || '', hours: hours, crewSize: crewSize, laborRate: laborRate, rowCost: rowCost });
         });
         var additionalMaterials = [];
@@ -876,7 +894,8 @@
           })(),
           additionalMaterials: additionalMaterials,
           materialSubtotal: materialSubtotalSum,
-          markupPct: getNum('markupPct'),
+          materialsMarkupPct: getNum('materialsMarkupPct'),
+          laborMarkupPct: getNum('laborMarkupPct'),
           scopeNotes: getStr('scopeNotes')
         };
       }
@@ -961,8 +980,13 @@
           '<div class="preview-section">' +
             '<h3>Pricing Breakdown</h3>' +
             '<table class="preview-table">' +
-              '<tr><th>Materials</th><th>Labor</th><th>Total</th></tr>' +
-              '<tr><td>$' + formatNum((totals.materials || 0) + (totals.markup != null ? totals.markup : 0), 2) + '</td><td>$' + formatNum(totals.labor || 0, 2) + '</td><td><strong>$' + formatNum(totals.total || 0, 2) + '</strong></td></tr>' +
+              '<tr><th>Item</th><th>Amount</th></tr>' +
+              '<tr><td>Materials</td><td>$' + formatNum(totals.materials || 0, 2) + '</td></tr>' +
+              '<tr><td>Materials Markup</td><td>$' + formatNum(totals.materialsMarkup != null ? totals.materialsMarkup : 0, 2) + '</td></tr>' +
+              '<tr style="font-weight: 600; border-top: 2px solid var(--border);"><td>Materials Subtotal</td><td style="text-align: right;">$' + formatNum((totals.materials || 0) + (totals.materialsMarkup != null ? totals.materialsMarkup : 0), 2) + '</td></tr>' +
+              '<tr><td>Labor</td><td>$' + formatNum(totals.labor || 0, 2) + '</td></tr>' +
+              '<tr><td>Labor Markup</td><td>$' + formatNum(totals.laborMarkup != null ? totals.laborMarkup : 0, 2) + '</td></tr>' +
+              '<tr style="font-weight: 600; border-top: 2px solid var(--border);"><td>Labor Subtotal</td><td style="text-align: right;">$' + formatNum((totals.labor || 0) + (totals.laborMarkup != null ? totals.laborMarkup : 0), 2) + '</td></tr>' +
             '</table>' +
           '</div>' +
           '<div class="preview-section">' +
@@ -1043,9 +1067,11 @@
           doc.text('Pricing Summary', margin, y);
           y += lineHeight + 2;
           doc.setFontSize(10);
-          doc.text('Materials: $' + formatNum((totals.materials || 0) + (totals.markup != null ? totals.markup : 0), 2), margin, y);
+          doc.text('Materials: $' + formatNum((totals.materials || 0) + (totals.materialsMarkup != null ? totals.materialsMarkup : 0), 2), margin, y);
           y += lineHeight;
-          doc.text('Labor: $' + formatNum(totals.labor || 0, 2), margin, y);
+          doc.text('Labor: $' + formatNum((totals.labor || 0) + (totals.laborMarkup != null ? totals.laborMarkup : 0), 2), margin, y);
+          y += lineHeight;
+          doc.text('Markup: $' + formatNum(totals.markup != null ? totals.markup : 0, 2), margin, y);
           y += lineHeight;
           doc.setFont(undefined, 'bold');
           doc.text('Grand Total: $' + formatNum(totals.total || 0, 2), margin, y);
@@ -1311,7 +1337,8 @@
           if (md) md.value = 'Pipe and fittings';
           if (ma) ma.value = 2500;
         }
-        if ($('markupPct')) $('markupPct').value = 30;
+        if ($('materialsMarkupPct')) $('materialsMarkupPct').value = 30;
+        if ($('laborMarkupPct')) $('laborMarkupPct').value = 30;
         if ($('scopeNotes')) $('scopeNotes').value = 'Sample scope: Rough-in and top-out per plans. Trim and fixture set by owner. Exclusions: owner-supplied fixtures, excavation, and final grading.';
         requiredIds.forEach(function(id) {
           var el = $(id);
