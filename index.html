@@ -26,7 +26,7 @@
       padding: 1rem;
     }
     .container { max-width: 960px; margin: 0 auto; }
-    .app-top-bar { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 1rem; }
+    .app-top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
     h1, h2, h3 { color: var(--primary); margin-top: 0; }
     h2 { font-size: 1.25rem; border-bottom: 2px solid var(--secondary); padding-bottom: 0.25rem; margin-bottom: 1rem; }
     .section {
@@ -222,6 +222,7 @@
 <body>
   <div class="container">
     <div class="app-top-bar no-print">
+      <button type="button" id="shareViaUrlBtn" class="btn btn-outline">Share via URL</button>
       <button type="button" id="fillSample" class="btn btn-outline">Fill with sample</button>
     </div>
     <form id="bidForm" class="no-print">
@@ -406,6 +407,14 @@
               <button type="button" aria-label="Decrease" data-target="fixtureHoseBibs">−</button>
               <input type="number" id="fixtureHoseBibs" name="fixtureHoseBibs" min="0" value="0">
               <button type="button" aria-label="Increase" data-target="fixtureHoseBibs">+</button>
+            </div>
+          </div>
+          <div class="fixture-item">
+            <label for="fixtureWaterFountain">Water fountain</label>
+            <div class="number-input-wrap">
+              <button type="button" aria-label="Decrease" data-target="fixtureWaterFountain">−</button>
+              <input type="number" id="fixtureWaterFountain" name="fixtureWaterFountain" min="0" value="0">
+              <button type="button" aria-label="Increase" data-target="fixtureWaterFountain">+</button>
             </div>
           </div>
           <div class="fixture-item">
@@ -708,7 +717,7 @@
         'fixtureUrinals', 'fixtureWaterClosets', 'fixtureKitchenSinks', 'fixtureDisposals',
         'fixtureIceMakers', 'fixturePotFiller',
         'fixtureLaundrySinks', 'fixtureWashingMachine',
-        'fixtureHoseBibs', 'fixtureGasDrops', 'fixtureFloorDrains', 'fixtureDogWash',
+        'fixtureHoseBibs', 'fixtureWaterFountain', 'fixtureGasDrops', 'fixtureFloorDrains', 'fixtureDogWash',
         'fixtureWHGas', 'fixtureWHElectric', 'fixtureWHTankless', 'fixtureWaterSoftener'
       ];
 
@@ -767,6 +776,7 @@
           fixtureShowerTub:    { label: 'Shower tub combo',             price: 3650,  roughIn: 1,   topOut: 3,   trim: 1,   note: 'no wall kit included' },
           fixtureLaundrySinks: { label: 'Laundry sink',                 price: 425,   roughIn: 1,   topOut: 1,   trim: 1,   note: 'no sink or faucet included' },
           fixtureHoseBibs:     { label: 'Hose bib',                     price: 500,   roughIn: 1,   topOut: 1,   trim: 0.5 },
+          fixtureWaterFountain: { label: 'Water fountain',              price: 1300,  roughIn: 2,   topOut: 3,   trim: 2 },
           fixtureWHGas:        { label: 'Water heater',                 price: 1200,  roughIn: 1,   topOut: 2,   trim: 2 },
           fixtureWHElectric:   { label: 'Water heater (electric)',      price: 1200,  roughIn: 1,   topOut: 2,   trim: 2 },
           fixtureWHTankless:   { label: 'Tankless Water Heater',        price: 3650,  roughIn: 1,   topOut: 3,   trim: 2 },
@@ -783,6 +793,7 @@
           fixtureShowerTub:    { label: 'Shower tub combo',             price: 3650,  roughIn: 1,   topOut: 3,   trim: 1,   note: 'no wall kit included' },
           fixtureLaundrySinks: { label: 'Laundry sink',                 price: 1800,  roughIn: 1,   topOut: 1,   trim: 1,   note: 'no sink or faucet included' },
           fixtureHoseBibs:     { label: 'Hose bib',                     price: 1200,  roughIn: 1,   topOut: 1,   trim: 0.5 },
+          fixtureWaterFountain: { label: 'Water fountain',              price: 3000,  roughIn: 2,   topOut: 3,   trim: 2 },
           fixtureWHGas:        { label: 'Water heater',                 price: 15000, roughIn: 1,   topOut: 2,   trim: 2 },
           fixtureWHElectric:   { label: 'Water heater (electric)',      price: 1200,  roughIn: 1,   topOut: 2,   trim: 2 },
           fixtureWHTankless:   { label: 'Tankless Water Heater',        price: 3650,  roughIn: 1,   topOut: 3,   trim: 2 },
@@ -1420,6 +1431,154 @@
         calculateTotals();
       }
 
+      function buildShareState() {
+        var fixtures = collectCurrentFixtures();
+        var ledger = getFixtureLedger();
+        var additionalLabor = [];
+        qsa('.additional-labor-row').forEach(function(row) {
+          var descEl = row.querySelector('.additional-labor-desc');
+          var hoursEl = row.querySelector('.additional-labor-hours');
+          var crewEl = row.querySelector('.additional-labor-crew');
+          var rateEl = row.querySelector('.additional-labor-rate');
+          additionalLabor.push({
+            desc: descEl ? descEl.value : '',
+            hours: hoursEl ? hoursEl.value : '',
+            crew: crewEl ? crewEl.value : '1',
+            rate: rateEl ? rateEl.value : ''
+          });
+        });
+        var additionalMaterials = [];
+        qsa('.additional-material-row').forEach(function(row) {
+          var descEl = row.querySelector('.additional-material-desc');
+          var amountEl = row.querySelector('.additional-material-amount');
+          additionalMaterials.push({
+            desc: descEl ? descEl.value : '',
+            amount: amountEl ? amountEl.value : ''
+          });
+        });
+        return { fixtures: fixtures, ledger: ledger, additionalLabor: additionalLabor, additionalMaterials: additionalMaterials };
+      }
+
+      function shareViaUrl() {
+        var state = buildShareState();
+        var payload = JSON.stringify(state);
+        var encoded;
+        try {
+          encoded = btoa(unescape(encodeURIComponent(payload)));
+        } catch (e) {
+          encoded = btoa(payload);
+        }
+        var url = location.origin + location.pathname + (location.search || '') + '#' + encoded;
+        try {
+          window.history.replaceState(null, '', url);
+        } catch (err) {
+          window.location.hash = encoded;
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).then(function() {
+            showShareFeedback('URL copied to clipboard');
+          }).catch(function() {
+            showShareFeedback('URL updated (copy from address bar)');
+          });
+        } else {
+          showShareFeedback('URL updated (copy from address bar)');
+        }
+      }
+
+      function showShareFeedback(message) {
+        var btn = $('shareViaUrlBtn');
+        if (!btn) return;
+        var orig = btn.textContent;
+        btn.textContent = message;
+        btn.disabled = true;
+        setTimeout(function() {
+          btn.textContent = orig;
+          btn.disabled = false;
+        }, 2000);
+      }
+
+      function restoreFromShareHash() {
+        var hash = location.hash;
+        if (!hash || hash.length < 2) return;
+        var encoded = hash.slice(1);
+        var payload;
+        try {
+          var decoded = decodeURIComponent(escape(atob(encoded)));
+          payload = JSON.parse(decoded);
+        } catch (e) {
+          return;
+        }
+        if (!payload || typeof payload.fixtures !== 'object') return;
+        var ledger = Array.isArray(payload.ledger) ? payload.ledger : [];
+        var additionalLabor = Array.isArray(payload.additionalLabor) ? payload.additionalLabor : [];
+        var additionalMaterials = Array.isArray(payload.additionalMaterials) ? payload.additionalMaterials : [];
+
+        Object.keys(payload.fixtures).forEach(function(label) {
+          var id = fixtureLabelToId[label];
+          var el = id ? $(id) : null;
+          if (el && el.value !== undefined) {
+            var val = payload.fixtures[label];
+            el.value = val != null ? String(val) : '';
+          }
+        });
+
+        setFixtureLedger(ledger);
+        renderLedgerList();
+
+        var laborContainer = $('additionalLaborRows');
+        if (laborContainer) {
+          qsa('.additional-labor-row', laborContainer).forEach(function(row) { row.remove(); });
+          var items = additionalLabor.length ? additionalLabor : [{ desc: '', hours: '', crew: '1', rate: '' }];
+          items.forEach(function(item) {
+            var row = document.createElement('div');
+            row.className = 'additional-labor-row';
+            row.innerHTML = '<input type="text" class="additional-labor-desc" placeholder="Description (e.g. Demo, Underground, Prep)"> <input type="number" class="additional-labor-hours" min="0" step="0.5" placeholder="Hrs" title="Hours"> <select class="additional-labor-crew" title="Crew size"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select> <input type="number" class="additional-labor-rate" min="0" step="0.01" placeholder="Rate" title="Labor rate $/hr"> <button type="button" class="additional-labor-remove" aria-label="Remove row">Remove</button>';
+            laborContainer.appendChild(row);
+            var descEl = row.querySelector('.additional-labor-desc');
+            var hoursEl = row.querySelector('.additional-labor-hours');
+            var crewEl = row.querySelector('.additional-labor-crew');
+            var rateEl = row.querySelector('.additional-labor-rate');
+            if (descEl) descEl.value = item.desc != null ? String(item.desc) : '';
+            if (hoursEl) hoursEl.value = item.hours != null ? String(item.hours) : '';
+            if (crewEl) crewEl.value = item.crew != null ? String(item.crew) : '1';
+            if (rateEl) rateEl.value = item.rate != null ? String(item.rate) : '';
+            qsa('input, select', row).forEach(function(el) {
+              el.addEventListener('input', calculateTotals);
+              el.addEventListener('change', calculateTotals);
+            });
+            if (!(String((item.rate || '').trim())) && rateEl) {
+              var crew = parseInt(crewEl ? crewEl.value : '1', 10) || 1;
+              var rateFromCrew = $('crewRate' + crew);
+              var rate = (rateFromCrew && parseFloat(rateFromCrew.value)) || 0;
+              rateEl.value = rate;
+            }
+          });
+        }
+
+        var materialContainer = $('additionalMaterialRows');
+        if (materialContainer) {
+          qsa('.additional-material-row', materialContainer).forEach(function(row) { row.remove(); });
+          var matItems = additionalMaterials.length ? additionalMaterials : [{ desc: '', amount: '' }];
+          matItems.forEach(function(item) {
+            var row = document.createElement('div');
+            row.className = 'additional-material-row';
+            row.innerHTML = '<input type="text" class="additional-material-desc" placeholder="Description (e.g. Pipe, Fittings)"> <input type="number" class="additional-material-amount" min="0" step="0.01" placeholder="Amount" title="Amount ($)"> <button type="button" class="additional-material-remove" aria-label="Remove row">Remove</button>';
+            materialContainer.appendChild(row);
+            var descEl = row.querySelector('.additional-material-desc');
+            var amountEl = row.querySelector('.additional-material-amount');
+            if (descEl) descEl.value = item.desc != null ? String(item.desc) : '';
+            if (amountEl) amountEl.value = item.amount != null ? String(item.amount) : '';
+            qsa('input', row).forEach(function(el) {
+              el.addEventListener('input', calculateTotals);
+              el.addEventListener('change', calculateTotals);
+            });
+          });
+        }
+
+        calculateTotals();
+        updateRoughBid();
+      }
+
       function setupIncrementDecrement() {
         document.body.addEventListener('click', function(e) {
           var btn = e.target;
@@ -1609,7 +1768,7 @@
         var ids = [
           'fixtureToilets', 'fixtureBathSinks', 'fixtureKitchenSinks', 'fixtureDisposals',
           'fixtureUrinals', 'fixtureTubs', 'fixtureShowerOnly', 'fixtureShowerTub',
-          'fixtureLaundrySinks', 'fixtureHoseBibs', 'fixtureWHGas', 'fixtureWHElectric',
+          'fixtureLaundrySinks', 'fixtureHoseBibs', 'fixtureWaterFountain', 'fixtureWHGas', 'fixtureWHElectric',
           'fixtureWHTankless', 'fixtureGasDrops'
         ];
         ids.forEach(function(id) {
@@ -1714,6 +1873,8 @@
         var confirmIfChanged = opts.confirmIfChanged !== false;
         if (!FIXTURE_MODES[modeName]) return false;
         if (modeName === currentFixtureMode) {
+          renderFixturePriceTable();
+          calculateTotals();
           updateFixtureModeUi();
           return true;
         }
@@ -1743,6 +1904,7 @@
       $('exportPdf').addEventListener('click', exportToPDF);
       $('addTakeoffRow').addEventListener('click', addTakeoffRow);
       if ($('fillSample')) $('fillSample').addEventListener('click', fillWithSampleData);
+      if ($('shareViaUrlBtn')) $('shareViaUrlBtn').addEventListener('click', shareViaUrl);
       if ($('addAdditionalLaborRow')) $('addAdditionalLaborRow').addEventListener('click', addAdditionalLaborRow);
       if ($('addAdditionalMaterialRow')) $('addAdditionalMaterialRow').addEventListener('click', addAdditionalMaterialRow);
       var additionalMaterialRowsEl = $('additionalMaterialRows');
@@ -1902,6 +2064,7 @@
       document.addEventListener('DOMContentLoaded', function() {
         initializeFixtureMode();
         renderLedgerList();
+        restoreFromShareHash();
       });
     })();
   </script>
