@@ -175,6 +175,13 @@
     .fixture-price-table tbody tr:nth-child(even) { background: rgba(0,0,0,0.03); }
     .fixture-price-input { width: 4.5rem; max-width: 100%; padding: 0.35rem 0.5rem; font-size: 0.9rem; border: 1px solid var(--border); border-radius: 6px; }
     .fixture-price-table .fixture-price-input { box-sizing: border-box; }
+    .fixture-mode-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin: 0.25rem 0 0.75rem 0; font-size: 0.9rem; }
+    .fixture-mode-row label { margin-bottom: 0; font-weight: 500; }
+    .fixture-mode-select { min-width: 140px; }
+    .fixture-mode-status { margin-left: auto; font-weight: 600; color: var(--primary); }
+    .fixture-price-details.fixture-mode-trace { border-color: #e09f3e; box-shadow: 0 0 0 1px rgba(224,159,62,0.4); }
+    .fixture-price-details.fixture-mode-trace .fixture-price-summary { color: #9a4a00; }
+    .fixture-mode-status-trace { color: #9a4a00; }
     @media (max-width: 768px) {
       body { padding: 0.75rem; }
       .section { padding: 1rem; }
@@ -464,9 +471,17 @@
           <button type="button" id="clearFixtureCounts" class="btn btn-outline">Clear counts</button>
         </p>
         <div class="fixture-price-reference">
-          <details class="fixture-price-details">
+          <details class="fixture-price-details" id="fixturePriceDetails">
             <summary class="fixture-price-summary">Fixture Prices and Labor</summary>
             <div class="fixture-price-details-content">
+          <div class="fixture-mode-row">
+            <label for="fixtureModeSelect">Fixture mode:</label>
+            <select id="fixtureModeSelect" class="fixture-mode-select">
+              <option value="Malachi">Malachi (default)</option>
+              <option value="Trace">Trace</option>
+            </select>
+            <span id="fixtureModeStatus" class="fixture-mode-status"></span>
+          </div>
           <table class="fixture-price-table" id="fixturePriceTable" aria-label="Fixture prices and labor">
             <thead>
               <tr>
@@ -566,6 +581,18 @@
           <table class="preview-table">
             <tr><th>Item</th><th>Amount</th></tr>
             <tr>
+              <td>Fixture Labor</td>
+              <td>$<span id="calcFixtureLaborBase">0.00</span></td>
+            </tr>
+            <tr>
+              <td>Fixture Labor Markup <input type="number" id="fixtureLaborMarkupPct" name="fixtureLaborMarkupPct" min="0" step="0.5" value="0" title="Fixture Labor Markup" style="width: 4rem; margin-left: 0.5rem; padding: 0.25rem 0.5rem; font-size: 0.9rem;">%</td>
+              <td>$<span id="calcFixtureLaborMarkup">0.00</span></td>
+            </tr>
+            <tr style="font-weight: 600; border-top: 2px solid var(--border);">
+              <td>Fixture Labor Subtotal</td>
+              <td style="text-align: right;">$<span id="calcFixtureLaborSubtotal">0.00</span></td>
+            </tr>
+            <tr>
               <td>Materials</td>
               <td>$<span id="calcMaterials">0.00</span></td>
             </tr>
@@ -578,15 +605,15 @@
               <td style="text-align: right;">$<span id="calcMaterialsSubtotal">0.00</span></td>
             </tr>
             <tr>
-              <td>Labor</td>
+              <td>Additional Labor</td>
               <td>$<span id="calcLabor">0.00</span></td>
             </tr>
             <tr>
-              <td>Labor Markup <input type="number" id="laborMarkupPct" name="laborMarkupPct" min="0" step="0.5" value="30" title="Labor Markup" style="width: 4rem; margin-left: 0.5rem; padding: 0.25rem 0.5rem; font-size: 0.9rem;">%</td>
+              <td>Additional Labor Markup <input type="number" id="laborMarkupPct" name="laborMarkupPct" min="0" step="0.5" value="30" title="Labor Markup" style="width: 4rem; margin-left: 0.5rem; padding: 0.25rem 0.5rem; font-size: 0.9rem;">%</td>
               <td>$<span id="calcLaborMarkup">0.00</span></td>
             </tr>
             <tr style="font-weight: 600; border-top: 2px solid var(--border);">
-              <td>Labor Subtotal</td>
+              <td>Additional Labor Subtotal</td>
               <td style="text-align: right;">$<span id="calcLaborSubtotal">0.00</span></td>
             </tr>
           </table>
@@ -674,23 +701,46 @@
         return m;
       })();
 
-      var FIXTURE_PRICES = {
-        fixtureToilets:            { label: 'Toilet',                       price: 650,   roughIn: 1,   topOut: 1,   trim: 1 },
-        fixtureBathSinks:          { label: 'Bathroom sinks',               price: 275,   roughIn: 1,   topOut: 1,   trim: 1,   note: 'no sink included' },
-        fixtureKitchenSinks:       { label: 'Kitchen sink',                 price: 425,   roughIn: 1,   topOut: 1,   trim: 2,   note: 'no sink or faucet included' },
-        fixtureDisposals:          { label: 'Garbage Disposal',             price: 350,   roughIn: 0,   topOut: 0,   trim: 1 },
-        fixtureUrinals:            { label: 'Urinal and valve',             price: 950,   roughIn: 1,   topOut: 3,   trim: 3 },
-        fixtureTubs:               { label: 'Bath tub and valve',           price: 2000,  roughIn: 1,   topOut: 2,   trim: 1 },
-        fixtureShowerOnly:         { label: 'Shower only',                  price: 2450,  roughIn: 1,   topOut: 2.5, trim: 1 },
-        fixtureShowerTub:          { label: 'Shower tub combo',             price: 3650,  roughIn: 1,   topOut: 3,   trim: 1,   note: 'no wall kit included' },
-        fixtureLaundrySinks:       { label: 'Laundry sink',                 price: 425,   roughIn: 1,   topOut: 1,   trim: 1,   note: 'no sink or faucet included' },
-        fixtureHoseBibs:           { label: 'Hose bib',                     price: 500,   roughIn: 1,   topOut: 1,   trim: 0.5 },
-        fixtureWHGas:              { label: 'Water heater',                 price: 1200,  roughIn: 1,   topOut: 2,   trim: 2 },
-        fixtureWHElectric:         { label: 'Water heater (electric)',      price: 1200,  roughIn: 1,   topOut: 2,   trim: 2 },
-        fixtureWHTankless:         { label: 'Tankless Water Heater',        price: 3650,  roughIn: 1,   topOut: 3,   trim: 2 },
-        fixtureGasDrops:           { label: 'Gas drops',                    price: 1000,  roughIn: 3,   topOut: 1,   trim: 0 }
+      var DEFAULT_FIXTURE_MODE = 'Malachi';
+      var currentFixtureMode = DEFAULT_FIXTURE_MODE;
+
+      var FIXTURE_MODES = {
+        Malachi: {
+          fixtureToilets:      { label: 'Toilet',                       price: 650,   roughIn: 1,   topOut: 1,   trim: 1 },
+          fixtureBathSinks:    { label: 'Bathroom sinks',               price: 275,   roughIn: 1,   topOut: 1,   trim: 1,   note: 'no sink included' },
+          fixtureKitchenSinks: { label: 'Kitchen sink',                 price: 425,   roughIn: 1,   topOut: 1,   trim: 2,   note: 'no sink or faucet included' },
+          fixtureDisposals:    { label: 'Garbage Disposal',             price: 350,   roughIn: 0,   topOut: 0,   trim: 1 },
+          fixtureUrinals:      { label: 'Urinal and valve',             price: 950,   roughIn: 1,   topOut: 3,   trim: 3 },
+          fixtureTubs:         { label: 'Bath tub and valve',           price: 2000,  roughIn: 1,   topOut: 2,   trim: 1 },
+          fixtureShowerOnly:   { label: 'Shower only',                  price: 2450,  roughIn: 1,   topOut: 2.5, trim: 1 },
+          fixtureShowerTub:    { label: 'Shower tub combo',             price: 3650,  roughIn: 1,   topOut: 3,   trim: 1,   note: 'no wall kit included' },
+          fixtureLaundrySinks: { label: 'Laundry sink',                 price: 425,   roughIn: 1,   topOut: 1,   trim: 1,   note: 'no sink or faucet included' },
+          fixtureHoseBibs:     { label: 'Hose bib',                     price: 500,   roughIn: 1,   topOut: 1,   trim: 0.5 },
+          fixtureWHGas:        { label: 'Water heater',                 price: 1200,  roughIn: 1,   topOut: 2,   trim: 2 },
+          fixtureWHElectric:   { label: 'Water heater (electric)',      price: 1200,  roughIn: 1,   topOut: 2,   trim: 2 },
+          fixtureWHTankless:   { label: 'Tankless Water Heater',        price: 3650,  roughIn: 1,   topOut: 3,   trim: 2 },
+          fixtureGasDrops:     { label: 'Gas drops',                    price: 1000,  roughIn: 3,   topOut: 1,   trim: 0 }
+        },
+        Trace: {
+          fixtureToilets:      { label: 'Toilet',                       price: 3800,  roughIn: 1,   topOut: 1,   trim: 1 },
+          fixtureBathSinks:    { label: 'Bathroom sinks',               price: 3800,  roughIn: 1,   topOut: 1,   trim: 1,   note: 'no sink included' },
+          fixtureKitchenSinks: { label: 'Kitchen sink',                 price: 3800,  roughIn: 1,   topOut: 1,   trim: 2,   note: 'no sink or faucet included' },
+          fixtureDisposals:    { label: 'Garbage Disposal',             price: 1800,  roughIn: 1.5, topOut: 0,   trim: 1 },
+          fixtureUrinals:      { label: 'Urinal and valve',             price: 950,   roughIn: 1,   topOut: 3,   trim: 3 },
+          fixtureTubs:         { label: 'Bath tub and valve',           price: 2000,  roughIn: 1,   topOut: 2,   trim: 1 },
+          fixtureShowerOnly:   { label: 'Shower only',                  price: 3800,  roughIn: 1,   topOut: 2.5, trim: 1 },
+          fixtureShowerTub:    { label: 'Shower tub combo',             price: 3650,  roughIn: 1,   topOut: 3,   trim: 1,   note: 'no wall kit included' },
+          fixtureLaundrySinks: { label: 'Laundry sink',                 price: 1800,  roughIn: 1,   topOut: 1,   trim: 1,   note: 'no sink or faucet included' },
+          fixtureHoseBibs:     { label: 'Hose bib',                     price: 1200,  roughIn: 1,   topOut: 1,   trim: 0.5 },
+          fixtureWHGas:        { label: 'Water heater',                 price: 15000, roughIn: 1,   topOut: 2,   trim: 2 },
+          fixtureWHElectric:   { label: 'Water heater (electric)',      price: 1200,  roughIn: 1,   topOut: 2,   trim: 2 },
+          fixtureWHTankless:   { label: 'Tankless Water Heater',        price: 3650,  roughIn: 1,   topOut: 3,   trim: 2 },
+          fixtureGasDrops:     { label: 'Gas drops',                    price: 1200,  roughIn: 3,   topOut: 1,   trim: 0 }
+        }
       };
-      var DEFAULT_FIXTURE_PRICES = JSON.parse(JSON.stringify(FIXTURE_PRICES));
+
+      var FIXTURE_PRICES = JSON.parse(JSON.stringify(FIXTURE_MODES[currentFixtureMode]));
+      var DEFAULT_FIXTURE_PRICES = JSON.parse(JSON.stringify(FIXTURE_MODES[DEFAULT_FIXTURE_MODE]));
 
       var FIXTURE_LEDGER_KEY = 'bidtoolingFixtureLedger';
       function getFixtureLedger() {
@@ -801,10 +851,14 @@
         var totalHours = fixtureLabor.total + additionalHours;
         var materialsMarkupPct = getNum('materialsMarkupPct') || 0;
         var laborMarkupPct = getNum('laborMarkupPct') || 0;
+        var fixtureLaborMarkupPct = getNum('fixtureLaborMarkupPct') || 0;
         var materialsMarkup = materials * (materialsMarkupPct / 100);
         var laborMarkup = labor * (laborMarkupPct / 100);
-        var markup = materialsMarkup + laborMarkup;
-        var total = materials + labor + markup;
+        var fixtureLaborMarkup = fixtureCost * (fixtureLaborMarkupPct / 100);
+        var fixtureLaborSubtotal = fixtureCost + fixtureLaborMarkup;
+        var materialsSubtotal = materials + materialsMarkup;
+        var laborSubtotal = labor + laborMarkup;
+        var total = fixtureLaborSubtotal + materialsSubtotal + laborSubtotal;
 
         var fixtureCount = totalFixtures();
         $('totalFixtures').textContent = formatNum(fixtureCount, 0);
@@ -822,17 +876,31 @@
         if ($('fixtureLaborTopOut')) $('fixtureLaborTopOut').textContent = formatNum(fixtureLabor.topOut, 1);
         if ($('fixtureLaborTrim')) $('fixtureLaborTrim').textContent = formatNum(fixtureLabor.trim, 1);
         $('laborTotal').textContent = formatNum(labor, 2);
+        if ($('calcFixtureLaborBase')) $('calcFixtureLaborBase').textContent = formatNum(fixtureCost, 2);
+        if ($('calcFixtureLaborMarkup')) $('calcFixtureLaborMarkup').textContent = formatNum(fixtureLaborMarkup, 2);
+        if ($('calcFixtureLaborSubtotal')) $('calcFixtureLaborSubtotal').textContent = formatNum(fixtureLaborSubtotal, 2);
         $('calcMaterials').textContent = formatNum(materials, 2);
         $('calcLabor').textContent = formatNum(labor, 2);
         if ($('calcMaterialsMarkup')) $('calcMaterialsMarkup').textContent = formatNum(materialsMarkup, 2);
         if ($('calcLaborMarkup')) $('calcLaborMarkup').textContent = formatNum(laborMarkup, 2);
-        var materialsSubtotal = materials + materialsMarkup;
-        var laborSubtotal = labor + laborMarkup;
         if ($('calcMaterialsSubtotal')) $('calcMaterialsSubtotal').textContent = formatNum(materialsSubtotal, 2);
         if ($('calcLaborSubtotal')) $('calcLaborSubtotal').textContent = formatNum(laborSubtotal, 2);
         if ($('calcTotal')) $('calcTotal').textContent = formatNum(total, 2);
         $('grandTotal').textContent = formatNum(total, 2);
-        return { materials, labor, markup, materialsMarkup, laborMarkup, total, totalHours, fixtureLabor, fixtureCost };
+        return {
+          materials: materials,
+          labor: labor,
+          materialsMarkup: materialsMarkup,
+          laborMarkup: laborMarkup,
+          total: total,
+          totalHours: totalHours,
+          fixtureLabor: fixtureLabor,
+          fixtureCost: fixtureCost,
+          fixtureLaborMarkup: fixtureLaborMarkup,
+          fixtureLaborSubtotal: fixtureLaborSubtotal,
+          materialsSubtotal: materialsSubtotal,
+          laborSubtotal: laborSubtotal
+        };
       }
 
       function updatePreview() {
@@ -981,12 +1049,15 @@
             '<h3>Pricing Breakdown</h3>' +
             '<table class="preview-table">' +
               '<tr><th>Item</th><th>Amount</th></tr>' +
+              '<tr><td>Fixture Labor</td><td>$' + formatNum(totals.fixtureCost || 0, 2) + '</td></tr>' +
+              '<tr><td>Fixture Labor Markup</td><td>$' + formatNum(totals.fixtureLaborMarkup != null ? totals.fixtureLaborMarkup : 0, 2) + '</td></tr>' +
+              '<tr style="font-weight: 600; border-top: 2px solid var(--border);"><td>Fixture Labor Subtotal</td><td style="text-align: right;">$' + formatNum(totals.fixtureLaborSubtotal != null ? totals.fixtureLaborSubtotal : (totals.fixtureCost || 0), 2) + '</td></tr>' +
               '<tr><td>Materials</td><td>$' + formatNum(totals.materials || 0, 2) + '</td></tr>' +
               '<tr><td>Materials Markup</td><td>$' + formatNum(totals.materialsMarkup != null ? totals.materialsMarkup : 0, 2) + '</td></tr>' +
-              '<tr style="font-weight: 600; border-top: 2px solid var(--border);"><td>Materials Subtotal</td><td style="text-align: right;">$' + formatNum((totals.materials || 0) + (totals.materialsMarkup != null ? totals.materialsMarkup : 0), 2) + '</td></tr>' +
-              '<tr><td>Labor</td><td>$' + formatNum(totals.labor || 0, 2) + '</td></tr>' +
-              '<tr><td>Labor Markup</td><td>$' + formatNum(totals.laborMarkup != null ? totals.laborMarkup : 0, 2) + '</td></tr>' +
-              '<tr style="font-weight: 600; border-top: 2px solid var(--border);"><td>Labor Subtotal</td><td style="text-align: right;">$' + formatNum((totals.labor || 0) + (totals.laborMarkup != null ? totals.laborMarkup : 0), 2) + '</td></tr>' +
+              '<tr style="font-weight: 600; border-top: 2px solid var(--border);"><td>Materials Subtotal</td><td style="text-align: right;">$' + formatNum(totals.materialsSubtotal != null ? totals.materialsSubtotal : (totals.materials || 0) + (totals.materialsMarkup != null ? totals.materialsMarkup : 0), 2) + '</td></tr>' +
+              '<tr><td>Additional Labor</td><td>$' + formatNum(totals.labor || 0, 2) + '</td></tr>' +
+              '<tr><td>Additional Labor Markup</td><td>$' + formatNum(totals.laborMarkup != null ? totals.laborMarkup : 0, 2) + '</td></tr>' +
+              '<tr style="font-weight: 600; border-top: 2px solid var(--border);"><td>Additional Labor Subtotal</td><td style="text-align: right;">$' + formatNum(totals.laborSubtotal != null ? totals.laborSubtotal : (totals.labor || 0) + (totals.laborMarkup != null ? totals.laborMarkup : 0), 2) + '</td></tr>' +
             '</table>' +
           '</div>' +
           '<div class="preview-section">' +
@@ -1067,11 +1138,16 @@
           doc.text('Pricing Summary', margin, y);
           y += lineHeight + 2;
           doc.setFontSize(10);
-          doc.text('Materials: $' + formatNum((totals.materials || 0) + (totals.materialsMarkup != null ? totals.materialsMarkup : 0), 2), margin, y);
+          var fxBase = totals.fixtureCost || 0;
+          var fxMarkup = totals.fixtureLaborMarkup != null ? totals.fixtureLaborMarkup : 0;
+          var fxSub = totals.fixtureLaborSubtotal != null ? totals.fixtureLaborSubtotal : (fxBase + fxMarkup);
+          var matSub = totals.materialsSubtotal != null ? totals.materialsSubtotal : ((totals.materials || 0) + (totals.materialsMarkup != null ? totals.materialsMarkup : 0));
+          var labSub = totals.laborSubtotal != null ? totals.laborSubtotal : ((totals.labor || 0) + (totals.laborMarkup != null ? totals.laborMarkup : 0));
+          doc.text('Fixture Labor Subtotal: $' + formatNum(fxSub, 2), margin, y);
           y += lineHeight;
-          doc.text('Labor: $' + formatNum((totals.labor || 0) + (totals.laborMarkup != null ? totals.laborMarkup : 0), 2), margin, y);
+          doc.text('Materials Subtotal: $' + formatNum(matSub, 2), margin, y);
           y += lineHeight;
-          doc.text('Markup: $' + formatNum(totals.markup != null ? totals.markup : 0, 2), margin, y);
+          doc.text('Additional Labor Subtotal: $' + formatNum(labSub, 2), margin, y);
           y += lineHeight;
           doc.setFont(undefined, 'bold');
           doc.text('Grand Total: $' + formatNum(totals.total || 0, 2), margin, y);
@@ -1487,9 +1563,9 @@
       }
 
       function resetFixturePricesToDefault() {
-        var ids = Object.keys(DEFAULT_FIXTURE_PRICES);
-        ids.forEach(function(id) {
-          var def = DEFAULT_FIXTURE_PRICES[id];
+        var modeDefaults = FIXTURE_MODES[currentFixtureMode] || {};
+        Object.keys(modeDefaults).forEach(function(id) {
+          var def = modeDefaults[id];
           if (!FIXTURE_PRICES[id]) FIXTURE_PRICES[id] = {};
           FIXTURE_PRICES[id].price = def.price;
           FIXTURE_PRICES[id].roughIn = def.roughIn;
@@ -1497,6 +1573,79 @@
           FIXTURE_PRICES[id].trim = def.trim;
         });
         renderFixturePriceTable();
+        calculateTotals();
+      }
+
+      function hasFixturePriceChangesFromMode(modeName) {
+        var base = FIXTURE_MODES[modeName];
+        if (!base) return false;
+        var ids = Object.keys(base);
+        for (var i = 0; i < ids.length; i++) {
+          var id = ids[i];
+          var baseRow = base[id] || {};
+          var currRow = FIXTURE_PRICES[id] || {};
+          if (baseRow.price !== currRow.price ||
+              baseRow.roughIn !== currRow.roughIn ||
+              baseRow.topOut !== currRow.topOut ||
+              baseRow.trim !== currRow.trim) {
+            return true;
+          }
+        }
+        return false;
+      }
+
+      function updateFixtureModeUi() {
+        var select = $('fixtureModeSelect');
+        if (select) {
+          select.value = currentFixtureMode;
+        }
+        var status = $('fixtureModeStatus');
+        var details = $('fixturePriceDetails');
+        if (status) {
+          if (currentFixtureMode === 'Trace') {
+            status.textContent = 'TRACE MODE ACTIVE';
+            status.classList.add('fixture-mode-status-trace');
+          } else {
+            status.textContent = 'Mode: Malachi';
+            status.classList.remove('fixture-mode-status-trace');
+          }
+        }
+        if (details) {
+          if (currentFixtureMode === 'Trace') {
+            details.classList.add('fixture-mode-trace');
+          } else {
+            details.classList.remove('fixture-mode-trace');
+          }
+        }
+      }
+
+      function setFixtureMode(modeName, opts) {
+        opts = opts || {};
+        var confirmIfChanged = opts.confirmIfChanged !== false;
+        if (!FIXTURE_MODES[modeName]) return false;
+        if (modeName === currentFixtureMode) {
+          updateFixtureModeUi();
+          return true;
+        }
+        if (confirmIfChanged && hasFixturePriceChangesFromMode(currentFixtureMode)) {
+          var ok = window.confirm('You have custom fixture pricing. Switch to ' + modeName + ' mode and overwrite them with that mode\u2019s defaults?');
+          if (!ok) {
+            updateFixtureModeUi();
+            return false;
+          }
+        }
+        currentFixtureMode = modeName;
+        var modeDefaults = FIXTURE_MODES[currentFixtureMode];
+        FIXTURE_PRICES = JSON.parse(JSON.stringify(modeDefaults));
+        try {
+          localStorage.setItem('bidtoolingFixtureMode', currentFixtureMode);
+        } catch (e) {
+          // ignore
+        }
+        renderFixturePriceTable();
+        calculateTotals();
+        updateFixtureModeUi();
+        return true;
       }
 
       $('generatePreview').addEventListener('click', onGeneratePreview);
@@ -1592,20 +1741,42 @@
         fixturePriceTable.addEventListener('change', syncFixturePriceInput);
       }
 
+      var fixtureModeSelectEl = $('fixtureModeSelect');
+      if (fixtureModeSelectEl) {
+        fixtureModeSelectEl.addEventListener('change', function(e) {
+          var newMode = e.target.value;
+          if (!FIXTURE_MODES[newMode]) {
+            updateFixtureModeUi();
+            return;
+          }
+          var ok = setFixtureMode(newMode, { confirmIfChanged: true });
+          if (!ok) {
+            updateFixtureModeUi();
+          }
+        });
+      }
+
       qsa('input, select, textarea').forEach(function(el) {
         el.addEventListener('input', calculateTotals);
         el.addEventListener('change', calculateTotals);
       });
       setupIncrementDecrement();
 
+      function initializeFixtureMode() {
+        var saved = null;
+        try {
+          saved = localStorage.getItem('bidtoolingFixtureMode');
+        } catch (e) {
+          saved = null;
+        }
+        var initialMode = (saved && FIXTURE_MODES[saved]) ? saved : DEFAULT_FIXTURE_MODE;
+        setFixtureMode(initialMode, { confirmIfChanged: false });
+      }
+
       document.addEventListener('DOMContentLoaded', function() {
-        calculateTotals();
+        initializeFixtureMode();
         renderLedgerList();
-        renderFixturePriceTable();
       });
-      calculateTotals();
-      renderLedgerList();
-      renderFixturePriceTable();
     })();
   </script>
 </body>
