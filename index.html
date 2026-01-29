@@ -547,8 +547,8 @@
               <summary class="fixture-price-summary">Crew pricing ($/hr)</summary>
               <div class="fixture-price-details-content">
                 <p style="margin: 0.5rem 0 0.25rem 0;"><label for="crewRate1">1 Tech</label><input type="number" id="crewRate1" name="crewRate1" min="0" step="0.01" value="275" style="max-width: 6rem;"> $/hr</p>
-                <p style="margin: 0.25rem 0;"><label for="crewRate2">2 Techs</label><input type="number" id="crewRate2" name="crewRate2" min="0" step="0.01" value="350" style="max-width: 6rem;"> $/hr</p>
-                <p style="margin: 0.25rem 0 0.5rem 0;"><label for="crewRate3">3 Techs</label><input type="number" id="crewRate3" name="crewRate3" min="0" step="0.01" value="500" style="max-width: 6rem;"> $/hr</p>
+                <p style="margin: 0.25rem 0;"><label for="crewRate2">Plumber and Helper</label><input type="number" id="crewRate2" name="crewRate2" min="0" step="0.01" value="315" style="max-width: 6rem;"> $/hr</p>
+                <p style="margin: 0.25rem 0 0.5rem 0;"><label for="crewRate3">3 Techs</label><input type="number" id="crewRate3" name="crewRate3" min="0" step="0.01" value="350" style="max-width: 6rem;"> $/hr</p>
               </div>
             </details>
             <button type="button" class="crew-pricing-link" id="openCrewPricing" aria-expanded="false">[Crew Pricing]</button>
@@ -688,7 +688,7 @@
       <div class="actions no-print">
         <button type="button" id="generatePreview" class="btn btn-primary">Generate Preview</button>
         <button type="button" id="printBtn" class="btn btn-secondary">Print</button>
-        <button type="button" id="exportPdf" class="btn btn-outline">Export to PDF</button>
+        <button type="button" id="exportPdf" class="btn btn-outline">Export Summary</button>
         <button type="button" id="clearBtn" class="btn btn-outline">Clear All</button>
         <button type="button" id="roughCalculatorBtn" class="btn btn-outline btn-push-right" aria-expanded="false">Rough Calculator</button>
       </div>
@@ -1610,8 +1610,8 @@
         qsa('.additional-labor-crew').forEach(function(el) { el.value = '1'; });
         qsa('.additional-labor-rate').forEach(function(el) { el.value = ''; });
         if ($('crewRate1')) $('crewRate1').value = '275';
-        if ($('crewRate2')) $('crewRate2').value = '350';
-        if ($('crewRate3')) $('crewRate3').value = '500';
+        if ($('crewRate2')) $('crewRate2').value = '315';
+        if ($('crewRate3')) $('crewRate3').value = '350';
         qsa('.additional-material-row').forEach(function(row, i) {
           if (i > 0) row.remove();
         });
@@ -1653,7 +1653,7 @@
           if (d) d.value = 'Demo and prep';
           if (h) h.value = 8;
           if (c) c.value = '2';
-          if (r) r.value = 350;
+          if (r) r.value = 315;
         }
         var materialRows = qsa('.additional-material-row');
         if (materialRows[0]) {
