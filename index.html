@@ -830,7 +830,7 @@
         var laborSubtotal = labor + laborMarkup;
         if ($('calcMaterialsSubtotal')) $('calcMaterialsSubtotal').textContent = formatNum(materialsSubtotal, 2);
         if ($('calcLaborSubtotal')) $('calcLaborSubtotal').textContent = formatNum(laborSubtotal, 2);
-        $('calcTotal').textContent = formatNum(total, 2);
+        if ($('calcTotal')) $('calcTotal').textContent = formatNum(total, 2);
         $('grandTotal').textContent = formatNum(total, 2);
         return { materials, labor, markup, materialsMarkup, laborMarkup, total, totalHours, fixtureLabor, fixtureCost };
       }
