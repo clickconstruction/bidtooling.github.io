@@ -101,8 +101,11 @@
     .additional-material-header .additional-material-hdr-desc { flex: 2; min-width: 0; }
     .additional-material-header .additional-material-hdr-amount { flex: 0 0 6rem; max-width: 7rem; text-align: center; }
     .additional-material-header .additional-material-hdr-remove { flex-shrink: 0; width: 5rem; }
-    .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.5rem 0; }
+    .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.5rem 0; align-items: flex-start; }
     .actions .btn-push-right { margin-left: auto; }
+    .internal-summary-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; text-align: center; }
+    .internal-summary-box .internal-summary-title { font-size: 1rem; margin: 0 0 0.75rem 0; color: var(--primary); font-weight: 600; }
+    .internal-summary-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; }
     .btn {
       padding: 0.75rem 1.25rem;
       border: none;
@@ -190,6 +193,40 @@
     .fixture-price-details.fixture-mode-trace { border-color: #e09f3e; box-shadow: 0 0 0 1px rgba(224,159,62,0.4); }
     .fixture-price-details.fixture-mode-trace .fixture-price-summary { color: #9a4a00; }
     .fixture-mode-status-trace { color: #9a4a00; }
+    .external-summary-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.4);
+      padding: 1rem;
+    }
+    .external-summary-modal.visible { display: flex; }
+    .external-summary-modal-panel {
+      background: var(--card-bg);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      max-width: 560px;
+      max-height: 90vh;
+      overflow: auto;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    .external-summary-modal-header { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); font-size: 1.1rem; font-weight: 600; color: var(--primary); }
+    .external-summary-modal-body { padding: 1.25rem; }
+    .external-summary-modal-body .external-summary-notes-label { display: block; margin-bottom: 0.35rem; font-weight: 500; color: var(--primary); }
+    .external-summary-modal-body #externalSummaryNotes { min-height: 80px; margin-bottom: 1rem; }
+    .external-summary-modal-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; padding: 1rem 1.25rem; border-top: 1px solid var(--border); }
+    .external-summary-print-notes { display: none; margin-top: 0.75rem; padding: 0.5rem 0; border-top: 1px solid var(--border); font-size: 0.9rem; white-space: pre-wrap; }
+    @media print {
+      body.print-external-summary .container { display: none !important; }
+      body.print-external-summary .external-summary-modal { display: flex !important; background: #fff; padding: 0; }
+      body.print-external-summary .external-summary-modal-panel { max-height: none; box-shadow: none; border: none; }
+      body.print-external-summary .external-summary-modal-actions { display: none !important; }
+      body.print-external-summary .external-summary-print-notes { display: block !important; }
+      body.print-external-summary #externalSummaryNotes { display: none !important; }
+    }
     @media (max-width: 768px) {
       body { padding: 0.75rem; }
       .section { padding: 1rem; }
@@ -234,8 +271,18 @@
             <input type="text" id="customerName" name="customerName" required placeholder="Customer name">
           </div>
           <div class="field">
+            <label for="customerAddress">Customer Address</label>
+            <textarea id="customerAddress" name="customerAddress" rows="2" placeholder="Street, City, State ZIP (optional)"></textarea>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label for="jobName">Job Name</label>
+            <input type="text" id="jobName" name="jobName" placeholder="e.g. Kitchen remodel (optional)">
+          </div>
+          <div class="field">
             <label for="jobAddress">Job Address *</label>
-            <input type="text" id="jobAddress" name="jobAddress" required placeholder="Street, City, State ZIP">
+            <textarea id="jobAddress" name="jobAddress" rows="2" required placeholder="Street, City, State ZIP"></textarea>
           </div>
         </div>
         <div class="form-row">
@@ -246,16 +293,6 @@
           <div class="field">
             <label for="bidNumber">Bid Number *</label>
             <input type="text" id="bidNumber" name="bidNumber" required placeholder="e.g. 2024-001">
-          </div>
-          <div class="field">
-            <label for="jobType">Job Type</label>
-            <select id="jobType" name="jobType">
-              <option value="Residential remodel">Residential remodel</option>
-              <option value="New construction">New construction</option>
-              <option value="Commercial">Commercial</option>
-              <option value="Service/repair">Service/repair</option>
-              <option value="Multi-family">Multi-family</option>
-            </select>
           </div>
         </div>
         <div class="form-row">
@@ -518,7 +555,7 @@
       </div>
 
       <div class="section section-takeoff">
-        <h2>DRAFT Material Takeoff Summary (Under development for integration with PipeTooling.com)</h2>
+        <h2>Fixture Materials (coming soon from <a href="https://pipetooling.com" target="_blank" rel="noopener noreferrer">PipeTooling.com</a>)</h2>
         <div id="takeoffRows">
           <div class="takeoff-row">
             <input type="text" placeholder="Item (e.g. Copper pipe 1/2\")" class="takeoff-desc">
@@ -598,15 +635,15 @@
           <table class="preview-table">
             <tr><th>Item</th><th>Amount</th></tr>
             <tr>
-              <td>Fixture Labor</td>
+              <td>Fixture and Set Labor</td>
               <td>$<span id="calcFixtureLaborBase">0.00</span></td>
             </tr>
             <tr>
-              <td>Fixture Labor Markup <input type="number" id="fixtureLaborMarkupPct" name="fixtureLaborMarkupPct" min="0" step="0.5" value="0" title="Fixture Labor Markup" style="width: 4rem; margin-left: 0.5rem; padding: 0.25rem 0.5rem; font-size: 0.9rem;">%</td>
+              <td>Fixture and Set Labor Markup <input type="number" id="fixtureLaborMarkupPct" name="fixtureLaborMarkupPct" min="0" step="0.5" value="0" title="Fixture and Set Labor Markup" style="width: 4rem; margin-left: 0.5rem; padding: 0.25rem 0.5rem; font-size: 0.9rem;">%</td>
               <td>$<span id="calcFixtureLaborMarkup">0.00</span></td>
             </tr>
             <tr style="font-weight: 600; border-top: 2px solid var(--border);">
-              <td>Fixture Labor Subtotal</td>
+              <td>Fixture and Set Labor Subtotal</td>
               <td style="text-align: right;">$<span id="calcFixtureLaborSubtotal">0.00</span></td>
             </tr>
             <tr>
@@ -686,15 +723,37 @@
       </div>
 
       <div class="actions no-print">
-        <button type="button" id="generatePreview" class="btn btn-primary">Generate Preview</button>
-        <button type="button" id="printBtn" class="btn btn-secondary">Print</button>
-        <button type="button" id="exportPdf" class="btn btn-outline">Export Summary</button>
+        <div class="internal-summary-box">
+          <h3 class="internal-summary-title">Internal Summary</h3>
+          <div class="internal-summary-actions">
+            <button type="button" id="generatePreview" class="btn btn-primary">Draft</button>
+            <button type="button" id="printBtn" class="btn btn-secondary">Print</button>
+          </div>
+        </div>
+        <button type="button" id="exportPdf" class="btn btn-outline">External Summary</button>
         <button type="button" id="clearBtn" class="btn btn-outline">Clear All</button>
         <button type="button" id="roughCalculatorBtn" class="btn btn-outline btn-push-right" aria-expanded="false">Rough Calculator</button>
       </div>
     </form>
 
     <div id="preview" class="preview-section" aria-live="polite"></div>
+
+    <div id="externalSummaryModal" class="external-summary-modal" aria-modal="true" aria-labelledby="externalSummaryModalTitle" role="dialog">
+      <div class="external-summary-modal-panel">
+        <div class="external-summary-modal-header" id="externalSummaryModalTitle">External Summary</div>
+        <div class="external-summary-modal-body">
+          <div id="externalSummaryPreviewContent"></div>
+          <label class="external-summary-notes-label" for="externalSummaryNotes">Notes / Exclusions</label>
+          <textarea id="externalSummaryNotes" rows="4"></textarea>
+          <div id="externalSummaryPrintNotes" class="external-summary-print-notes"></div>
+        </div>
+        <div class="external-summary-modal-actions no-print">
+          <button type="button" id="externalSummaryDownloadPdf" class="btn btn-primary">Download PDF</button>
+          <button type="button" id="externalSummaryPrint" class="btn btn-secondary">Print</button>
+          <button type="button" id="externalSummaryClose" class="btn btn-outline">Close</button>
+        </div>
+      </div>
+    </div>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
@@ -726,6 +785,37 @@
 
       function formatNum(n, decimals) {
         return (parseFloat(n) || 0).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+      }
+
+      function numberToWords(n) {
+        n = Math.floor(Number(n)) || 0;
+        if (n < 0) n = 0;
+        if (n > 999999) n = 999999;
+        var ones = ['Zero','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
+        var tens = ['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+        function under100(x) {
+          if (x < 20) return ones[x];
+          var t = Math.floor(x / 10), o = x % 10;
+          return tens[t] + (o ? ' ' + ones[o] : '');
+        }
+        function under1000(x) {
+          if (x < 100) return under100(x);
+          var h = Math.floor(x / 100), r = x % 100;
+          return ones[h] + ' Hundred' + (r ? ' ' + under100(r) : '');
+        }
+        if (n < 1000) return under1000(n);
+        var th = Math.floor(n / 1000), r = n % 1000;
+        return under1000(th) + ' Thousand' + (r ? ' ' + under1000(r) : '');
+      }
+
+      function formatProposalAmount(total) {
+        var t = Number(total) || 0;
+        var dollars = Math.floor(t);
+        var cents = Math.round((t - dollars) * 100);
+        if (cents >= 100) cents = 99;
+        if (cents < 0) cents = 0;
+        var centsStr = (cents < 10 ? '0' : '') + cents;
+        return numberToWords(dollars) + ' ' + centsStr + '/100 Dollars ($' + formatNum(t, 2) + ')';
       }
 
       function formatFixtureCostShort(n) {
@@ -1039,10 +1129,11 @@
         });
         return {
           customerName: getStr('customerName'),
+          customerAddress: getStr('customerAddress'),
+          jobName: getStr('jobName'),
           jobAddress: getStr('jobAddress'),
           bidDate: getStr('bidDate'),
           bidNumber: getStr('bidNumber'),
-          jobType: ($('jobType') || {}).value || 'Residential remodel',
           planName: getStr('planName'),
           planIssueDate: getStr('planIssueDate'),
           planTitle: getStr('planTitle'),
@@ -1109,7 +1200,10 @@
           '</div>' +
           '<div class="preview-section">' +
             '<h3>Customer &amp; Job</h3>' +
-            '<p><strong>' + escapeHtml(data.customerName) + '</strong><br>' + escapeHtml(data.jobAddress) + '<br>Job type: ' + escapeHtml(data.jobType) +
+            '<p><strong>' + escapeHtml(data.customerName) + '</strong>' +
+            (data.customerAddress ? '<br>' + escapeHtml(data.customerAddress) : '') +
+            (data.jobName ? '<br>' + escapeHtml(data.jobName) : '') +
+            '<br>' + escapeHtml(data.jobAddress) +
             (data.planTitle || data.planName || data.planIssueDate ? '<br>Plans: ' + [data.planTitle, data.planName, data.planIssueDate].filter(Boolean).map(escapeHtml).join(' — ') : '') + '</p>' +
           '</div>' +
           '<div class="preview-section">' +
@@ -1117,7 +1211,7 @@
             '<table class="preview-table"><thead><tr><th>Item</th><th>Qty</th></tr></thead><tbody>' + fixtureRows + '</tbody></table>' +
           '</div>' +
           '<div class="preview-section">' +
-            '<h3>Material Highlights</h3>' +
+            '<h3>Fixture Materials</h3>' +
             '<table class="preview-table"><thead><tr><th>Item</th><th>Qty</th></tr></thead><tbody>' + takeoffRows + '</tbody></table>' +
           '</div>' +
           additionalLaborBlock +
@@ -1140,7 +1234,7 @@
             var addlBlock = addlList ? '<ul style="margin: 0.5rem 0;">' + addlList + '</ul>' : '';
             return '<div class="preview-section">' +
               '<h3>Labor Summary</h3>' +
-              '<h4>Fixture Labor</h4>' +
+              '<h4>Fixture and Set Labor</h4>' +
               '<p>Total: ' + flTotal + ' hours (Rough in: ' + flRough + ', Top out: ' + flTop + ', Trim: ' + flTrim + '). Fixture labor cost: $' + fixtureCostVal + '</p>' +
               '<h4>Additional Labor</h4>' +
               addlBlock + '<p>' + addlHours + ' hours = $' + addlCost + '</p>' +
@@ -1150,9 +1244,9 @@
             '<h3>Pricing Breakdown</h3>' +
             '<table class="preview-table">' +
               '<tr><th>Item</th><th>Amount</th></tr>' +
-              '<tr><td>Fixture Labor</td><td>$' + formatNum(totals.fixtureCost || 0, 2) + '</td></tr>' +
-              '<tr><td>Fixture Labor Markup</td><td>$' + formatNum(totals.fixtureLaborMarkup != null ? totals.fixtureLaborMarkup : 0, 2) + '</td></tr>' +
-              '<tr style="font-weight: 600; border-top: 2px solid var(--border);"><td>Fixture Labor Subtotal</td><td style="text-align: right;">$' + formatNum(totals.fixtureLaborSubtotal != null ? totals.fixtureLaborSubtotal : (totals.fixtureCost || 0), 2) + '</td></tr>' +
+              '<tr><td>Fixture and Set Labor</td><td>$' + formatNum(totals.fixtureCost || 0, 2) + '</td></tr>' +
+              '<tr><td>Fixture and Set Labor Markup</td><td>$' + formatNum(totals.fixtureLaborMarkup != null ? totals.fixtureLaborMarkup : 0, 2) + '</td></tr>' +
+              '<tr style="font-weight: 600; border-top: 2px solid var(--border);"><td>Fixture and Set Labor Subtotal</td><td style="text-align: right;">$' + formatNum(totals.fixtureLaborSubtotal != null ? totals.fixtureLaborSubtotal : (totals.fixtureCost || 0), 2) + '</td></tr>' +
               '<tr><td>Materials</td><td>$' + formatNum(totals.materials || 0, 2) + '</td></tr>' +
               '<tr><td>Materials Markup</td><td>$' + formatNum(totals.materialsMarkup != null ? totals.materialsMarkup : 0, 2) + '</td></tr>' +
               '<tr style="font-weight: 600; border-top: 2px solid var(--border);"><td>Materials Subtotal</td><td style="text-align: right;">$' + formatNum(totals.materialsSubtotal != null ? totals.materialsSubtotal : (totals.materials || 0) + (totals.materialsMarkup != null ? totals.materialsMarkup : 0), 2) + '</td></tr>' +
@@ -1202,13 +1296,74 @@
         setTimeout(function() { window.print(); }, 100);
       }
 
-      function exportToPDF() {
+      function buildExternalSummaryPreviewHtml(data, totals) {
+        var fxBase = totals.fixtureCost || 0;
+        var fxMarkup = totals.fixtureLaborMarkup != null ? totals.fixtureLaborMarkup : 0;
+        var fxSub = totals.fixtureLaborSubtotal != null ? totals.fixtureLaborSubtotal : (fxBase + fxMarkup);
+        var matSub = totals.materialsSubtotal != null ? totals.materialsSubtotal : ((totals.materials || 0) + (totals.materialsMarkup != null ? totals.materialsMarkup : 0));
+        var labSub = totals.laborSubtotal != null ? totals.laborSubtotal : ((totals.labor || 0) + (totals.laborMarkup != null ? totals.laborMarkup : 0));
+        var planParts = [data.planTitle, data.planName, data.planIssueDate].filter(Boolean).map(escapeHtml);
+        var planLine = planParts.length ? 'Plans: ' + planParts.join(' — ') : '';
+        var custAddrLines = (data.customerAddress || '').split(/\r?\n/).map(function(s) { return s.trim(); }).filter(Boolean);
+        var jobAddrLines = (data.jobAddress || '').split(/\r?\n/).map(function(s) { return s.trim(); }).filter(Boolean);
+        var custBlock = '<p style="margin: 0 0 0.25rem 0;"><strong>' + escapeHtml(data.customerName) + '</strong></p>' +
+          custAddrLines.map(function(line) { return '<p style="margin: 0 0 0.25rem 0;">' + escapeHtml(line) + '</p>'; }).join('');
+        var jobBlock = (data.jobName ? '<p style="margin: 0 0 0.25rem 0;"><strong>' + escapeHtml(data.jobName) + '</strong></p>' : '') +
+          jobAddrLines.map(function(line) { return '<p style="margin: 0 0 0.25rem 0;">' + escapeHtml(line) + '</p>'; }).join('');
+        var f = data.fixtures || {};
+        var inclusionItems = '<li>Fixtures provided and installed by us per plan:</li>' +
+          fixtureIds.map(function(id) {
+            var label = id.replace('fixture', '').replace(/([A-Z])/g, ' $1').trim();
+            var qty = (parseInt(f[label], 10) || 0);
+            return qty > 0 ? '<li>' + escapeHtml(label) + ' ' + qty + '</li>' : '';
+          }).filter(Boolean).join('');
+        return '<div class="preview-section">' +
+          '<p style="font-size: 1.1rem; font-weight: 600; margin: 0 0 0.5rem 0;">Click Plumbing and Electrical</p>' +
+          '<p class="preview-meta" style="margin: 0 0 0.75rem 0;">Bid # ' + escapeHtml(data.bidNumber) + ' — ' + escapeHtml(data.bidDate) + '</p>' +
+          '<div style="margin-bottom: 1rem;">' + custBlock + '</div>' +
+          '<div style="margin-bottom: 1rem;">' + jobBlock + '</div>' +
+          '<p style="margin: 0.75rem 0;">As per plumbing plans and specifications, we propose to do the plumbing in the amount of: <strong>' + formatProposalAmount(totals.total || 0) + '</strong></p>' +
+          '<p style="margin: 0.5rem 0 0.25rem 0; font-weight: 600;">Inclusions:</p>' +
+          '<ul style="margin: 0 0 0; padding-left: 1.25rem;">' + inclusionItems + '</ul>' +
+          '<ul style="margin: 1em 0 0.75rem 0; padding-left: 1.25rem;"><li>Permits</li></ul>' +
+          (planLine ? '<p style="margin: 0.75rem 0 0 0;">' + planLine + '</p>' : '') +
+          '</div>' +
+          '<div class="preview-section">' +
+          '<h3>Pricing Summary</h3>' +
+          '<table class="preview-table">' +
+          '<tr><td>Fixture and Set Labor Subtotal</td><td>$' + formatNum(fxSub, 2) + '</td></tr>' +
+          '<tr><td>Materials Subtotal</td><td>$' + formatNum(matSub, 2) + '</td></tr>' +
+          '<tr><td>Additional Labor Subtotal</td><td>$' + formatNum(labSub, 2) + '</td></tr>' +
+          '<tr style="font-weight: 600; border-top: 2px solid var(--border);"><td>Grand Total</td><td style="text-align: right;">$' + formatNum(totals.total || 0, 2) + '</td></tr>' +
+          '</table></div>';
+      }
+
+      function openExternalSummaryModal() {
+        if (!validateForm()) {
+          alert('Please fill in required fields before opening External Summary.');
+          return;
+        }
+        var data = collectFormData();
+        var totals = calculateTotals();
+        $('externalSummaryPreviewContent').innerHTML = buildExternalSummaryPreviewHtml(data, totals);
+        $('externalSummaryNotes').value = data.scopeNotes != null ? data.scopeNotes : '';
+        $('externalSummaryModal').classList.add('visible');
+      }
+
+      function closeExternalSummaryModal() {
+        $('externalSummaryModal').classList.remove('visible');
+      }
+
+      function exportToPDF(notesOverride) {
         if (!validateForm()) {
           alert('Please fill in required fields before exporting.');
           return;
         }
         updatePreview();
         try {
+          var data = collectFormData();
+          var totals = calculateTotals();
+          var notesText = notesOverride !== undefined ? notesOverride : (data.scopeNotes || '');
           var JsPDF = window.jspdf.jsPDF;
           var doc = new JsPDF({ orientation: 'portrait', unit: 'pt', format: 'letter' });
           var margin = 40;
@@ -1220,15 +1375,59 @@
           doc.text('Click Plumbing and Electrical', margin, y);
           y += 20;
           doc.setFontSize(10);
-          var data = collectFormData();
-          var totals = calculateTotals();
           doc.text('Bid # ' + data.bidNumber + ' — ' + data.bidDate, margin, y);
           y += lineHeight + 4;
-          doc.text('Customer: ' + data.customerName, margin, y);
+          doc.setFont(undefined, 'bold');
+          doc.text(data.customerName, margin, y);
           y += lineHeight;
-          doc.text('Address: ' + data.jobAddress, margin, y);
+          doc.setFont(undefined, 'normal');
+          (data.customerAddress || '').split(/\r?\n/).forEach(function(line) {
+            var t = line.trim();
+            if (t) { doc.text(t, margin, y); y += lineHeight; }
+          });
           y += lineHeight;
-          doc.text('Job type: ' + data.jobType, margin, y);
+          if (data.jobName) {
+            doc.setFont(undefined, 'bold');
+            doc.text(data.jobName, margin, y);
+            y += lineHeight;
+            doc.setFont(undefined, 'normal');
+          }
+          (data.jobAddress || '').split(/\r?\n/).forEach(function(line) {
+            var t = line.trim();
+            if (t) { doc.text(t, margin, y); y += lineHeight; }
+          });
+          y += lineHeight;
+          doc.text('As per plumbing plans and specifications, we propose to do the plumbing in the amount of:', margin, y);
+          y += lineHeight;
+          var amountStr = formatProposalAmount(totals.total || 0);
+          doc.setFont(undefined, 'bold');
+          var amountLines = doc.splitTextToSize(amountStr, maxWidth);
+          amountLines.forEach(function(line) {
+            if (y > 700) { doc.addPage(); y = 40; }
+            doc.text(line, margin, y);
+            y += lineHeight;
+          });
+          doc.setFont(undefined, 'normal');
+          y += lineHeight;
+          doc.setFont(undefined, 'bold');
+          doc.text('Inclusions:', margin, y);
+          y += lineHeight;
+          doc.setFont(undefined, 'normal');
+          doc.text('- Fixtures provided and installed by us per plan:', margin, y);
+          y += lineHeight;
+          var f = data.fixtures || {};
+          fixtureIds.forEach(function(id) {
+            var label = id.replace('fixture', '').replace(/([A-Z])/g, ' $1').trim();
+            var qty = (parseInt(f[label], 10) || 0);
+            if (qty > 0) {
+              if (y > 700) { doc.addPage(); y = 40; }
+              doc.text('- ' + label + ' ' + qty, margin, y);
+              y += lineHeight;
+            }
+          });
+          y += lineHeight;
+          if (y > 700) { doc.addPage(); y = 40; }
+          doc.text('- Permits', margin, y);
           y += lineHeight;
           if (data.planTitle) { doc.text('Plan Title: ' + data.planTitle, margin, y); y += lineHeight; }
           if (data.planName) { doc.text('Plan Name: ' + data.planName, margin, y); y += lineHeight; }
@@ -1244,7 +1443,7 @@
           var fxSub = totals.fixtureLaborSubtotal != null ? totals.fixtureLaborSubtotal : (fxBase + fxMarkup);
           var matSub = totals.materialsSubtotal != null ? totals.materialsSubtotal : ((totals.materials || 0) + (totals.materialsMarkup != null ? totals.materialsMarkup : 0));
           var labSub = totals.laborSubtotal != null ? totals.laborSubtotal : ((totals.labor || 0) + (totals.laborMarkup != null ? totals.laborMarkup : 0));
-          doc.text('Fixture Labor Subtotal: $' + formatNum(fxSub, 2), margin, y);
+          doc.text('Fixture and Set Labor Subtotal: $' + formatNum(fxSub, 2), margin, y);
           y += lineHeight;
           doc.text('Materials Subtotal: $' + formatNum(matSub, 2), margin, y);
           y += lineHeight;
@@ -1254,13 +1453,13 @@
           doc.text('Grand Total: $' + formatNum(totals.total || 0, 2), margin, y);
           y += lineHeight + 6;
 
-          if (data.scopeNotes) {
+          if (notesText) {
             doc.setFont(undefined, 'normal');
             doc.setFontSize(11);
             doc.text('Notes / Exclusions', margin, y);
             y += lineHeight + 2;
             doc.setFontSize(10);
-            var noteLines = doc.splitTextToSize(data.scopeNotes, maxWidth);
+            var noteLines = doc.splitTextToSize(notesText, maxWidth);
             noteLines.forEach(function(line) {
               if (y > 700) { doc.addPage(); y = 40; }
               doc.text(line, margin, y);
@@ -1625,10 +1824,11 @@
 
       function fillWithSampleData() {
         if ($('customerName')) $('customerName').value = 'Sample Customer';
-        if ($('jobAddress')) $('jobAddress').value = '123 Main St, Portland, OR 97201';
+        if ($('customerAddress')) $('customerAddress').value = '456 Oak Ave\nPortland, OR 97202';
+        if ($('jobName')) $('jobName').value = 'Main floor bath and kitchen';
+        if ($('jobAddress')) $('jobAddress').value = '123 Main St\nPortland, OR 97201';
         if ($('bidDate')) $('bidDate').value = new Date().toISOString().slice(0, 10);
         if ($('bidNumber')) $('bidNumber').value = '2025-SAMPLE-001';
-        if ($('jobType')) $('jobType').value = 'Residential remodel';
         if ($('planName')) $('planName').value = 'Floor plans A';
         if ($('planIssueDate')) $('planIssueDate').value = '2024-06-15';
         if ($('planTitle')) $('planTitle').value = 'Main and upper';
@@ -1901,7 +2101,16 @@
 
       $('generatePreview').addEventListener('click', onGeneratePreview);
       $('printBtn').addEventListener('click', onPrint);
-      $('exportPdf').addEventListener('click', exportToPDF);
+      $('exportPdf').addEventListener('click', openExternalSummaryModal);
+      $('externalSummaryDownloadPdf').addEventListener('click', function() {
+        exportToPDF($('externalSummaryNotes').value);
+      });
+      $('externalSummaryPrint').addEventListener('click', function() {
+        $('externalSummaryPrintNotes').textContent = $('externalSummaryNotes').value;
+        document.body.classList.add('print-external-summary');
+        setTimeout(function() { window.print(); document.body.classList.remove('print-external-summary'); }, 100);
+      });
+      $('externalSummaryClose').addEventListener('click', closeExternalSummaryModal);
       $('addTakeoffRow').addEventListener('click', addTakeoffRow);
       if ($('fillSample')) $('fillSample').addEventListener('click', fillWithSampleData);
       if ($('shareViaUrlBtn')) $('shareViaUrlBtn').addEventListener('click', shareViaUrl);
