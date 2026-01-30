@@ -37,6 +37,7 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
     .section.section-takeoff { background: #f0f0f0; }
+    .section-takeoff button[disabled] { opacity: 0.6; cursor: not-allowed; }
     .section-rough-calculator { background: #fffde7; }
     .section-rough-calculator.hidden { display: none; }
     .section-rough-calculator .field.field-disabled { opacity: 0.65; color: #666; }
@@ -106,6 +107,10 @@
     .internal-summary-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; text-align: center; }
     .internal-summary-box .internal-summary-title { font-size: 1rem; margin: 0 0 0.75rem 0; color: var(--primary); font-weight: 600; }
     .internal-summary-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; }
+    .letterhead-link { display: block; text-align: center; color: var(--primary); transition: opacity 0.2s; }
+    .letterhead-link:hover { opacity: 0.85; }
+    .letterhead-icon { width: 2.5rem; height: 2.5rem; display: inline-block; fill: currentColor; vertical-align: middle; }
+    .letterhead-icons { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; }
     .btn {
       padding: 0.75rem 1.25rem;
       border: none;
@@ -131,6 +136,15 @@
       display: none;
     }
     #preview.visible { display: block; }
+    #externalSummaryPreview.external-summary-inline {
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 2rem;
+      margin-top: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      display: none;
+    }
+    #externalSummaryPreview.external-summary-inline.visible { display: block; }
     .preview-header { text-align: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid var(--primary); }
     .preview-header h1 { font-size: 1.5rem; margin: 0; }
     .preview-logo { width: 80px; height: 80px; margin: 0 auto 0.5rem; }
@@ -149,6 +163,7 @@
     .fixture-plan-page-wrap input { width: auto; min-width: 140px; max-width: 200px; }
     .fixture-section-wrap { display: flex; gap: 1.5rem; align-items: flex-start; }
     .fixture-form-col { flex: 1; min-width: 0; }
+    .fixture-form-col h3:not(:first-of-type) { margin-top: 1.25rem; }
     .fixture-ledger-col { flex: 0 0 280px; background: var(--bg); border-radius: 8px; padding: 1rem; border: 1px solid var(--border); }
     .fixture-ledger-col h3 { font-size: 1rem; margin-bottom: 0.75rem; }
     .fixture-ledger-list { max-height: 400px; overflow-y: auto; }
@@ -193,39 +208,11 @@
     .fixture-price-details.fixture-mode-trace { border-color: #e09f3e; box-shadow: 0 0 0 1px rgba(224,159,62,0.4); }
     .fixture-price-details.fixture-mode-trace .fixture-price-summary { color: #9a4a00; }
     .fixture-mode-status-trace { color: #9a4a00; }
-    .external-summary-modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0,0,0,0.4);
-      padding: 1rem;
-    }
-    .external-summary-modal.visible { display: flex; }
-    .external-summary-modal-panel {
-      background: var(--card-bg);
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      max-width: 560px;
-      max-height: 90vh;
-      overflow: auto;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-    }
-    .external-summary-modal-header { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); font-size: 1.1rem; font-weight: 600; color: var(--primary); }
-    .external-summary-modal-body { padding: 1.25rem; }
-    .external-summary-modal-body .external-summary-notes-label { display: block; margin-bottom: 0.35rem; font-weight: 500; color: var(--primary); }
-    .external-summary-modal-body #externalSummaryNotes { min-height: 80px; margin-bottom: 1rem; }
-    .external-summary-modal-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; padding: 1rem 1.25rem; border-top: 1px solid var(--border); }
-    .external-summary-print-notes { display: none; margin-top: 0.75rem; padding: 0.5rem 0; border-top: 1px solid var(--border); font-size: 0.9rem; white-space: pre-wrap; }
     @media print {
-      body.print-external-summary .container { display: none !important; }
-      body.print-external-summary .external-summary-modal { display: flex !important; background: #fff; padding: 0; }
-      body.print-external-summary .external-summary-modal-panel { max-height: none; box-shadow: none; border: none; }
-      body.print-external-summary .external-summary-modal-actions { display: none !important; }
-      body.print-external-summary .external-summary-print-notes { display: block !important; }
-      body.print-external-summary #externalSummaryNotes { display: none !important; }
+      body.print-external-summary .container .app-top-bar,
+      body.print-external-summary .container form,
+      body.print-external-summary .container #preview { display: none !important; }
+      body.print-external-summary #externalSummaryPreview { display: block !important; }
     }
     @media (max-width: 768px) {
       body { padding: 0.75rem; }
@@ -350,7 +337,7 @@
             </div>
           </div>
           <div class="fixture-item">
-            <label for="fixtureShowerOnly">Shower only</label>
+            <label for="fixtureShowerOnly">Showers no tub</label>
             <div class="number-input-wrap">
               <button type="button" aria-label="Decrease" data-target="fixtureShowerOnly">−</button>
               <input type="number" id="fixtureShowerOnly" name="fixtureShowerOnly" min="0" value="0">
@@ -549,6 +536,7 @@
             <tbody id="fixturePriceTableBody"></tbody>
           </table>
           <button type="button" id="resetFixturePrices" class="btn btn-outline" style="margin-top: 0.75rem;">Reset to default</button>
+          <button type="button" id="exportFixturePricesBtn" class="btn btn-outline" style="margin-top: 0.75rem;">Export my prices and times</button>
             </div>
           </details>
         </div>
@@ -563,7 +551,7 @@
             <button type="button" class="takeoff-remove" aria-label="Remove row">Remove</button>
           </div>
         </div>
-        <button type="button" id="addTakeoffRow" class="btn btn-outline" style="margin-top: 0.5rem;">Add row</button>
+        <button type="button" id="addTakeoffRow" class="btn btn-outline" style="margin-top: 0.5rem;" disabled>Add row</button>
       </div>
 
       <div class="section">
@@ -675,9 +663,9 @@
         </div>
       </div>
 
-      <div class="section">
-        <h2>Scope Notes / Exclusions</h2>
-        <textarea id="scopeNotes" name="scopeNotes" rows="5" placeholder="Describe scope, exclusions, and any special notes..."></textarea>
+      <div class="no-print" style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin: 0 0 1rem 0;">
+        <button type="button" id="roughCalculatorBtn" class="btn btn-outline" aria-expanded="false">Rough Calculator</button>
+        <button type="button" id="clearBtn" class="btn btn-outline" style="margin-left: auto;">Reset Fields</button>
       </div>
 
       <div id="roughCalculatorSection" class="section section-rough-calculator hidden" aria-hidden="true">
@@ -722,44 +710,62 @@
         </div>
       </div>
 
+      <div class="section">
+        <h2>Inclusions (each line is an item)</h2>
+        <textarea id="inclusions" name="inclusions" rows="5" placeholder="Describe what is included (e.g. fixtures per plan, permits)...">Permits</textarea>
+      </div>
+
+      <div class="section">
+        <h2>Exclusions and Scope</h2>
+        <textarea id="scopeNotes" name="scopeNotes" rows="5" placeholder="Describe scope, exclusions, and any special notes..."></textarea>
+      </div>
+
+      <div class="section">
+        <h2>Terms and Warranty</h2>
+        <textarea id="termsAndWarranty" name="termsAndWarranty" rows="8" placeholder="Terms and warranty..."></textarea>
+      </div>
+
       <div class="actions no-print">
         <div class="internal-summary-box">
           <h3 class="internal-summary-title">Internal Summary</h3>
           <div class="internal-summary-actions">
-            <button type="button" id="generatePreview" class="btn btn-primary">Draft</button>
+            <button type="button" id="generatePreview" class="btn btn-primary">View</button>
             <button type="button" id="printBtn" class="btn btn-secondary">Print</button>
           </div>
         </div>
-        <button type="button" id="exportPdf" class="btn btn-outline">External Summary</button>
-        <button type="button" id="clearBtn" class="btn btn-outline">Clear All</button>
-        <button type="button" id="roughCalculatorBtn" class="btn btn-outline btn-push-right" aria-expanded="false">Rough Calculator</button>
+        <div class="internal-summary-box">
+          <h3 class="internal-summary-title">External Summary</h3>
+          <div class="internal-summary-actions">
+            <button type="button" id="exportPdf" class="btn btn-outline">View</button>
+            <button type="button" id="externalSummaryCopyBtn" class="btn btn-outline">Copy Text</button>
+            <button type="button" id="externalSummaryDownloadPdf" class="btn btn-primary">Download PDF</button>
+            <button type="button" id="externalSummaryPrint" class="btn btn-secondary">Print</button>
+          </div>
+        </div>
+        <div class="internal-summary-box">
+          <h3 class="internal-summary-title">Letterhead</h3>
+          <div class="letterhead-icons">
+            <a class="letterhead-link" href="https://docs.google.com/document/d/1Xs76a1fAZfj4GGyIQ-wH_x98rtjnfoB7RVt7cMBmPP8/edit?usp=sharing" target="_blank" rel="noopener noreferrer" title="Open Click letterhead">
+              <svg class="letterhead-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" aria-hidden="true"><path d="M480 576L192 576C139 576 96 533 96 480L96 160C96 107 139 64 192 64L496 64C522.5 64 544 85.5 544 112L544 400C544 420.9 530.6 438.7 512 445.3L512 512C529.7 512 544 526.3 544 544C544 561.7 529.7 576 512 576L480 576zM192 448C174.3 448 160 462.3 160 480C160 497.7 174.3 512 192 512L448 512L448 448L192 448zM224 216C224 229.3 234.7 240 248 240L424 240C437.3 240 448 229.3 448 216C448 202.7 437.3 192 424 192L248 192C234.7 192 224 202.7 224 216zM248 288C234.7 288 224 298.7 224 312C224 325.3 234.7 336 248 336L424 336C437.3 336 448 325.3 448 312C448 298.7 437.3 288 424 288L248 288z"/></svg>
+            </a>
+            <a id="letterheadCopyLink" class="letterhead-link" href="#" target="_blank" rel="noopener noreferrer" title="Copy letterhead as new document (named with bid number)">
+              <svg class="letterhead-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" aria-hidden="true"><path d="M64 160C64 124.7 92.7 96 128 96L416 96C451.3 96 480 124.7 480 160L480 192L530.7 192C547.7 192 564 198.7 576 210.7L621.3 256C633.3 268 640 284.3 640 301.3L640 448C640 483.3 611.3 512 576 512L572.7 512C562.3 548.9 528.3 576 488 576C447.7 576 413.8 548.9 403.3 512L300.7 512C290.3 548.9 256.3 576 216 576C175.7 576 141.8 548.9 131.3 512L128 512C92.7 512 64 483.3 64 448L64 400L24 400C10.7 400 0 389.3 0 376C0 362.7 10.7 352 24 352L136 352C149.3 352 160 341.3 160 328C160 314.7 149.3 304 136 304L24 304C10.7 304 0 293.3 0 280C0 266.7 10.7 256 24 256L200 256C213.3 256 224 245.3 224 232C224 218.7 213.3 208 200 208L24 208C10.7 208 0 197.3 0 184C0 170.7 10.7 160 24 160L64 160zM576 352L576 301.3L530.7 256L480 256L480 352L576 352zM256 488C256 465.9 238.1 448 216 448C193.9 448 176 465.9 176 488C176 510.1 193.9 528 216 528C238.1 528 256 510.1 256 488zM488 528C510.1 528 528 510.1 528 488C528 465.9 510.1 448 488 448C465.9 448 448 465.9 448 488C448 510.1 465.9 528 488 528z"/></svg>
+            </a>
+          </div>
+        </div>
       </div>
     </form>
 
     <div id="preview" class="preview-section" aria-live="polite"></div>
 
-    <div id="externalSummaryModal" class="external-summary-modal" aria-modal="true" aria-labelledby="externalSummaryModalTitle" role="dialog">
-      <div class="external-summary-modal-panel">
-        <div class="external-summary-modal-header" id="externalSummaryModalTitle">External Summary</div>
-        <div class="external-summary-modal-body">
-          <div id="externalSummaryPreviewContent"></div>
-          <label class="external-summary-notes-label" for="externalSummaryNotes">Notes / Exclusions</label>
-          <textarea id="externalSummaryNotes" rows="4"></textarea>
-          <div id="externalSummaryPrintNotes" class="external-summary-print-notes"></div>
-        </div>
-        <div class="external-summary-modal-actions no-print">
-          <button type="button" id="externalSummaryDownloadPdf" class="btn btn-primary">Download PDF</button>
-          <button type="button" id="externalSummaryPrint" class="btn btn-secondary">Print</button>
-          <button type="button" id="externalSummaryClose" class="btn btn-outline">Close</button>
-        </div>
-      </div>
-    </div>
+    <div id="externalSummaryPreview" class="external-summary-inline" aria-live="polite"></div>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     (function() {
       const CREW_MULTIPLIERS = { 1: 1, 2: 1.8, 3: 2.5 };
       const requiredIds = ['customerName', 'jobAddress', 'bidDate', 'bidNumber'];
+      var REQUIRED_FIELDS_MESSAGE = 'Please fill in required fields: Customer Name, Job Address, Bid Date, Bid Number.';
 
       function $(id) { return document.getElementById(id); }
       function qs(sel, root) { return (root || document).querySelector(sel); }
@@ -782,6 +788,29 @@
 
       function getNum(id) { const el = $(id); return el ? (parseFloat(el.value) || 0) : 0; }
       function getStr(id) { const el = $(id); return el ? (el.value || '').trim() : ''; }
+
+      function getParagraphs(str) {
+        if (!str || !str.trim()) return [];
+        var lines = str.trim().split(/\r?\n/).map(function(s) { return s.trim(); });
+        var paragraphs = [];
+        var current = [];
+        for (var i = 0; i < lines.length; i++) {
+          if (lines[i] === '') {
+            if (current.length) {
+              paragraphs.push(current);
+              current = [];
+            }
+          } else {
+            current.push(lines[i]);
+          }
+        }
+        if (current.length) paragraphs.push(current);
+        return paragraphs;
+      }
+
+      function paragraphsToText(paragraphs) {
+        return paragraphs.map(function(p) { return p.join('\n'); }).join('\n\n');
+      }
 
       function formatNum(n, decimals) {
         return (parseFloat(n) || 0).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
@@ -862,7 +891,7 @@
           fixtureDisposals:    { label: 'Garbage Disposal',             price: 350,   roughIn: 0,   topOut: 0,   trim: 1 },
           fixtureUrinals:      { label: 'Urinal and valve',             price: 950,   roughIn: 1,   topOut: 3,   trim: 3 },
           fixtureTubs:         { label: 'Bath tub and valve',           price: 2000,  roughIn: 1,   topOut: 2,   trim: 1 },
-          fixtureShowerOnly:   { label: 'Shower only',                  price: 2450,  roughIn: 1,   topOut: 2.5, trim: 1 },
+          fixtureShowerOnly:   { label: 'Showers no tub',               price: 2450,  roughIn: 1,   topOut: 2.5, trim: 1 },
           fixtureShowerTub:    { label: 'Shower tub combo',             price: 3650,  roughIn: 1,   topOut: 3,   trim: 1,   note: 'no wall kit included' },
           fixtureLaundrySinks: { label: 'Laundry sink',                 price: 425,   roughIn: 1,   topOut: 1,   trim: 1,   note: 'no sink or faucet included' },
           fixtureHoseBibs:     { label: 'Hose bib',                     price: 500,   roughIn: 1,   topOut: 1,   trim: 0.5 },
@@ -879,7 +908,7 @@
           fixtureDisposals:    { label: 'Garbage Disposal',             price: 1800,  roughIn: 1.5, topOut: 0,   trim: 1 },
           fixtureUrinals:      { label: 'Urinal and valve',             price: 950,   roughIn: 1,   topOut: 3,   trim: 3 },
           fixtureTubs:         { label: 'Bath tub and valve',           price: 2000,  roughIn: 1,   topOut: 2,   trim: 1 },
-          fixtureShowerOnly:   { label: 'Shower only',                  price: 3800,  roughIn: 1,   topOut: 2.5, trim: 1 },
+          fixtureShowerOnly:   { label: 'Showers no tub',               price: 3800,  roughIn: 1,   topOut: 2.5, trim: 1 },
           fixtureShowerTub:    { label: 'Shower tub combo',             price: 3650,  roughIn: 1,   topOut: 3,   trim: 1,   note: 'no wall kit included' },
           fixtureLaundrySinks: { label: 'Laundry sink',                 price: 1800,  roughIn: 1,   topOut: 1,   trim: 1,   note: 'no sink or faucet included' },
           fixtureHoseBibs:     { label: 'Hose bib',                     price: 1200,  roughIn: 1,   topOut: 1,   trim: 0.5 },
@@ -1156,7 +1185,9 @@
           materialSubtotal: materialSubtotalSum,
           materialsMarkupPct: getNum('materialsMarkupPct'),
           laborMarkupPct: getNum('laborMarkupPct'),
-          scopeNotes: getStr('scopeNotes')
+          inclusions: getStr('inclusions'),
+          scopeNotes: getStr('scopeNotes'),
+          termsAndWarranty: getStr('termsAndWarranty')
         };
       }
 
@@ -1196,7 +1227,7 @@
           '<div class="preview-header">' +
             '<div class="preview-logo" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" aria-hidden="true"><path fill="#E85D04" d="M541.4 162.6C549 155 561.7 156.9 565.5 166.9C572.3 184.6 576 203.9 576 224C576 312.4 504.4 384 416 384C398.5 384 381.6 381.2 365.8 376L178.9 562.9C150.8 591 105.2 591 77.1 562.9C49 534.8 49 489.2 77.1 461.1L264 274.2C258.8 258.4 256 241.6 256 224C256 135.6 327.6 64 416 64C436.1 64 455.4 67.7 473.1 74.5C483.1 78.3 484.9 91 477.4 98.6L388.7 187.3C385.7 190.3 384 194.4 384 198.6L384 240C384 248.8 391.2 256 400 256L441.4 256C445.6 256 449.7 254.3 452.7 251.3L541.4 162.6z"/></svg></div>' +
             '<h1>Click Plumbing and Electrical</h1>' +
-            '<p class="preview-meta">Bid # ' + escapeHtml(data.bidNumber) + ' — ' + escapeHtml(data.bidDate) + '</p>' +
+            '<p class="preview-meta">Bid # ' + escapeHtml(data.bidNumber) + ' \u2022 ' + escapeHtml(data.bidDate) + '</p>' +
           '</div>' +
           '<div class="preview-section">' +
             '<h3>Customer &amp; Job</h3>' +
@@ -1258,7 +1289,7 @@
           '<div class="preview-section">' +
             '<p class="grand-total">Grand Total: $' + formatNum(totals.total || 0, 2) + '</p>' +
           '</div>' +
-          (data.scopeNotes ? '<div class="preview-section"><h3>Notes / Exclusions</h3><p>' + escapeHtml(data.scopeNotes).replace(/\n/g, '<br>') + '</p></div>' : '')
+          (data.scopeNotes ? '<div class="preview-section"><h3>Exclusions and Scope</h3><p>' + escapeHtml(data.scopeNotes).replace(/\n/g, '<br>') + '</p></div>' : '')
         );
       }
 
@@ -1267,6 +1298,28 @@
         var div = document.createElement('div');
         div.textContent = s;
         return div.innerHTML;
+      }
+
+      function buildExternalSummaryHtml(plainText) {
+        if (!plainText || !plainText.trim()) return '';
+        var paragraphs = plainText.split(/\n\n+/);
+        return paragraphs.map(function(para, paraIndex) {
+          var lines = para.replace(/\s+$/, '').split('\n').map(function(line, lineIndex) {
+            line = line.replace(/^ +/, function(m) { return Array(m.length + 1).join('\u00a0'); });
+            var amountPrefix = 'in the amount of: ';
+            var amountIdx = line.indexOf(amountPrefix);
+            if (amountIdx !== -1) {
+              var prefix = line.substring(0, amountIdx + amountPrefix.length);
+              var amount = line.substring(amountIdx + amountPrefix.length);
+              return escapeHtml(prefix) + '<strong>' + escapeHtml(amount) + '</strong>';
+            }
+            var escaped = escapeHtml(line);
+            var trimmed = line.trim();
+            var isBold = (paraIndex === 1 && lineIndex === 0) || (paraIndex === 2 && lineIndex === 0) || trimmed === 'Inclusions:' || trimmed === 'Exclusions and Scope:' || trimmed === 'Terms and Warranty:';
+            return isBold ? '<strong>' + escaped + '</strong>' : escaped;
+          });
+          return '<p>' + lines.join('<br>') + '</p>';
+        }).join('');
       }
 
       function validateForm() {
@@ -1281,7 +1334,7 @@
 
       function onGeneratePreview() {
         if (!validateForm()) {
-          alert('Please fill in required fields: Customer Name, Job Address, Bid Date, Bid Number.');
+          alert(REQUIRED_FIELDS_MESSAGE);
           return;
         }
         updatePreview();
@@ -1289,7 +1342,7 @@
 
       function onPrint() {
         if (!validateForm()) {
-          alert('Please fill in required fields before printing.');
+          alert(REQUIRED_FIELDS_MESSAGE);
           return;
         }
         updatePreview();
@@ -1311,79 +1364,179 @@
         var jobBlock = (data.jobName ? '<p style="margin: 0 0 0.25rem 0;"><strong>' + escapeHtml(data.jobName) + '</strong></p>' : '') +
           jobAddrLines.map(function(line) { return '<p style="margin: 0 0 0.25rem 0;">' + escapeHtml(line) + '</p>'; }).join('');
         var f = data.fixtures || {};
-        var inclusionItems = '<li>Fixtures provided and installed by us per plan:</li>' +
-          fixtureIds.map(function(id) {
-            var label = id.replace('fixture', '').replace(/([A-Z])/g, ' $1').trim();
-            var qty = (parseInt(f[label], 10) || 0);
-            return qty > 0 ? '<li>' + escapeHtml(label) + ' ' + qty + '</li>' : '';
-          }).filter(Boolean).join('');
+        var inclusionHeader = '<li>Fixtures provided and installed by us per plan:</li>';
+        var inclusionSubItems = fixtureIds.map(function(id) {
+          var derivedLabel = id.replace('fixture', '').replace(/([A-Z])/g, ' $1').trim();
+          var label = (FIXTURE_PRICES[id] && FIXTURE_PRICES[id].label) || derivedLabel;
+          var qty = (parseInt(f[derivedLabel], 10) || 0);
+          return qty > 0 ? '<li>[' + qty + '] ' + escapeHtml(label) + '</li>' : '';
+        }).filter(Boolean).join('');
+        var inclusionBlock = '<ul style="margin: 0 0 0; padding-left: 1.25rem;">' + inclusionHeader + '</ul>' +
+          '<div style="padding-left: 1.5rem; margin-top: 0.25rem;">' +
+          '<ul style="margin: 0 0 0.5rem 0; padding-left: 1.25rem;">' + inclusionSubItems + '</ul>' +
+          '</div>' +
+          (function() {
+            var incLines = (data.inclusions || '').trim().split(/\r?\n/).map(function(s) { return s.trim(); }).filter(Boolean);
+            return incLines.length === 0 ? '' : '<ul style="margin: 0.5rem 0 0 0; padding-left: 1.25rem;">' + incLines.map(function(l) { return '<li>' + escapeHtml(l) + '</li>'; }).join('') + '</ul>';
+          })();
         return '<div class="preview-section">' +
-          '<p style="font-size: 1.1rem; font-weight: 600; margin: 0 0 0.5rem 0;">Click Plumbing and Electrical</p>' +
-          '<p class="preview-meta" style="margin: 0 0 0.75rem 0;">Bid # ' + escapeHtml(data.bidNumber) + ' — ' + escapeHtml(data.bidDate) + '</p>' +
           '<div style="margin-bottom: 1rem;">' + custBlock + '</div>' +
           '<div style="margin-bottom: 1rem;">' + jobBlock + '</div>' +
+          '<p style="font-size: 1.1rem; font-weight: 600; margin: 0 0 0.5rem 0;">Click Plumbing and Electrical</p>' +
+          '<p class="preview-meta" style="margin: 0 0 0.75rem 0;">Bid # ' + escapeHtml(data.bidNumber) + ' \u2022 ' + escapeHtml(data.bidDate) + '</p>' +
           '<p style="margin: 0.75rem 0;">As per plumbing plans and specifications, we propose to do the plumbing in the amount of: <strong>' + formatProposalAmount(totals.total || 0) + '</strong></p>' +
           '<p style="margin: 0.5rem 0 0.25rem 0; font-weight: 600;">Inclusions:</p>' +
-          '<ul style="margin: 0 0 0; padding-left: 1.25rem;">' + inclusionItems + '</ul>' +
-          '<ul style="margin: 1em 0 0.75rem 0; padding-left: 1.25rem;"><li>Permits</li></ul>' +
+          inclusionBlock +
+          (data.scopeNotes && data.scopeNotes.trim() ? (function() {
+            var scopeLines = data.scopeNotes.trim().split(/\r?\n/).map(function(s) { return s.trim(); }).filter(Boolean);
+            var scopeList = scopeLines.length ? '<ul style="margin: 0.5rem 0 0 0; padding-left: 1.25rem;">' + scopeLines.map(function(l) { return '<li>' + escapeHtml(l) + '</li>'; }).join('') + '</ul>' : '';
+            return '<p style="margin: 0.5rem 0 0.25rem 0; font-weight: 600;">Exclusions and Scope:</p>' + scopeList;
+          })() : '') +
+          '<p style="margin: 0.5rem 0 0.25rem 0; font-weight: 600;">Terms and Warranty:</p><p style="margin: 0 0 0;">' + (data.termsAndWarranty && data.termsAndWarranty.trim() ? escapeHtml(data.termsAndWarranty.trim()).replace(/\n/g, '<br>') : '—') + '</p>' +
           (planLine ? '<p style="margin: 0.75rem 0 0 0;">' + planLine + '</p>' : '') +
           '</div>' +
           '<div class="preview-section">' +
-          '<h3>Pricing Summary</h3>' +
-          '<table class="preview-table">' +
-          '<tr><td>Fixture and Set Labor Subtotal</td><td>$' + formatNum(fxSub, 2) + '</td></tr>' +
-          '<tr><td>Materials Subtotal</td><td>$' + formatNum(matSub, 2) + '</td></tr>' +
-          '<tr><td>Additional Labor Subtotal</td><td>$' + formatNum(labSub, 2) + '</td></tr>' +
-          '<tr style="font-weight: 600; border-top: 2px solid var(--border);"><td>Grand Total</td><td style="text-align: right;">$' + formatNum(totals.total || 0, 2) + '</td></tr>' +
-          '</table></div>';
+          '<p style="margin: 0.75rem 0 0.25rem 0;">No work shall commence until Click Plumbing has received acceptance of the estimate.</p>' +
+          '<p style="margin: 0.5rem 0 0.25rem 0;">Respectfully submitted by Click Plumbing</p>' +
+          '<p style="margin: 0.75rem 0 0.25rem 0;">&nbsp;</p>' +
+          '<p style="margin: 0.5rem 0 0.25rem 0; padding-left: 1.5rem;">_______________________________</p>' +
+          '<p style="margin: 0.75rem 0 0.25rem 0;">The above prices, specifications, and conditions are satisfactory and are hereby accepted. You are authorized to perform the work as specified.</p>' +
+          '<p style="margin: 0.5rem 0 0.25rem 0; font-weight: 600;">Acceptance of estimate</p>' +
+          '<p style="margin: 0.5rem 0 0.25rem 0;">General Contractor / Builder Signature:</p>' +
+          '<p style="margin: 0.25rem 0 0.25rem 0;">____________________________________</p>' +
+          '<p style="margin: 0.5rem 0 0.25rem 0;">&nbsp;</p>' +
+          '<p style="margin: 0.5rem 0 0.25rem 0; text-align: right;">Date: ____________________________________</p>' +
+          '</div>';
       }
 
-      function openExternalSummaryModal() {
+      function buildExternalSummaryPlainText(data, totals) {
+        var planParts = [data.planTitle, data.planName, data.planIssueDate].filter(Boolean);
+        var planLine = planParts.length ? 'Plans: ' + planParts.join(' \u2022 ') : '';
+        var pad40 = Array(41).join(' ');
+        var headerLines = [
+          pad40 + 'Bid # ' + (data.bidNumber || '') + ' \u2022 ' + (data.bidDate || '')
+        ];
+        if (planLine) headerLines.push(pad40 + planLine);
+        var headerBlock = headerLines.join('\n');
+        var custAddrLines = (data.customerAddress || '').trim().split(/\r?\n/).map(function(s) { return s.trim(); }).filter(Boolean);
+        var custAddrText = custAddrLines.join('\n');
+        var customerBlock = [(data.customerName || '').trim()].concat(custAddrLines).filter(Boolean).join('\n');
+        var jobAddrText = paragraphsToText(getParagraphs(data.jobAddress || ''));
+        var f = data.fixtures || {};
+        var inclusionLines = ['• Fixtures provided and installed by us per plan:'];
+        fixtureIds.forEach(function(id) {
+          var derivedLabel = id.replace('fixture', '').replace(/([A-Z])/g, ' $1').trim();
+          var label = (FIXTURE_PRICES[id] && FIXTURE_PRICES[id].label) || derivedLabel;
+          var qty = (parseInt(f[derivedLabel], 10) || 0);
+          if (qty > 0) inclusionLines.push('     • [' + qty + '] ' + label);
+        });
+        var inclusionParagraphs = getParagraphs(data.inclusions || '');
+        var userInclusionText = inclusionParagraphs.map(function(p) {
+          return p.map(function(l) { return '• ' + l; }).join('\n');
+        }).join('\n\n');
+        var inclusionSection = inclusionLines.join('\n') + (userInclusionText ? '\n\n' + userInclusionText : '');
+        var parts = [
+          headerBlock,
+          '',
+          customerBlock,
+          '',
+          (data.jobName || '') + (jobAddrText ? (data.jobName ? '\n' : '') + jobAddrText : ''),
+          '',
+          'As per plumbing plans and specifications, we propose to do the plumbing in the amount of: ' + formatProposalAmount(totals.total || 0),
+          '',
+          'Inclusions:',
+          inclusionSection,
+          ''
+        ];
+        if (data.scopeNotes && data.scopeNotes.trim()) {
+          var scopeParagraphs = getParagraphs(data.scopeNotes);
+          var scopeText = scopeParagraphs.map(function(p) {
+            return p.map(function(l) { return '• ' + l; }).join('\n');
+          }).join('\n\n');
+          parts.push('Exclusions and Scope:');
+          parts.push(scopeText);
+          parts.push('');
+        }
+        parts.push('Terms and Warranty:');
+        parts.push(data.termsAndWarranty && data.termsAndWarranty.trim() ? paragraphsToText(getParagraphs(data.termsAndWarranty)) : '—');
+        parts.push('');
+        parts.push('No work shall commence until Click Plumbing has received acceptance of the estimate.');
+        parts.push('');
+        parts.push('Respectfully submitted by Click Plumbing');
+        parts.push('');
+        parts.push('_______________________________');
+        parts.push('');
+        parts.push('The above prices, specifications, and conditions are satisfactory and are hereby accepted. You are authorized to perform the work as specified.');
+        parts.push('');
+        parts.push('');
+        parts.push('Acceptance of estimate');
+        parts.push('');
+        parts.push('General Contractor / Builder Signature:');
+        parts.push('');
+        parts.push('____________________________________');
+        parts.push('');
+        parts.push('Date: ____________________________________');
+        return parts.join('\n');
+      }
+
+      function showExternalSummaryBelow() {
         if (!validateForm()) {
-          alert('Please fill in required fields before opening External Summary.');
-          return;
+          alert(REQUIRED_FIELDS_MESSAGE);
+          return false;
         }
         var data = collectFormData();
         var totals = calculateTotals();
-        $('externalSummaryPreviewContent').innerHTML = buildExternalSummaryPreviewHtml(data, totals);
-        $('externalSummaryNotes').value = data.scopeNotes != null ? data.scopeNotes : '';
-        $('externalSummaryModal').classList.add('visible');
+        var el = $('externalSummaryPreview');
+        if (el) {
+          el.innerHTML = buildExternalSummaryPreviewHtml(data, totals);
+          el.classList.add('visible');
+        }
+        return true;
       }
 
-      function closeExternalSummaryModal() {
-        $('externalSummaryModal').classList.remove('visible');
+      function openExternalSummaryView() {
+        if (showExternalSummaryBelow()) {
+          var el = $('externalSummaryPreview');
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
       }
 
-      function exportToPDF(notesOverride) {
+      function exportToPDF() {
         if (!validateForm()) {
-          alert('Please fill in required fields before exporting.');
+          alert(REQUIRED_FIELDS_MESSAGE);
           return;
         }
         updatePreview();
         try {
           var data = collectFormData();
           var totals = calculateTotals();
-          var notesText = notesOverride !== undefined ? notesOverride : (data.scopeNotes || '');
           var JsPDF = window.jspdf.jsPDF;
           var doc = new JsPDF({ orientation: 'portrait', unit: 'pt', format: 'letter' });
           var margin = 40;
           var maxWidth = 520;
           var y = 40;
           var lineHeight = 14;
-
-          doc.setFontSize(16);
-          doc.text('Click Plumbing and Electrical', margin, y);
-          y += 20;
           doc.setFontSize(10);
-          doc.text('Bid # ' + data.bidNumber + ' — ' + data.bidDate, margin, y);
-          y += lineHeight + 4;
+          var pad120 = Array(121).join(' ');
+          doc.text(pad120 + 'Click Plumbing and Electrical', margin, y);
+          y += lineHeight;
+          doc.text(pad120 + 'Bid # ' + data.bidNumber + ' \u2022 ' + data.bidDate, margin, y);
+          y += lineHeight;
+          if (data.planTitle) { doc.text(pad120 + 'Plan Title: ' + data.planTitle, margin, y); y += lineHeight; }
+          if (data.planName) { doc.text(pad120 + 'Plan Name: ' + data.planName, margin, y); y += lineHeight; }
+          if (data.planIssueDate) { doc.text(pad120 + 'Plan Issue Date: ' + data.planIssueDate, margin, y); y += lineHeight; }
+
           doc.setFont(undefined, 'bold');
           doc.text(data.customerName, margin, y);
           y += lineHeight;
           doc.setFont(undefined, 'normal');
           (data.customerAddress || '').split(/\r?\n/).forEach(function(line) {
             var t = line.trim();
-            if (t) { doc.text(t, margin, y); y += lineHeight; }
+            if (t) {
+              if (y > 700) { doc.addPage(); y = 40; }
+              doc.text(t, margin, y);
+              y += lineHeight;
+            }
           });
           y += lineHeight;
           if (data.jobName) {
@@ -1394,7 +1547,11 @@
           }
           (data.jobAddress || '').split(/\r?\n/).forEach(function(line) {
             var t = line.trim();
-            if (t) { doc.text(t, margin, y); y += lineHeight; }
+            if (t) {
+              if (y > 700) { doc.addPage(); y = 40; }
+              doc.text(t, margin, y);
+              y += lineHeight;
+            }
           });
           y += lineHeight;
           doc.text('As per plumbing plans and specifications, we propose to do the plumbing in the amount of:', margin, y);
@@ -1413,59 +1570,108 @@
           doc.text('Inclusions:', margin, y);
           y += lineHeight;
           doc.setFont(undefined, 'normal');
-          doc.text('- Fixtures provided and installed by us per plan:', margin, y);
+          doc.text('• Fixtures provided and installed by us per plan:', margin, y);
           y += lineHeight;
+          var indentMargin = margin + 25;
           var f = data.fixtures || {};
           fixtureIds.forEach(function(id) {
             var label = id.replace('fixture', '').replace(/([A-Z])/g, ' $1').trim();
             var qty = (parseInt(f[label], 10) || 0);
             if (qty > 0) {
               if (y > 700) { doc.addPage(); y = 40; }
-              doc.text('- ' + label + ' ' + qty, margin, y);
+              doc.text('\u2022 [' + qty + '] ' + label, indentMargin, y);
               y += lineHeight;
             }
           });
           y += lineHeight;
-          if (y > 700) { doc.addPage(); y = 40; }
-          doc.text('- Permits', margin, y);
-          y += lineHeight;
-          if (data.planTitle) { doc.text('Plan Title: ' + data.planTitle, margin, y); y += lineHeight; }
-          if (data.planName) { doc.text('Plan Name: ' + data.planName, margin, y); y += lineHeight; }
-          if (data.planIssueDate) { doc.text('Plan Issue Date: ' + data.planIssueDate, margin, y); y += lineHeight; }
-          y += 8;
-
-          doc.setFontSize(11);
-          doc.text('Pricing Summary', margin, y);
-          y += lineHeight + 2;
-          doc.setFontSize(10);
-          var fxBase = totals.fixtureCost || 0;
-          var fxMarkup = totals.fixtureLaborMarkup != null ? totals.fixtureLaborMarkup : 0;
-          var fxSub = totals.fixtureLaborSubtotal != null ? totals.fixtureLaborSubtotal : (fxBase + fxMarkup);
-          var matSub = totals.materialsSubtotal != null ? totals.materialsSubtotal : ((totals.materials || 0) + (totals.materialsMarkup != null ? totals.materialsMarkup : 0));
-          var labSub = totals.laborSubtotal != null ? totals.laborSubtotal : ((totals.labor || 0) + (totals.laborMarkup != null ? totals.laborMarkup : 0));
-          doc.text('Fixture and Set Labor Subtotal: $' + formatNum(fxSub, 2), margin, y);
-          y += lineHeight;
-          doc.text('Materials Subtotal: $' + formatNum(matSub, 2), margin, y);
-          y += lineHeight;
-          doc.text('Additional Labor Subtotal: $' + formatNum(labSub, 2), margin, y);
-          y += lineHeight;
-          doc.setFont(undefined, 'bold');
-          doc.text('Grand Total: $' + formatNum(totals.total || 0, 2), margin, y);
-          y += lineHeight + 6;
-
-          if (notesText) {
-            doc.setFont(undefined, 'normal');
-            doc.setFontSize(11);
-            doc.text('Notes / Exclusions', margin, y);
-            y += lineHeight + 2;
-            doc.setFontSize(10);
-            var noteLines = doc.splitTextToSize(notesText, maxWidth);
-            noteLines.forEach(function(line) {
-              if (y > 700) { doc.addPage(); y = 40; }
-              doc.text(line, margin, y);
-              y += lineHeight;
+          if (data.inclusions && data.inclusions.trim()) {
+            var inclusionsLines = data.inclusions.trim().split(/\r?\n/).map(function(s) { return s.trim(); }).filter(Boolean);
+            inclusionsLines.forEach(function(line) {
+              var bulletLine = '\u2022 ' + line;
+              var wrapped = doc.splitTextToSize(bulletLine, maxWidth);
+              wrapped.forEach(function(w) {
+                if (y > 700) { doc.addPage(); y = 40; }
+                doc.text(w, margin, y);
+                y += lineHeight;
+              });
             });
           }
+          if (data.scopeNotes && data.scopeNotes.trim()) {
+            y += lineHeight;
+            doc.setFont(undefined, 'bold');
+            doc.text('Exclusions and Scope:', margin, y);
+            y += lineHeight;
+            doc.setFont(undefined, 'normal');
+            var scopeUserLines = data.scopeNotes.trim().split(/\r?\n/).map(function(s) { return s.trim(); }).filter(Boolean);
+            scopeUserLines.forEach(function(line) {
+              var bulletLine = '• ' + line;
+              var wrapped = doc.splitTextToSize(bulletLine, maxWidth);
+              wrapped.forEach(function(w) {
+                if (y > 700) { doc.addPage(); y = 40; }
+                doc.text(w, margin, y);
+                y += lineHeight;
+              });
+            });
+          }
+          y += lineHeight;
+          doc.setFont(undefined, 'bold');
+          doc.text('Terms and Warranty:', margin, y);
+          y += lineHeight;
+          doc.setFont(undefined, 'normal');
+          var termsText = data.termsAndWarranty && data.termsAndWarranty.trim() ? data.termsAndWarranty.trim() : '—';
+          var termsLines = doc.splitTextToSize(termsText, maxWidth);
+          termsLines.forEach(function(line) {
+            if (y > 700) { doc.addPage(); y = 40; }
+            doc.text(line, margin, y);
+            y += lineHeight;
+          });
+          y += lineHeight;
+
+          if (y > 700) { doc.addPage(); y = 40; }
+          doc.text('No work shall commence until Click Plumbing has received acceptance of the estimate.', margin, y);
+          y += lineHeight;
+          if (y > 700) { doc.addPage(); y = 40; }
+          doc.text('Respectfully submitted by Click Plumbing', margin, y);
+          y += lineHeight;
+          y += lineHeight;
+          if (y > 700) { doc.addPage(); y = 40; }
+          doc.text('        _______________________________', margin, y);
+          y += lineHeight;
+          y += lineHeight;
+          var acceptPara = 'The above prices, specifications, and conditions are satisfactory and are hereby accepted. You are authorized to perform the work as specified.';
+          var acceptLines = doc.splitTextToSize(acceptPara, maxWidth);
+          acceptLines.forEach(function(line) {
+            if (y > 700) { doc.addPage(); y = 40; }
+            doc.text(line, margin, y);
+            y += lineHeight;
+          });
+          y += lineHeight;
+          var footerLines = [
+            'Click Plumbing and Electrical, 5501 Balcones Dr, Austin, TX 78731',
+            'Malachi Whites RMP M-41130 | Phone: 512 360 0599',
+            'Regulated by the Texas State Board of Plumbing Examiners',
+            '929 E 41st St, Austin, TX 78751 | (512) 936-5200 | https://tsbpe.texas.gov'
+          ];
+          footerLines.forEach(function(line) {
+            if (y > 700) { doc.addPage(); y = 40; }
+            doc.text(line, margin, y);
+            y += lineHeight;
+          });
+          y += lineHeight;
+          if (y > 700) { doc.addPage(); y = 40; }
+          doc.setFont(undefined, 'bold');
+          doc.text('Acceptance of estimate', margin, y);
+          y += lineHeight;
+          doc.setFont(undefined, 'normal');
+          doc.text('General Contractor / Builder Signature:', margin, y);
+          y += lineHeight;
+          y += lineHeight;
+          if (y > 700) { doc.addPage(); y = 40; }
+          doc.text('____________________________________', margin, y);
+          y += lineHeight;
+          y += lineHeight;
+          if (y > 700) { doc.addPage(); y = 40; }
+          doc.text('Date: ____________________________________', margin, y);
 
           doc.save('bid-summary-' + (getStr('bidNumber') || 'export') + '.pdf');
         } catch (e) {
@@ -1793,6 +1999,12 @@
         });
       }
 
+      var TERMS_AND_WARRANTY_DEFAULT = 'All work to be completed in a workmanlike manner in accordance with uniform code and/or specifications; workmanship warranty of one year for new construction projects considering substantial completion date. All material is guaranteed to be as specified; warranty by manufacturer, labor not included. No liability, no warranty on customer provided materials. All agreements contingent upon strikes, accidents or delays beyond our control. This estimate is subject to acceptance within thirty (30) days and is void thereafter at the option of Click Plumbing. Any alteration or deviation from above specifications involving extra cost, including rock excavation and removal or haul-off of spoils or debris will become an extra charge over and above the estimate.';
+
+      var EXCLUSIONS_AND_SCOPE_DEFAULT = 'Concrete cutting, removal, and/or pour back is excluded from this proposal.\nThis proposal excludes all impact fees.\nThis proposal excludes any work not specifically described within.\nThis proposal excludes any electrical, fire protection, fire alarm, drywall, framing, or architectural finishes of any type.';
+
+      var INCLUSIONS_DEFAULT = 'Permits';
+
       function clearForm() {
         document.getElementById('bidForm').reset();
         setDefaultDate();
@@ -1816,6 +2028,9 @@
         });
         qsa('.additional-material-desc').forEach(function(el) { el.value = ''; });
         qsa('.additional-material-amount').forEach(function(el) { el.value = ''; });
+        if ($('termsAndWarranty')) $('termsAndWarranty').value = TERMS_AND_WARRANTY_DEFAULT;
+        if ($('scopeNotes')) $('scopeNotes').value = EXCLUSIONS_AND_SCOPE_DEFAULT;
+        if ($('inclusions')) $('inclusions').value = INCLUSIONS_DEFAULT;
         requiredIds.forEach(function(id) { var el = $(id); if (el) el.classList.remove('error'); });
         calculateTotals();
         $('preview').classList.remove('visible');
@@ -1864,7 +2079,8 @@
         }
         if ($('materialsMarkupPct')) $('materialsMarkupPct').value = 0;
         if ($('laborMarkupPct')) $('laborMarkupPct').value = 0;
-        if ($('scopeNotes')) $('scopeNotes').value = 'Sample scope: Rough-in and top-out per plans. Trim and fixture set by owner. Exclusions: owner-supplied fixtures, excavation, and final grading.';
+        if ($('inclusions')) $('inclusions').value = 'Any change orders requested by the builder agreed to in writing';
+        if ($('scopeNotes')) $('scopeNotes').value = EXCLUSIONS_AND_SCOPE_DEFAULT;
         requiredIds.forEach(function(id) {
           var el = $(id);
           if (el) el.classList.remove('error');
@@ -2025,6 +2241,44 @@
         calculateTotals();
       }
 
+      function exportFixturePricesAndTimes() {
+        var ids = [
+          'fixtureToilets', 'fixtureBathSinks', 'fixtureKitchenSinks', 'fixtureDisposals',
+          'fixtureUrinals', 'fixtureTubs', 'fixtureShowerOnly', 'fixtureShowerTub',
+          'fixtureLaundrySinks', 'fixtureHoseBibs', 'fixtureWaterFountain', 'fixtureWHGas', 'fixtureWHElectric',
+          'fixtureWHTankless', 'fixtureGasDrops'
+        ];
+        function csvEscape(s) {
+          var str = String(s == null ? '' : s);
+          return str.indexOf(',') >= 0 || str.indexOf('"') >= 0 ? '"' + str.replace(/"/g, '""') + '"' : str;
+        }
+        var rows = ['Fixture,Price,Rough in,Top out,Trim'];
+        ids.forEach(function(id) {
+          var row = FIXTURE_PRICES[id];
+          if (!row) return;
+          var name = row.label || '';
+          if (row.note) name += ' (' + row.note + ')';
+          rows.push([
+            csvEscape(name),
+            row.price != null ? row.price : '',
+            row.roughIn != null ? row.roughIn : '',
+            row.topOut != null ? row.topOut : '',
+            row.trim != null ? row.trim : ''
+          ].join(','));
+        });
+        var csv = rows.join('\r\n');
+        var blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'fixture-prices-and-times.csv';
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
       function hasFixturePriceChangesFromMode(modeName) {
         var base = FIXTURE_MODES[modeName];
         if (!base) return false;
@@ -2101,16 +2355,105 @@
 
       $('generatePreview').addEventListener('click', onGeneratePreview);
       $('printBtn').addEventListener('click', onPrint);
-      $('exportPdf').addEventListener('click', openExternalSummaryModal);
+      $('exportPdf').addEventListener('click', openExternalSummaryView);
+      var letterheadCopyLink = $('letterheadCopyLink');
+      if (letterheadCopyLink) {
+        letterheadCopyLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (!validateForm()) {
+            alert(REQUIRED_FIELDS_MESSAGE);
+            return;
+          }
+          var data = collectFormData();
+          var totals = calculateTotals();
+          var plainText = buildExternalSummaryPlainText(data, totals);
+          var html = buildExternalSummaryHtml(plainText);
+          function fallbackCopy() {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              return navigator.clipboard.writeText(plainText);
+            }
+            var ta = document.createElement('textarea');
+            ta.value = plainText;
+            ta.setAttribute('readonly', '');
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+              return document.execCommand('copy');
+            } finally {
+              document.body.removeChild(ta);
+            }
+          }
+          function tryCopy() {
+            if (navigator.clipboard && navigator.clipboard.write) {
+              return navigator.clipboard.write([
+                new ClipboardItem({ 'text/plain': new Blob([plainText], { type: 'text/plain' }), 'text/html': new Blob([html], { type: 'text/html' }) })
+              ]).then(function() { return true; }).catch(function() { return fallbackCopy(); });
+            }
+            return Promise.resolve(fallbackCopy());
+          }
+          var title = getStr('bidNumber') || 'My Customized Document';
+          var url = 'https://docs.google.com/document/d/1Xs76a1fAZfj4GGyIQ-wH_x98rtjnfoB7RVt7cMBmPP8/copy?title=' + encodeURIComponent(title);
+          tryCopy().then(function() { window.open(url, '_blank', 'noopener,noreferrer'); });
+        });
+      }
+      var externalSummaryCopyBtn = $('externalSummaryCopyBtn');
+      if (externalSummaryCopyBtn) {
+        externalSummaryCopyBtn.addEventListener('click', function() {
+          if (!validateForm()) {
+            alert(REQUIRED_FIELDS_MESSAGE);
+            return;
+          }
+          var data = collectFormData();
+          var totals = calculateTotals();
+          var plainText = buildExternalSummaryPlainText(data, totals);
+          var html = buildExternalSummaryHtml(plainText);
+          var btn = this;
+          var originalText = btn.textContent;
+          function fallbackCopy() {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              return navigator.clipboard.writeText(plainText);
+            }
+            var ta = document.createElement('textarea');
+            ta.value = plainText;
+            ta.setAttribute('readonly', '');
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+              return document.execCommand('copy');
+            } finally {
+              document.body.removeChild(ta);
+            }
+          }
+          function tryCopy() {
+            if (navigator.clipboard && navigator.clipboard.write) {
+              return navigator.clipboard.write([
+                new ClipboardItem({ 'text/plain': new Blob([plainText], { type: 'text/plain' }), 'text/html': new Blob([html], { type: 'text/html' }) })
+              ]).then(function() { return true; }).catch(function() { return fallbackCopy(); });
+            }
+            return Promise.resolve(fallbackCopy());
+          }
+          tryCopy().then(function(ok) {
+            if (ok) {
+              btn.textContent = 'Copied!';
+              setTimeout(function() { btn.textContent = originalText; }, 2000);
+            } else {
+              alert('Copy failed. Please select and copy manually from the View summary.');
+            }
+          });
+        });
+      }
       $('externalSummaryDownloadPdf').addEventListener('click', function() {
-        exportToPDF($('externalSummaryNotes').value);
+        exportToPDF();
       });
       $('externalSummaryPrint').addEventListener('click', function() {
-        $('externalSummaryPrintNotes').textContent = $('externalSummaryNotes').value;
+        if (!showExternalSummaryBelow()) return;
         document.body.classList.add('print-external-summary');
         setTimeout(function() { window.print(); document.body.classList.remove('print-external-summary'); }, 100);
       });
-      $('externalSummaryClose').addEventListener('click', closeExternalSummaryModal);
       $('addTakeoffRow').addEventListener('click', addTakeoffRow);
       if ($('fillSample')) $('fillSample').addEventListener('click', fillWithSampleData);
       if ($('shareViaUrlBtn')) $('shareViaUrlBtn').addEventListener('click', shareViaUrl);
@@ -2214,6 +2557,7 @@
       if ($('exportCoverPage')) $('exportCoverPage').addEventListener('click', exportCoverPage);
       if ($('clearFixtureCounts')) $('clearFixtureCounts').addEventListener('click', clearFixtureCounts);
       if ($('resetFixturePrices')) $('resetFixturePrices').addEventListener('click', resetFixturePricesToDefault);
+      if ($('exportFixturePricesBtn')) $('exportFixturePricesBtn').addEventListener('click', exportFixturePricesAndTimes);
       var fixturePriceTable = $('fixturePriceTable');
       if (fixturePriceTable) {
         fixturePriceTable.addEventListener('input', syncFixturePriceInput);
@@ -2274,6 +2618,9 @@
         initializeFixtureMode();
         renderLedgerList();
         restoreFromShareHash();
+        if ($('termsAndWarranty') && !$('termsAndWarranty').value.trim()) $('termsAndWarranty').value = TERMS_AND_WARRANTY_DEFAULT;
+        if ($('scopeNotes') && !$('scopeNotes').value.trim()) $('scopeNotes').value = EXCLUSIONS_AND_SCOPE_DEFAULT;
+        if ($('inclusions') && !$('inclusions').value.trim()) $('inclusions').value = INCLUSIONS_DEFAULT;
       });
     })();
   </script>
