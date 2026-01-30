@@ -110,6 +110,11 @@
     .letterhead-link { display: block; text-align: center; color: var(--primary); transition: opacity 0.2s; }
     .letterhead-link:hover { opacity: 0.85; }
     .letterhead-icon { width: 2.5rem; height: 2.5rem; display: inline-block; fill: currentColor; vertical-align: middle; }
+    .share-via-url-icon, .share-via-email-icon { width: 2.5rem; height: 2.5rem; display: block; fill: currentColor; }
+    .share-via-url-trigger { display: inline-block; cursor: pointer; color: var(--primary); transition: opacity 0.2s; }
+    .share-url-actions { display: inline-flex; align-items: center; gap: 0.5rem; }
+    .share-via-url-trigger:hover { opacity: 0.85; }
+    .share-via-url-trigger:focus { outline: 2px solid var(--primary); outline-offset: 2px; }
     .letterhead-icons { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; }
     .google-doc-steps { display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; }
     .google-doc-arrow { color: #000; font-weight: bold; font-size: 1rem; }
@@ -131,6 +136,8 @@
     .btn-secondary:hover { background: #0052a3; }
     .btn-outline { background: #fff; color: var(--primary); border: 2px solid var(--primary); }
     .btn-outline:hover { background: var(--bg); }
+    .btn-primary.view-active { background: #E85D04; }
+    .btn-primary.view-active:hover { background: #c95203; }
     #preview {
       background: var(--card-bg);
       border-radius: 8px;
@@ -140,6 +147,13 @@
       display: none;
     }
     #preview.visible { display: block; }
+    .share-url-modal { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; z-index: 9999; }
+    .share-url-modal.visible { display: flex; }
+    .share-url-modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.4); cursor: pointer; }
+    .share-url-modal-dialog { position: relative; background: var(--card-bg); padding: 1.5rem; border-radius: 8px; max-width: 24rem; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+    .share-url-modal-dialog h2 { margin: 0 0 0.75rem 0; font-size: 1.125rem; }
+    .share-url-modal-message { margin: 0 0 1rem 0; line-height: 1.4; }
+    .share-url-modal-dialog .btn { width: 100%; }
     #externalSummaryPreview.external-summary-inline {
       background: var(--card-bg);
       border-radius: 8px;
@@ -250,8 +264,8 @@
 <body>
   <div class="container">
     <div class="app-top-bar no-print">
-      <button type="button" id="shareViaUrlBtn" class="btn btn-outline">Share via URL</button>
       <button type="button" id="fillSample" class="btn btn-outline">Fill with sample</button>
+      <button type="button" id="clearAllFieldsBtn" class="btn btn-outline" title="Viewing someone else's plan? Clear the form to start fresh.">Clear all fields</button>
     </div>
     <form id="bidForm" class="no-print">
       <div class="section">
@@ -509,7 +523,7 @@
           <div class="fixture-ledger-col">
             <h3>Plan pages</h3>
             <div id="fixtureLedgerList" class="fixture-ledger-list"></div>
-            <button type="button" id="exportCoverPage" class="btn btn-outline" style="margin-top: 0.75rem;">Export cover page</button>
+            <button type="button" id="exportCoverPage" class="btn btn-outline" style="margin-top: 0.75rem;">Export Labor Page</button>
           </div>
         </div>
         <p style="margin-top: 1rem; margin-bottom: 0;">
@@ -758,12 +772,34 @@
             </a>
           </div>
         </div>
+        <div class="internal-summary-box">
+          <h3 class="internal-summary-title">Share via URL</h3>
+          <div class="internal-summary-actions">
+            <div class="share-url-actions">
+              <span id="shareViaUrlBtn" class="share-via-url-trigger" role="button" tabindex="0" title="Share via URL" aria-label="Share via URL">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" class="share-via-url-icon" aria-hidden="true"><path d="M480 400L288 400C279.2 400 272 392.8 272 384L272 128C272 119.2 279.2 112 288 112L421.5 112C425.7 112 429.8 113.7 432.8 116.7L491.3 175.2C494.3 178.2 496 182.3 496 186.5L496 384C496 392.8 488.8 400 480 400zM288 448L480 448C515.3 448 544 419.3 544 384L544 186.5C544 169.5 537.3 153.2 525.3 141.2L466.7 82.7C454.7 70.7 438.5 64 421.5 64L288 64C252.7 64 224 92.7 224 128L224 384C224 419.3 252.7 448 288 448zM160 192C124.7 192 96 220.7 96 256L96 512C96 547.3 124.7 576 160 576L352 576C387.3 576 416 547.3 416 512L416 496L368 496L368 512C368 520.8 360.8 528 352 528L160 528C151.2 528 144 520.8 144 512L144 256C144 247.2 151.2 240 160 240L176 240L176 192L160 192z"/></svg>
+              </span>
+              <span id="shareViaEmailBtn" class="share-via-url-trigger" role="button" tabindex="0" title="Email link" aria-label="Email link">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" class="share-via-email-icon" aria-hidden="true"><path d="M125.4 128C91.5 128 64 155.5 64 189.4C64 190.3 64 191.1 64.1 192L64 192L64 448C64 483.3 92.7 512 128 512L512 512C547.3 512 576 483.3 576 448L576 192L575.9 192C575.9 191.1 576 190.3 576 189.4C576 155.5 548.5 128 514.6 128L125.4 128zM528 256.3L528 448C528 456.8 520.8 464 512 464L128 464C119.2 464 112 456.8 112 448L112 256.3L266.8 373.7C298.2 397.6 341.7 397.6 373.2 373.7L528 256.3zM112 189.4C112 182 118 176 125.4 176L514.6 176C522 176 528 182 528 189.4C528 193.6 526 197.6 522.7 200.1L344.2 335.5C329.9 346.3 310.1 346.3 295.8 335.5L117.3 200.1C114 197.6 112 193.6 112 189.4z"/></svg>
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
     </form>
 
     <div id="preview" class="preview-section" aria-live="polite"></div>
 
     <div id="externalSummaryPreview" class="external-summary-inline" aria-live="polite"></div>
+
+    <div id="shareUrlLongModal" class="share-url-modal" aria-hidden="true">
+      <div class="share-url-modal-backdrop" aria-label="Close"></div>
+      <div class="share-url-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="shareUrlLongModalTitle">
+        <h2 id="shareUrlLongModalTitle" class="share-url-modal-title">Copied to clipboard.</h2>
+        <p id="shareUrlLongModalMessage" class="share-url-modal-message"></p>
+        <button type="button" id="shareUrlLongModalClose" class="btn btn-primary">OK</button>
+      </div>
+    </div>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
@@ -771,6 +807,8 @@
       const CREW_MULTIPLIERS = { 1: 1, 2: 1.8, 3: 2.5 };
       const requiredIds = ['customerName', 'jobAddress', 'bidDate', 'bidNumber'];
       var REQUIRED_FIELDS_MESSAGE = 'Please fill in required fields: Customer Name, Job Address, Bid Date, Bid Number.';
+      var MAX_SHARE_URL_LENGTH = 2000;
+      var userEditedBidNumber = false;
 
       function $(id) { return document.getElementById(id); }
       function qs(sel, root) { return (root || document).querySelector(sel); }
@@ -781,6 +819,7 @@
         if (bidDate && !bidDate.value) bidDate.value = new Date().toISOString().slice(0, 10);
       }
       setDefaultDate();
+      updateBidNumberFromDateAndJob();
 
       var fixtureIds = [
         'fixtureToilets', 'fixtureBathSinks', 'fixtureShowerTub', 'fixtureShowerOnly', 'fixtureTubs',
@@ -793,6 +832,25 @@
 
       function getNum(id) { const el = $(id); return el ? (parseFloat(el.value) || 0) : 0; }
       function getStr(id) { const el = $(id); return el ? (el.value || '').trim() : ''; }
+
+      function getSuggestedBidNumber() {
+        var dateEl = $('bidDate');
+        var dateStr = dateEl && dateEl.value ? dateEl.value.trim() : '';
+        if (!dateStr) dateStr = new Date().toISOString().slice(0, 10);
+        var yymmdd = dateStr.length >= 10 ? (dateStr.slice(2, 4) + dateStr.slice(5, 7) + dateStr.slice(8, 10)) : '';
+        var jobRaw = getStr('jobName');
+        var jobPart = jobRaw.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '').replace(/-+/g, '-').replace(/^-|-$/g, '');
+        return jobPart ? yymmdd + '-' + jobPart : yymmdd;
+      }
+
+      function updateBidNumberFromDateAndJob() {
+        var el = $('bidNumber');
+        if (!el) return;
+        var val = (el.value || '').trim();
+        if (val === '') userEditedBidNumber = false;
+        if (userEditedBidNumber && val !== '') return;
+        el.value = getSuggestedBidNumber();
+      }
 
       function getParagraphs(str) {
         if (!str || !str.trim()) return [];
@@ -1338,11 +1396,20 @@
       }
 
       function onGeneratePreview() {
+        var preview = $('preview');
+        var genBtn = $('generatePreview');
+        if (preview && preview.classList.contains('visible')) {
+          preview.classList.remove('visible');
+          preview.innerHTML = '';
+          if (genBtn) genBtn.classList.remove('view-active');
+          return;
+        }
         if (!validateForm()) {
           alert(REQUIRED_FIELDS_MESSAGE);
           return;
         }
         updatePreview();
+        if (genBtn) genBtn.classList.add('view-active');
       }
 
       function onPrint() {
@@ -1502,9 +1569,17 @@
       }
 
       function openExternalSummaryView() {
+        var extEl = $('externalSummaryPreview');
+        var exportBtn = $('exportPdf');
+        if (extEl && extEl.classList.contains('visible')) {
+          extEl.classList.remove('visible');
+          extEl.innerHTML = '';
+          if (exportBtn) exportBtn.classList.remove('view-active');
+          return;
+        }
         if (showExternalSummaryBelow()) {
-          var el = $('externalSummaryPreview');
-          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          if (extEl) extEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          if (exportBtn) exportBtn.classList.add('view-active');
         }
       }
 
@@ -1805,9 +1880,6 @@
         row.className = 'takeoff-row';
         row.innerHTML = '<input type="text" placeholder="Item (e.g. Copper pipe 1/2\")" class="takeoff-desc"> <input type="text" placeholder="Qty" class="takeoff-qty"> <button type="button" class="takeoff-remove" aria-label="Remove row">Remove</button>';
         container.appendChild(row);
-        row.querySelector('.takeoff-remove').addEventListener('click', function() {
-          if (qsa('.takeoff-row').length > 1) row.remove();
-        });
       }
 
       function addAdditionalLaborRow() {
@@ -1868,10 +1940,44 @@
             amount: amountEl ? amountEl.value : ''
           });
         });
-        return { fixtures: fixtures, ledger: ledger, additionalLabor: additionalLabor, additionalMaterials: additionalMaterials };
+        var takeoff = [];
+        qsa('.takeoff-row').forEach(function(row) {
+          var descEl = row.querySelector('.takeoff-desc');
+          var qtyEl = row.querySelector('.takeoff-qty');
+          takeoff.push({
+            desc: descEl ? descEl.value : '',
+            qty: qtyEl ? qtyEl.value : ''
+          });
+        });
+        var inclusionsVal = getStr('inclusions');
+        var scopeVal = getStr('scopeNotes');
+        var state = {
+          fixtures: fixtures,
+          ledger: ledger,
+          additionalLabor: additionalLabor,
+          additionalMaterials: additionalMaterials,
+          customerName: getStr('customerName'),
+          customerAddress: getStr('customerAddress'),
+          jobName: getStr('jobName'),
+          jobAddress: getStr('jobAddress'),
+          bidDate: getStr('bidDate'),
+          bidNumber: getStr('bidNumber'),
+          planTitle: getStr('planTitle'),
+          planName: getStr('planName'),
+          planIssueDate: getStr('planIssueDate'),
+          crewRate1: getNum('crewRate1'),
+          crewRate2: getNum('crewRate2'),
+          crewRate3: getNum('crewRate3'),
+          materialsMarkupPct: getNum('materialsMarkupPct'),
+          fixtureLaborMarkupPct: getNum('fixtureLaborMarkupPct'),
+          takeoff: takeoff,
+          inclusions: inclusionsVal === INCLUSIONS_DEFAULT ? 'default' : inclusionsVal,
+          scopeNotes: scopeVal === EXCLUSIONS_AND_SCOPE_DEFAULT ? 'default' : scopeVal
+        };
+        return state;
       }
 
-      function shareViaUrl() {
+      function getShareUrl() {
         var state = buildShareState();
         var payload = JSON.stringify(state);
         var encoded;
@@ -1880,32 +1986,77 @@
         } catch (e) {
           encoded = btoa(payload);
         }
-        var url = location.origin + location.pathname + (location.search || '') + '#' + encoded;
+        return location.origin + location.pathname + (location.search || '') + '#' + encoded;
+      }
+
+      function shareViaUrl() {
+        var url = getShareUrl();
         try {
           window.history.replaceState(null, '', url);
         } catch (err) {
-          window.location.hash = encoded;
+          window.location.hash = url.split('#')[1] || '';
         }
+        var feedbackMsg = url.length > MAX_SHARE_URL_LENGTH
+          ? 'URL is long, make sure to only send in apps that can handle long text strings. Copied to clipboard.'
+          : 'URL copied to clipboard';
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(url).then(function() {
-            showShareFeedback('URL copied to clipboard');
+            if (url.length > MAX_SHARE_URL_LENGTH) showShareUrlLongModal(feedbackMsg); else showShareFeedback(feedbackMsg);
           }).catch(function() {
-            showShareFeedback('URL updated (copy from address bar)');
+            if (url.length > MAX_SHARE_URL_LENGTH) showShareUrlLongModal(feedbackMsg); else showShareFeedback('URL updated (copy from address bar)');
           });
         } else {
-          showShareFeedback('URL updated (copy from address bar)');
+          if (url.length > MAX_SHARE_URL_LENGTH) showShareUrlLongModal('URL is long, make sure to only send in apps that can handle long text strings. Copy the URL from your address bar.'); else showShareFeedback('URL updated (copy from address bar)');
+        }
+      }
+
+      function shareViaEmail() {
+        var url = getShareUrl();
+        try {
+          window.history.replaceState(null, '', url);
+        } catch (err) {
+          window.location.hash = url.split('#')[1] || '';
+        }
+        var subject = (getStr('bidNumber') || 'Bid').replace(/\s+/g, ' ');
+        var mailto = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(url);
+        window.location.href = mailto;
+      }
+
+      function showShareUrlLongModal(message) {
+        var modal = $('shareUrlLongModal');
+        var msgEl = $('shareUrlLongModalMessage');
+        if (modal && msgEl) {
+          var text = (message || '').replace(/\s*Copied to clipboard\.?\s*$/, '').trim();
+          msgEl.textContent = text;
+          modal.classList.add('visible');
+          modal.setAttribute('aria-hidden', 'false');
+        }
+      }
+
+      function closeShareUrlLongModal() {
+        var modal = $('shareUrlLongModal');
+        if (modal) {
+          var returnFocus = $('shareViaUrlBtn') || $('shareViaEmailBtn');
+          if (returnFocus && document.activeElement && modal.contains(document.activeElement)) {
+            returnFocus.focus();
+          }
+          modal.classList.remove('visible');
+          modal.setAttribute('aria-hidden', 'true');
         }
       }
 
       function showShareFeedback(message) {
         var btn = $('shareViaUrlBtn');
         if (!btn) return;
-        var orig = btn.textContent;
+        var hasSvg = !!btn.querySelector('svg');
+        var orig = hasSvg ? btn.innerHTML : btn.textContent;
         btn.textContent = message;
-        btn.disabled = true;
+        if (btn.disabled !== undefined) btn.disabled = true;
+        btn.style.pointerEvents = 'none';
         setTimeout(function() {
-          btn.textContent = orig;
-          btn.disabled = false;
+          if (hasSvg) btn.innerHTML = orig; else btn.textContent = orig;
+          if (btn.disabled !== undefined) btn.disabled = false;
+          btn.style.pointerEvents = '';
         }, 2000);
       }
 
@@ -1987,6 +2138,50 @@
           });
         }
 
+        if (payload.customerName != null) { var el = $('customerName'); if (el) el.value = String(payload.customerName); }
+        if (payload.customerAddress != null) { var el = $('customerAddress'); if (el) el.value = String(payload.customerAddress); }
+        if (payload.jobName != null) { var el = $('jobName'); if (el) el.value = String(payload.jobName); }
+        if (payload.jobAddress != null) { var el = $('jobAddress'); if (el) el.value = String(payload.jobAddress); }
+        if (payload.bidDate != null) { var el = $('bidDate'); if (el) el.value = String(payload.bidDate); }
+        if (payload.bidNumber != null) { var el = $('bidNumber'); if (el) el.value = String(payload.bidNumber); }
+        if (payload.planTitle != null) { var el = $('planTitle'); if (el) el.value = String(payload.planTitle); }
+        if (payload.planName != null) { var el = $('planName'); if (el) el.value = String(payload.planName); }
+        if (payload.planIssueDate != null) { var el = $('planIssueDate'); if (el) el.value = String(payload.planIssueDate); }
+        if (payload.crewRate1 != null) { var el = $('crewRate1'); if (el) el.value = String(payload.crewRate1); }
+        if (payload.crewRate2 != null) { var el = $('crewRate2'); if (el) el.value = String(payload.crewRate2); }
+        if (payload.crewRate3 != null) { var el = $('crewRate3'); if (el) el.value = String(payload.crewRate3); }
+        if (payload.materialsMarkupPct != null) { var el = $('materialsMarkupPct'); if (el) el.value = String(payload.materialsMarkupPct); }
+        if (payload.fixtureLaborMarkupPct != null) { var el = $('fixtureLaborMarkupPct'); if (el) el.value = String(payload.fixtureLaborMarkupPct); }
+
+        if (Array.isArray(payload.takeoff)) {
+          var takeoffContainer = $('takeoffRows');
+          if (takeoffContainer) {
+            qsa('.takeoff-row', takeoffContainer).forEach(function(row) { row.remove(); });
+            var takeoffItems = payload.takeoff.length ? payload.takeoff : [{ desc: '', qty: '' }];
+            takeoffItems.forEach(function(item) {
+              var row = document.createElement('div');
+              row.className = 'takeoff-row';
+              row.innerHTML = '<input type="text" placeholder="Item (e.g. Copper pipe 1/2\")" class="takeoff-desc"> <input type="text" placeholder="Qty" class="takeoff-qty"> <button type="button" class="takeoff-remove" aria-label="Remove row">Remove</button>';
+              takeoffContainer.appendChild(row);
+              var descEl = row.querySelector('.takeoff-desc');
+              var qtyEl = row.querySelector('.takeoff-qty');
+              if (descEl) descEl.value = item.desc != null ? String(item.desc) : '';
+              if (qtyEl) qtyEl.value = item.qty != null ? String(item.qty) : '';
+            });
+          }
+        }
+
+        if (payload.inclusions !== undefined) {
+          var incEl = $('inclusions');
+          if (incEl) incEl.value = payload.inclusions === 'default' ? INCLUSIONS_DEFAULT : String(payload.inclusions);
+        }
+        if (payload.scopeNotes !== undefined) {
+          var scopeEl = $('scopeNotes');
+          if (scopeEl) scopeEl.value = payload.scopeNotes === 'default' ? EXCLUSIONS_AND_SCOPE_DEFAULT : String(payload.scopeNotes);
+        }
+        var termsEl = $('termsAndWarranty');
+        if (termsEl) termsEl.value = TERMS_AND_WARRANTY_DEFAULT;
+
         calculateTotals();
         updateRoughBid();
       }
@@ -2042,6 +2237,8 @@
         calculateTotals();
         $('preview').classList.remove('visible');
         $('preview').innerHTML = '';
+        var genBtn = $('generatePreview');
+        if (genBtn) genBtn.classList.remove('view-active');
       }
 
       function fillWithSampleData() {
@@ -2462,16 +2659,78 @@
         setTimeout(function() { window.print(); document.body.classList.remove('print-external-summary'); }, 100);
       });
       $('addTakeoffRow').addEventListener('click', addTakeoffRow);
+      var takeoffRowsEl = $('takeoffRows');
+      if (takeoffRowsEl) {
+        takeoffRowsEl.addEventListener('click', function(e) {
+          if (e.target.classList.contains('takeoff-remove')) {
+            var row = e.target.closest('.takeoff-row');
+            if (row) {
+              var desc = row.querySelector('.takeoff-desc');
+              var qty = row.querySelector('.takeoff-qty');
+              if (desc) desc.value = '';
+              if (qty) qty.value = '';
+            }
+          }
+        });
+      }
+      document.addEventListener('keydown', function(e) {
+        if (e.key !== 'Delete' && e.key !== 'Backspace') return;
+        var el = document.activeElement;
+        if (!el) return;
+        if (takeoffRowsEl && takeoffRowsEl.contains(el) && el.nodeName === 'INPUT' && (el.classList.contains('takeoff-desc') || el.classList.contains('takeoff-qty'))) {
+          el.value = '';
+          e.preventDefault();
+          return;
+        }
+        var laborRows = $('additionalLaborRows');
+        if (laborRows && laborRows.contains(el)) {
+          if (el.classList.contains('additional-labor-desc') || el.classList.contains('additional-labor-hours') || el.classList.contains('additional-labor-rate')) {
+            el.value = '';
+            e.preventDefault();
+          } else if (el.classList.contains('additional-labor-crew') && el.nodeName === 'SELECT') {
+            el.selectedIndex = 0;
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+            e.preventDefault();
+          }
+          return;
+        }
+        var materialRows = $('additionalMaterialRows');
+        if (materialRows && materialRows.contains(el) && (el.classList.contains('additional-material-desc') || el.classList.contains('additional-material-amount'))) {
+          el.value = '';
+          e.preventDefault();
+        }
+      }, true);
       if ($('fillSample')) $('fillSample').addEventListener('click', fillWithSampleData);
       if ($('shareViaUrlBtn')) $('shareViaUrlBtn').addEventListener('click', shareViaUrl);
+      if ($('shareViaEmailBtn')) $('shareViaEmailBtn').addEventListener('click', shareViaEmail);
+      if ($('bidDate')) $('bidDate').addEventListener('input', updateBidNumberFromDateAndJob);
+      if ($('bidDate')) $('bidDate').addEventListener('change', updateBidNumberFromDateAndJob);
+      if ($('jobName')) $('jobName').addEventListener('input', updateBidNumberFromDateAndJob);
+      if ($('jobName')) $('jobName').addEventListener('change', updateBidNumberFromDateAndJob);
+      if ($('bidNumber')) $('bidNumber').addEventListener('input', function() {
+        var el = $('bidNumber');
+        userEditedBidNumber = el && (el.value || '').trim() !== '';
+      });
+      var shareUrlLongModal = $('shareUrlLongModal');
+      var shareUrlModalBackdrop = shareUrlLongModal && shareUrlLongModal.querySelector('.share-url-modal-backdrop');
+      var shareUrlModalDialog = shareUrlLongModal && shareUrlLongModal.querySelector('.share-url-modal-dialog');
+      if (shareUrlModalBackdrop) shareUrlModalBackdrop.addEventListener('click', closeShareUrlLongModal);
+      if ($('shareUrlLongModalClose')) $('shareUrlLongModalClose').addEventListener('click', closeShareUrlLongModal);
+      if (shareUrlModalDialog) shareUrlModalDialog.addEventListener('click', function(e) { e.stopPropagation(); });
       if ($('addAdditionalLaborRow')) $('addAdditionalLaborRow').addEventListener('click', addAdditionalLaborRow);
       if ($('addAdditionalMaterialRow')) $('addAdditionalMaterialRow').addEventListener('click', addAdditionalMaterialRow);
       var additionalMaterialRowsEl = $('additionalMaterialRows');
       if (additionalMaterialRowsEl) {
         additionalMaterialRowsEl.addEventListener('click', function(e) {
-          if (e.target.classList.contains('additional-material-remove') && qsa('.additional-material-row').length > 1) {
-            e.target.closest('.additional-material-row').remove();
-            calculateTotals();
+          if (e.target.classList.contains('additional-material-remove')) {
+            var row = e.target.closest('.additional-material-row');
+            if (row) {
+              var desc = row.querySelector('.additional-material-desc');
+              var amount = row.querySelector('.additional-material-amount');
+              if (desc) desc.value = '';
+              if (amount) amount.value = '';
+              calculateTotals();
+            }
           }
         });
       }
@@ -2495,9 +2754,19 @@
       var additionalLaborRowsEl = $('additionalLaborRows');
       if (additionalLaborRowsEl) {
         additionalLaborRowsEl.addEventListener('click', function(e) {
-          if (e.target.classList.contains('additional-labor-remove') && qsa('.additional-labor-row').length > 1) {
-            e.target.closest('.additional-labor-row').remove();
-            calculateTotals();
+          if (e.target.classList.contains('additional-labor-remove')) {
+            var row = e.target.closest('.additional-labor-row');
+            if (row) {
+              var desc = row.querySelector('.additional-labor-desc');
+              var hours = row.querySelector('.additional-labor-hours');
+              var crew = row.querySelector('.additional-labor-crew');
+              var rate = row.querySelector('.additional-labor-rate');
+              if (desc) desc.value = '';
+              if (hours) hours.value = '';
+              if (crew) { crew.selectedIndex = 0; crew.dispatchEvent(new Event('change', { bubbles: true })); }
+              if (rate) rate.value = '';
+              calculateTotals();
+            }
           }
         });
         additionalLaborRowsEl.addEventListener('change', function(e) {
@@ -2527,6 +2796,14 @@
         });
       }
       $('clearBtn').addEventListener('click', clearForm);
+      if ($('clearAllFieldsBtn')) $('clearAllFieldsBtn').addEventListener('click', function() {
+        clearForm();
+        var extEl = $('externalSummaryPreview');
+        if (extEl) { extEl.classList.remove('visible'); extEl.innerHTML = ''; }
+        var exportBtn = $('exportPdf');
+        if (exportBtn) exportBtn.classList.remove('view-active');
+        try { window.history.replaceState(null, '', location.pathname + (location.search || '')); } catch (e) { location.hash = ''; }
+      });
       var roughCalculatorBtn = $('roughCalculatorBtn');
       var roughCalculatorSection = $('roughCalculatorSection');
       if (roughCalculatorBtn && roughCalculatorSection) {
