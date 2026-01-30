@@ -111,6 +111,10 @@
     .letterhead-link:hover { opacity: 0.85; }
     .letterhead-icon { width: 2.5rem; height: 2.5rem; display: inline-block; fill: currentColor; vertical-align: middle; }
     .letterhead-icons { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; }
+    .google-doc-steps { display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+    .google-doc-arrow { color: #000; font-weight: bold; font-size: 1rem; }
+    .google-doc-make-a-copy { height: 2rem; width: auto; vertical-align: middle; }
+    .google-doc-shortcut { font-size: 0.9rem; font-family: inherit; }
     .btn {
       padding: 0.75rem 1.25rem;
       border: none;
@@ -736,20 +740,21 @@
         <div class="internal-summary-box">
           <h3 class="internal-summary-title">External Summary</h3>
           <div class="internal-summary-actions">
-            <button type="button" id="exportPdf" class="btn btn-outline">View</button>
+            <button type="button" id="exportPdf" class="btn btn-primary">View</button>
             <button type="button" id="externalSummaryCopyBtn" class="btn btn-outline">Copy Text</button>
             <button type="button" id="externalSummaryDownloadPdf" class="btn btn-primary">Download PDF</button>
             <button type="button" id="externalSummaryPrint" class="btn btn-secondary">Print</button>
           </div>
         </div>
         <div class="internal-summary-box">
-          <h3 class="internal-summary-title">Letterhead</h3>
+          <h3 class="internal-summary-title">Google Doc</h3>
           <div class="letterhead-icons">
-            <a class="letterhead-link" href="https://docs.google.com/document/d/1Xs76a1fAZfj4GGyIQ-wH_x98rtjnfoB7RVt7cMBmPP8/edit?usp=sharing" target="_blank" rel="noopener noreferrer" title="Open Click letterhead">
-              <svg class="letterhead-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" aria-hidden="true"><path d="M480 576L192 576C139 576 96 533 96 480L96 160C96 107 139 64 192 64L496 64C522.5 64 544 85.5 544 112L544 400C544 420.9 530.6 438.7 512 445.3L512 512C529.7 512 544 526.3 544 544C544 561.7 529.7 576 512 576L480 576zM192 448C174.3 448 160 462.3 160 480C160 497.7 174.3 512 192 512L448 512L448 448L192 448zM224 216C224 229.3 234.7 240 248 240L424 240C437.3 240 448 229.3 448 216C448 202.7 437.3 192 424 192L248 192C234.7 192 224 202.7 224 216zM248 288C234.7 288 224 298.7 224 312C224 325.3 234.7 336 248 336L424 336C437.3 336 448 325.3 448 312C448 298.7 437.3 288 424 288L248 288z"/></svg>
-            </a>
-            <a id="letterheadCopyLink" class="letterhead-link" href="#" target="_blank" rel="noopener noreferrer" title="Copy letterhead as new document (named with bid number)">
-              <svg class="letterhead-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" aria-hidden="true"><path d="M64 160C64 124.7 92.7 96 128 96L416 96C451.3 96 480 124.7 480 160L480 192L530.7 192C547.7 192 564 198.7 576 210.7L621.3 256C633.3 268 640 284.3 640 301.3L640 448C640 483.3 611.3 512 576 512L572.7 512C562.3 548.9 528.3 576 488 576C447.7 576 413.8 548.9 403.3 512L300.7 512C290.3 548.9 256.3 576 216 576C175.7 576 141.8 548.9 131.3 512L128 512C92.7 512 64 483.3 64 448L64 400L24 400C10.7 400 0 389.3 0 376C0 362.7 10.7 352 24 352L136 352C149.3 352 160 341.3 160 328C160 314.7 149.3 304 136 304L24 304C10.7 304 0 293.3 0 280C0 266.7 10.7 256 24 256L200 256C213.3 256 224 245.3 224 232C224 218.7 213.3 208 200 208L24 208C10.7 208 0 197.3 0 184C0 170.7 10.7 160 24 160L64 160zM576 352L576 301.3L530.7 256L480 256L480 352L576 352zM256 488C256 465.9 238.1 448 216 448C193.9 448 176 465.9 176 488C176 510.1 193.9 528 216 528C238.1 528 256 510.1 256 488zM488 528C510.1 528 528 510.1 528 488C528 465.9 510.1 448 488 448C465.9 448 448 465.9 448 488C448 510.1 465.9 528 488 528z"/></svg>
+            <a id="letterheadCopyLink" class="letterhead-link google-doc-steps" href="#" target="_blank" rel="noopener noreferrer" title="Copy letterhead as new document (named with bid number)">
+              <img src="make-a-copy.png" alt="Make a copy" class="google-doc-make-a-copy">
+              <span class="google-doc-arrow">→</span>
+              <span>Click once</span>
+              <span class="google-doc-arrow">→</span>
+              <span class="google-doc-shortcut">⌘+V</span>
             </a>
           </div>
         </div>
@@ -1464,6 +1469,7 @@
         parts.push('');
         parts.push('Respectfully submitted by Click Plumbing');
         parts.push('');
+        parts.push('');
         parts.push('_______________________________');
         parts.push('');
         parts.push('The above prices, specifications, and conditions are satisfactory and are hereby accepted. You are authorized to perform the work as specified.');
@@ -1474,6 +1480,7 @@
         parts.push('General Contractor / Builder Signature:');
         parts.push('');
         parts.push('____________________________________');
+        parts.push('');
         parts.push('');
         parts.push('Date: ____________________________________');
         return parts.join('\n');
