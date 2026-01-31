@@ -17,35 +17,31 @@ Single-page web app for building plumbing bids: job details, fixture counts, lab
 
 ### Fixture counts
 
-- Plan page name + **Save to ledger**.
 - Grid of fixture types (toilets, sinks, showers, tubs, water heaters, etc.) with quantities.
-- Total fixtures and fixture labor (rough-in, top-out, trim) computed from default or custom prices.
-
-### Fixture ledger (plan pages)
-
-- Saved pages listed in a sidebar; **Load** fills the grid from that page; **Delete** removes it.
-- **Export Labor Page** produces a PDF of ledger pages (fixture tables).
+- **Plan Page Ledger** (right column): saved plan pages; **Load** fills the grid from that page; **Delete** removes it. **Total fixtures** appears below the title; **Export Labor Summary** produces a PDF of ledger pages (fixture tables).
+- At the bottom of the section: **Clear counts**, **Plan page:** (input), and **Upload to Ledger** (all left-aligned).
 
 ### Fixture prices
 
 - Toggle **Fixture mode** (residential vs commercial) for different price sets.
 - Optional table of prices and labor times; **Reset to default**; **Export my prices and times** (JSON).
 
-### Fixture materials (takeoff)
+### Fixture Material Takeoffs
 
-- Placeholder section (PipeTooling.com); item/qty rows.
+- Collapsible section (coming soon from PipeTooling.com); item/qty rows. Collapsed by default.
 - Delete/Backspace clears the focused field.
 
-### Labor estimate
+### Additional Labor and Materials
 
-- Fixture labor summary; crew rates (1 tech, plumber+helper, 3 techs).
-- **Additional labor** rows (description, hours, crew, rate) with crew multiplier.
-- Delete/Backspace clears the focused labor field.
+- **Fixture Labor Estimate:** Rough in / Top out / Trim hours on the left; total fixtures, manhours, and cost on the right.
+- **Additional labor** (work not included in fixture price): rows for description, hours, crew, rate with crew multiplier. Delete/Backspace clears the focused labor field.
+- **Crew pricing ($/hr):** Collapsible at the bottom with 1 Tech, Plumber and Helper, 3 Techs rates.
+- **Additional materials:** Description and amount rows; Delete/Backspace clears the focused material field. **Add row** at the bottom.
+- **Labor total** (Hours • Rate) and grand total logic feed into the Pricing section.
 
 ### Pricing
 
-- Additional materials (description, amount); Delete/Backspace clears the focused material field.
-- Markups for fixture labor, materials, and additional labor; grand total.
+- Table of fixture labor, materials, additional labor (with optional markups) and **Grand Total**. No separate additional-materials block here; that lives in Additional Labor and Materials.
 
 ### Rough calculator
 

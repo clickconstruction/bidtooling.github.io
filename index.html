@@ -38,6 +38,12 @@
     }
     .section.section-takeoff { background: #f0f0f0; }
     .section-takeoff button[disabled] { opacity: 0.6; cursor: not-allowed; }
+    .takeoff-details { border: none; padding: 0; margin: 0; }
+    .takeoff-summary { font-size: 1.25rem; font-weight: 600; color: var(--primary); border-bottom: 2px solid var(--secondary); padding-bottom: 0.25rem; margin-bottom: 0; cursor: pointer; list-style: none; user-select: none; }
+    .takeoff-summary::-webkit-details-marker { display: none; }
+    .takeoff-summary::before { content: '\25b8 '; display: inline-block; transition: transform 0.2s; }
+    .takeoff-details[open] .takeoff-summary::before { transform: rotate(90deg); }
+    .takeoff-details[open] .takeoff-summary { margin-bottom: 1rem; }
     .section-rough-calculator { background: #fffde7; }
     .section-rough-calculator.hidden { display: none; }
     .section-rough-calculator .field.field-disabled { opacity: 0.65; color: #666; }
@@ -94,6 +100,18 @@
     .additional-labor-header .additional-labor-hdr-crew { flex: 0 0 4rem; max-width: 4rem; text-align: center; }
     .additional-labor-header .additional-labor-hdr-rate { flex: 0 0 5.5rem; max-width: 6rem; text-align: center; }
     .additional-labor-header .additional-labor-hdr-remove { flex-shrink: 0; width: 5rem; }
+    .additional-labor-actions-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.75rem; margin-top: 0.5rem; }
+    .additional-labor-actions-left { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; }
+    .additional-labor-subtotal { margin-left: auto; }
+    button.crew-pricing-link-text { background: none; border: none; padding: 0; margin: 0; font-size: 0.875rem; font-weight: 500; color: var(--secondary); cursor: pointer; text-decoration: none; font-family: inherit; }
+    button.crew-pricing-link-text:hover { text-decoration: underline; color: #004499; }
+    #crewPricingDetails.crew-pricing-details { margin-top: 1rem; border: none; padding: 0; background: none; }
+    #crewPricingDetails .crew-pricing-summary-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; list-style: none; }
+    #crewPricingDetails .crew-pricing-summary-sr::-webkit-details-marker { display: none; }
+    #crewPricingDetails .crew-pricing-summary-sr::before { display: none; }
+    .crew-pricing-content { display: grid; grid-template-columns: auto 1fr; gap: 0.5rem 1rem; align-items: center; margin-top: 0.75rem; padding: 0.75rem; background: var(--bg); border-radius: 8px; border: 1px solid var(--border); min-width: 14rem; }
+    .crew-pricing-content label { min-width: 8rem; text-align: left; margin: 0; }
+    .crew-pricing-content input { max-width: 6rem; }
     .additional-material-row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center; }
     .additional-material-row .additional-material-desc { flex: 2; min-width: 0; }
     .additional-material-row .additional-material-amount { flex: 0 0 6rem; max-width: 7rem; }
@@ -102,6 +120,8 @@
     .additional-material-header .additional-material-hdr-desc { flex: 2; min-width: 0; }
     .additional-material-header .additional-material-hdr-amount { flex: 0 0 6rem; max-width: 7rem; text-align: center; }
     .additional-material-header .additional-material-hdr-remove { flex-shrink: 0; width: 5rem; }
+    .additional-material-actions-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.75rem; margin-top: 0.5rem; }
+    .additional-material-subtotal { margin-left: auto; }
     .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.5rem 0; align-items: flex-start; }
     .actions .btn-push-right { margin-left: auto; }
     .internal-summary-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; text-align: center; }
@@ -183,7 +203,7 @@
     .fixture-form-col { flex: 1; min-width: 0; }
     .fixture-form-col h3:not(:first-of-type) { margin-top: 1.25rem; }
     .fixture-ledger-col { flex: 0 0 280px; background: var(--bg); border-radius: 8px; padding: 1rem; border: 1px solid var(--border); }
-    .fixture-ledger-col h3 { font-size: 1rem; margin-bottom: 0.75rem; }
+    .fixture-ledger-col h3 { font-size: 1rem; margin-bottom: 0.75rem; text-align: center; }
     .fixture-ledger-list { max-height: 400px; overflow-y: auto; }
     .fixture-ledger-item { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
     .fixture-ledger-item:last-child { border-bottom: none; }
@@ -200,10 +220,15 @@
     .fixture-price-summary::before { content: '▸ '; display: inline-block; transition: transform 0.2s; }
     .fixture-price-details[open] .fixture-price-summary::before { transform: rotate(90deg); }
     .fixture-price-details-content { margin-top: 0.5rem; }
-    .fixture-labor-details { border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem; }
+    .fixture-labor-details { display: flex; flex-direction: column; }
+    .block-heading { margin: 0 0 0.5rem 0; font-weight: 600; }
+    .block-heading-spaced { margin-top: 1rem; }
     .fixture-labor-summary { padding: 0; margin: 0; }
-    .fixture-labor-breakdown { margin-top: 0.5rem; font-size: 0.9rem; color: #555; }
+    .fixture-labor-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-top: 0.5rem; }
+    .fixture-labor-breakdown { font-size: 0.9rem; color: #555; margin: 0; }
     .fixture-labor-breakdown p { margin: 0.25rem 0; }
+    .fixture-labor-summary-wrap { text-align: right; }
+    .fixture-labor-summary-row { margin-top: auto; padding-top: 0.5rem; text-align: right; }
     .fixture-cost-toggle { cursor: pointer; }
     .crew-pricing-link { background: none; border: none; padding: 0; font: inherit; color: var(--secondary); cursor: pointer; text-decoration: underline; }
     .additional-labor-title-row .crew-pricing-link { margin-left: auto; }
@@ -211,8 +236,6 @@
     .additional-labor-title-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 1rem; margin-bottom: 0; }
     .additional-labor-title-row > p { flex: 1; min-width: 0; }
     .additional-labor-title-row .crew-pricing-details { flex-shrink: 0; margin: 0; }
-    #crewPricingDetails .fixture-price-details-content label { display: inline-block; min-width: 4rem; text-align: center; }
-    #crewPricingDetails summary { display: none; }
     .fixture-price-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
     .fixture-price-table th, .fixture-price-table td { border: 1px solid var(--border); padding: 0.4rem 0.6rem; text-align: left; }
     .fixture-price-table th { background: var(--bg); font-weight: 600; }
@@ -264,8 +287,8 @@
 <body>
   <div class="container">
     <div class="app-top-bar no-print">
-      <button type="button" id="fillSample" class="btn btn-outline">Fill with sample</button>
       <button type="button" id="clearAllFieldsBtn" class="btn btn-outline" title="Viewing someone else's plan? Clear the form to start fresh.">Clear all fields</button>
+      <button type="button" id="fillSample" class="btn btn-outline">Fill with sample</button>
     </div>
     <form id="bidForm" class="no-print">
       <div class="section">
@@ -319,15 +342,9 @@
       <div class="section" id="fixtureCountsSection">
         <div class="fixture-header-row">
           <h2>Fixture Counts</h2>
-          <div class="fixture-plan-page-wrap">
-            <label for="fixturePlanPageName">Plan page:</label>
-            <input type="text" id="fixturePlanPageName" name="fixturePlanPageName" placeholder="e.g. A-101, Floor 2">
-            <button type="button" id="saveToLedger" class="btn btn-secondary">Save to ledger</button>
-          </div>
         </div>
         <div class="fixture-section-wrap">
           <div class="fixture-form-col">
-        <p><strong>Total fixtures: <span id="totalFixtures">0</span></strong></p>
         <h3>Bathrooms</h3>
         <div class="fixture-grid" id="fixturesBathrooms">
           <div class="fixture-item">
@@ -487,7 +504,7 @@
         <h3>Appliances</h3>
         <div class="fixture-grid">
           <div class="fixture-item">
-            <label for="fixtureWHGas">Water heaters (gas)</label>
+            <label for="fixtureWHGas">Water heaters<br>(gas)</label>
             <div class="number-input-wrap">
               <button type="button" aria-label="Decrease" data-target="fixtureWHGas">−</button>
               <input type="number" id="fixtureWHGas" name="fixtureWHGas" min="0" value="0">
@@ -521,14 +538,22 @@
         </div>
           </div>
           <div class="fixture-ledger-col">
-            <h3>Plan pages</h3>
+            <h3>Plan Page Ledger</h3>
+            <p style="margin: 0 0 0.75rem 0; text-align: center;"><strong>Total fixtures: <span id="totalFixtures">0</span></strong></p>
             <div id="fixtureLedgerList" class="fixture-ledger-list"></div>
-            <button type="button" id="exportCoverPage" class="btn btn-outline" style="margin-top: 0.75rem;">Export Labor Page</button>
+            <div style="text-align: center; margin-top: 0.75rem;"><button type="button" id="exportCoverPage" class="btn btn-outline">Export Labor Summary</button></div>
           </div>
         </div>
-        <p style="margin-top: 1rem; margin-bottom: 0;">
-          <button type="button" id="clearFixtureCounts" class="btn btn-outline">Clear counts</button>
-        </p>
+        <div class="fixture-bottom-row" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1rem;">
+          <p style="margin: 0;">
+            <button type="button" id="clearFixtureCounts" class="btn btn-outline">Clear counts</button>
+          </p>
+          <div class="fixture-plan-page-wrap">
+            <label for="fixturePlanPageName">Plan page:</label>
+            <input type="text" id="fixturePlanPageName" name="fixturePlanPageName" placeholder="e.g. A-101, Floor 2">
+            <button type="button" id="saveToLedger" class="btn btn-secondary">Upload to Ledger</button>
+          </div>
+        </div>
         <div class="fixture-price-reference">
           <details class="fixture-price-details" id="fixturePriceDetails">
             <summary class="fixture-price-summary">Fixture Prices and Labor</summary>
@@ -561,40 +586,37 @@
       </div>
 
       <div class="section section-takeoff">
-        <h2>Fixture Materials (coming soon from <a href="https://pipetooling.com" target="_blank" rel="noopener noreferrer">PipeTooling.com</a>)</h2>
-        <div id="takeoffRows">
-          <div class="takeoff-row">
-            <input type="text" placeholder="Item (e.g. Copper pipe 1/2\")" class="takeoff-desc">
-            <input type="text" placeholder="Qty" class="takeoff-qty">
-            <button type="button" class="takeoff-remove" aria-label="Remove row">Remove</button>
+        <details class="takeoff-details">
+          <summary class="takeoff-summary">Fixture Material Takeoffs (coming soon from <a href="https://pipetooling.com" target="_blank" rel="noopener noreferrer">PipeTooling.com</a>)</summary>
+          <div id="takeoffRows">
+            <div class="takeoff-row">
+              <input type="text" placeholder="Item (e.g. Copper pipe 1/2\")" class="takeoff-desc">
+              <input type="text" placeholder="Qty" class="takeoff-qty">
+              <button type="button" class="takeoff-remove" aria-label="Remove row">Remove</button>
+            </div>
           </div>
-        </div>
-        <button type="button" id="addTakeoffRow" class="btn btn-outline" style="margin-top: 0.5rem;" disabled>Add row</button>
+          <button type="button" id="addTakeoffRow" class="btn btn-outline" style="margin-top: 0.5rem;" disabled>Add row</button>
+        </details>
       </div>
 
       <div class="section">
-        <h2>Labor Estimate</h2>
+        <h2>Additional Labor and Materials</h2>
         <div class="fixture-labor-details" style="margin-bottom: 0.75rem;">
-          <p class="fixture-labor-heading" style="margin: 0 0 0.25rem 0; font-weight: 600;">Fixture labor</p>
-          <p class="fixture-labor-summary" style="margin: 0 0 0.5rem 0;"><strong><span id="fixtureLaborCount">0</span></strong><span id="fixtureLaborCountLabel"> Fixtures</span> / <strong><span id="fixtureLaborHours">0</span></strong> hours / <strong class="fixture-cost-toggle" id="fixtureLaborCostWrap" title="Click to toggle decimals">$<span id="fixtureLaborCost">0</span></strong></p>
-          <div class="fixture-labor-breakdown">
-            <p>Rough in: <strong><span id="fixtureLaborRoughIn">0</span></strong> hours</p>
-            <p>Top out: <strong><span id="fixtureLaborTopOut">0</span></strong> hours</p>
-            <p>Trim: <strong><span id="fixtureLaborTrim">0</span></strong> hours</p>
+          <p class="block-heading">Fixtures and Set</p>
+          <div class="fixture-labor-row">
+            <div class="fixture-labor-breakdown">
+              <p>Rough in: <strong><span id="fixtureLaborRoughIn">0</span></strong> hours</p>
+              <p>Top out: <strong><span id="fixtureLaborTopOut">0</span></strong> hours</p>
+              <p>Trim: <strong><span id="fixtureLaborTrim">0</span></strong> hours</p>
+            </div>
+          </div>
+          <div class="fixture-labor-summary-row">
+            <p class="fixture-labor-summary fixture-labor-summary-wrap" style="margin: 0;"><strong><span id="fixtureLaborCount">0</span></strong><span id="fixtureLaborCountLabel"> Fixtures</span> / <strong><span id="fixtureLaborHours">0</span></strong> manhours / <strong class="fixture-cost-toggle" id="fixtureLaborCostWrap" title="Click to toggle decimals">$<span id="fixtureLaborCost">0</span></strong></p>
           </div>
         </div>
         <div class="additional-labor-block" style="margin-bottom: 1rem;">
           <div class="additional-labor-title-row">
-            <p style="margin: 0 0 0.5rem 0; font-weight: 500;">Additional labor (work other than fixtures)</p>
-            <details class="fixture-price-details crew-pricing-details" id="crewPricingDetails">
-              <summary class="fixture-price-summary">Crew pricing ($/hr)</summary>
-              <div class="fixture-price-details-content">
-                <p style="margin: 0.5rem 0 0.25rem 0;"><label for="crewRate1">1 Tech</label><input type="number" id="crewRate1" name="crewRate1" min="0" step="0.01" value="275" style="max-width: 6rem;"> $/hr</p>
-                <p style="margin: 0.25rem 0;"><label for="crewRate2">Plumber and Helper</label><input type="number" id="crewRate2" name="crewRate2" min="0" step="0.01" value="315" style="max-width: 6rem;"> $/hr</p>
-                <p style="margin: 0.25rem 0 0.5rem 0;"><label for="crewRate3">3 Techs</label><input type="number" id="crewRate3" name="crewRate3" min="0" step="0.01" value="350" style="max-width: 6rem;"> $/hr</p>
-              </div>
-            </details>
-            <button type="button" class="crew-pricing-link" id="openCrewPricing" aria-expanded="false">[Crew Pricing]</button>
+            <p class="block-heading">Additional labor<br>(work not included in fixture price)</p>
           </div>
           <div class="additional-labor-header" aria-hidden="true">
             <span class="additional-labor-hdr-desc">Description</span>
@@ -616,14 +638,26 @@
               <button type="button" class="additional-labor-remove" aria-label="Remove row">Remove</button>
             </div>
           </div>
-          <button type="button" id="addAdditionalLaborRow" class="btn btn-outline" style="margin-top: 0.5rem;">Add row</button>
+          <div class="additional-labor-actions-row">
+            <div class="additional-labor-actions-left">
+              <button type="button" id="addAdditionalLaborRow" class="btn btn-outline">Add row</button>
+              <button type="button" id="crewPricingTrigger" class="crew-pricing-link-text">[crew pricing]</button>
+            </div>
+            <p class="additional-labor-subtotal" style="margin: 0;"><strong><span id="additionalLaborManhours">0</span></strong> manhours / <strong>$<span id="laborTotal">0.00</span></strong></p>
+          </div>
+          <details id="crewPricingDetails" class="crew-pricing-details">
+            <summary class="crew-pricing-summary-sr">[crew pricing]</summary>
+            <div class="crew-pricing-content">
+              <label for="crewRate1">1 Tech</label>
+              <span><input type="number" id="crewRate1" name="crewRate1" min="0" step="0.01" value="275"> $/hr</span>
+              <label for="crewRate2">Plumber and Helper</label>
+              <span><input type="number" id="crewRate2" name="crewRate2" min="0" step="0.01" value="315"> $/hr</span>
+              <label for="crewRate3">3 Techs</label>
+              <span><input type="number" id="crewRate3" name="crewRate3" min="0" step="0.01" value="350"> $/hr</span>
+            </div>
+          </details>
         </div>
-        <p><strong>Labor total (Hours • Rate): $<span id="laborTotal">0.00</span></strong></p>
-      </div>
-
-      <div class="section">
-        <h2>Pricing</h2>
-        <p style="margin-bottom: 0.5rem; font-weight: 500;">Additional materials</p>
+        <p class="block-heading block-heading-spaced">Additional materials<br>(materials not included in fixture price)</p>
         <div class="additional-material-header" aria-hidden="true">
           <span class="additional-material-hdr-desc">Description</span>
           <span class="additional-material-hdr-amount">Amount</span>
@@ -636,7 +670,14 @@
             <button type="button" class="additional-material-remove" aria-label="Remove row">Remove</button>
           </div>
         </div>
-        <button type="button" id="addAdditionalMaterialRow" class="btn btn-outline" style="margin-top: 0.5rem;">Add row</button>
+        <div class="additional-material-actions-row">
+          <button type="button" id="addAdditionalMaterialRow" class="btn btn-outline">Add row</button>
+          <p class="additional-material-subtotal" style="margin: 0;"><strong>$<span id="additionalMaterialsTotal">0.00</span></strong></p>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Pricing</h2>
         <div class="preview-section" style="margin-top: 1rem;">
           <table class="preview-table">
             <tr><th>Item</th><th>Amount</th></tr>
@@ -649,20 +690,8 @@
               <td>$<span id="calcFixtureLaborMarkup">0.00</span></td>
             </tr>
             <tr style="font-weight: 600; border-top: 2px solid var(--border);">
-              <td>Fixture and Set Labor Subtotal</td>
+              <td style="text-align: right;">Fixture and Set Labor Subtotal</td>
               <td style="text-align: right;">$<span id="calcFixtureLaborSubtotal">0.00</span></td>
-            </tr>
-            <tr>
-              <td>Materials</td>
-              <td>$<span id="calcMaterials">0.00</span></td>
-            </tr>
-            <tr>
-              <td>Materials Markup <input type="number" id="materialsMarkupPct" name="materialsMarkupPct" min="0" step="0.5" value="0" title="Materials Markup" style="width: 4rem; margin-left: 0.5rem; padding: 0.25rem 0.5rem; font-size: 0.9rem;">%</td>
-              <td>$<span id="calcMaterialsMarkup">0.00</span></td>
-            </tr>
-            <tr style="font-weight: 600; border-top: 2px solid var(--border);">
-              <td>Materials Subtotal</td>
-              <td style="text-align: right;">$<span id="calcMaterialsSubtotal">0.00</span></td>
             </tr>
             <tr>
               <td>Additional Labor</td>
@@ -673,8 +702,20 @@
               <td>$<span id="calcLaborMarkup">0.00</span></td>
             </tr>
             <tr style="font-weight: 600; border-top: 2px solid var(--border);">
-              <td>Additional Labor Subtotal</td>
+              <td style="text-align: right;">Additional Labor Subtotal</td>
               <td style="text-align: right;">$<span id="calcLaborSubtotal">0.00</span></td>
+            </tr>
+            <tr>
+              <td>Materials</td>
+              <td>$<span id="calcMaterials">0.00</span></td>
+            </tr>
+            <tr>
+              <td>Materials Markup <input type="number" id="materialsMarkupPct" name="materialsMarkupPct" min="0" step="0.5" value="0" title="Materials Markup" style="width: 4rem; margin-left: 0.5rem; padding: 0.25rem 0.5rem; font-size: 0.9rem;">%</td>
+              <td>$<span id="calcMaterialsMarkup">0.00</span></td>
+            </tr>
+            <tr style="font-weight: 600; border-top: 2px solid var(--border);">
+              <td style="text-align: right;">Materials Subtotal</td>
+              <td style="text-align: right;">$<span id="calcMaterialsSubtotal">0.00</span></td>
             </tr>
           </table>
           <p class="grand-total">Grand Total: $<span id="grandTotal">0.00</span></p>
@@ -682,8 +723,8 @@
       </div>
 
       <div class="no-print" style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin: 0 0 1rem 0;">
-        <button type="button" id="roughCalculatorBtn" class="btn btn-outline" aria-expanded="false">Rough Calculator</button>
-        <button type="button" id="clearBtn" class="btn btn-outline" style="margin-left: auto;">Reset Fields</button>
+        <button type="button" id="clearBtn" class="btn btn-outline">Reset Fields</button>
+        <button type="button" id="roughCalculatorBtn" class="btn btn-outline" aria-expanded="false" style="margin-left: auto;">Rough Calculator</button>
       </div>
 
       <div id="roughCalculatorSection" class="section section-rough-calculator hidden" aria-hidden="true">
@@ -707,7 +748,7 @@
           </div>
           <div class="form-row">
             <div class="field">
-              <label for="roughCostPerSqFt">Cost per SF before fixtures ($)</label>
+              <label for="roughCostPerSqFt">Additional cost per SF ($)</label>
               <input type="number" id="roughCostPerSqFt" name="roughCostPerSqFt" min="0" step="0.01" placeholder="0" class="rough-calc-cost-input">
             </div>
           </div>
@@ -809,6 +850,7 @@
       var REQUIRED_FIELDS_MESSAGE = 'Please fill in required fields: Customer Name, Job Address, Bid Date, Bid Number.';
       var MAX_SHARE_URL_LENGTH = 2000;
       var userEditedBidNumber = false;
+      var roughSfManuallyEdited = false;
 
       function $(id) { return document.getElementById(id); }
       function qs(sel, root) { return (root || document).querySelector(sel); }
@@ -1076,7 +1118,11 @@
         return total;
       }
 
-      function updateRoughBid() {
+      function updateRoughBid(ev) {
+        if (ev && ev.target) {
+          if (ev.target.id === 'roughSfFromDimensions') roughSfManuallyEdited = true;
+          else if (ev.target.id === 'roughLength' || ev.target.id === 'roughWidth') roughSfManuallyEdited = false;
+        }
         var roughLengthEl = $('roughLength');
         var roughWidthEl = $('roughWidth');
         var roughSfEl = $('roughSfFromDimensions');
@@ -1085,9 +1131,17 @@
         var roughSfEntered = roughSfEl ? (parseFloat(roughSfEl.value) || 0) : 0;
         var roughCostPerSqFt = getNum('roughCostPerSqFt') || 0;
         var roughPricePerFixture = getNum('roughPricePerFixture') || 0;
-        var effectiveSf = roughSfEntered > 0 ? roughSfEntered : (roughLength * roughWidth);
+        var computedSf = (roughLength * roughWidth) || 0;
+        if (isNaN(computedSf)) computedSf = 0;
+        var isManualSfOverride = roughSfManuallyEdited && roughSfEntered > 0;
+        var shouldSyncSf = !ev || (ev.target && ev.target.id !== 'roughSfFromDimensions');
+        if (roughSfEl && !isManualSfOverride && shouldSyncSf) {
+          var displaySf = Math.round(computedSf * 100) / 100;
+          roughSfEl.value = displaySf > 0 ? String(displaySf) : '';
+        }
+        var effectiveSf = isManualSfOverride ? roughSfEntered : computedSf;
         if (isNaN(effectiveSf)) effectiveSf = 0;
-        var dimensionsDisabled = roughSfEntered > 0;
+        var dimensionsDisabled = isManualSfOverride;
         if (roughLengthEl) {
           roughLengthEl.disabled = dimensionsDisabled;
           var lengthField = roughLengthEl.closest ? roughLengthEl.closest('.field') : null;
@@ -1106,7 +1160,7 @@
         if (isNaN(buildingPart)) buildingPart = 0;
         var fixturePart = fixtureCount * roughPricePerFixture;
         if (isNaN(fixturePart)) fixturePart = 0;
-        var roughBid = buildingPart * fixturePart;
+        var roughBid = buildingPart + fixturePart;
         if (isNaN(roughBid)) roughBid = 0;
         var fcEl = $('roughFixtureCount');
         if (fcEl) fcEl.textContent = formatNum(fixtureCountFromAbove, 0);
@@ -1122,11 +1176,13 @@
         var fixtureLabor = getFixtureLaborTotals();
         var fixtureCost = getFixtureCostTotal();
         var additionalLaborCost = 0;
+        var additionalLaborManhours = 0;
         qsa('.additional-labor-row').forEach(function(row) {
           var hours = parseFloat((row.querySelector('.additional-labor-hours') || {}).value) || 0;
           var rowCrew = parseInt((row.querySelector('.additional-labor-crew') || {}).value, 10) || 1;
           var rowRate = parseFloat((row.querySelector('.additional-labor-rate') || {}).value) || 0;
           additionalLaborCost += hours * rowRate;
+          additionalLaborManhours += hours * rowCrew;
         });
         var labor = additionalLaborCost;
         var additionalHours = getAdditionalLaborHours();
@@ -1158,10 +1214,12 @@
         if ($('fixtureLaborTopOut')) $('fixtureLaborTopOut').textContent = formatNum(fixtureLabor.topOut, 1);
         if ($('fixtureLaborTrim')) $('fixtureLaborTrim').textContent = formatNum(fixtureLabor.trim, 1);
         $('laborTotal').textContent = formatNum(labor, 2);
+        if ($('additionalLaborManhours')) $('additionalLaborManhours').textContent = formatNum(additionalLaborManhours, 1);
         if ($('calcFixtureLaborBase')) $('calcFixtureLaborBase').textContent = formatNum(fixtureCost, 2);
         if ($('calcFixtureLaborMarkup')) $('calcFixtureLaborMarkup').textContent = formatNum(fixtureLaborMarkup, 2);
         if ($('calcFixtureLaborSubtotal')) $('calcFixtureLaborSubtotal').textContent = formatNum(fixtureLaborSubtotal, 2);
         $('calcMaterials').textContent = formatNum(materials, 2);
+        if ($('additionalMaterialsTotal')) $('additionalMaterialsTotal').textContent = formatNum(materials, 2);
         $('calcLabor').textContent = formatNum(labor, 2);
         if ($('calcMaterialsMarkup')) $('calcMaterialsMarkup').textContent = formatNum(materialsMarkup, 2);
         if ($('calcLaborMarkup')) $('calcLaborMarkup').textContent = formatNum(laborMarkup, 2);
@@ -1170,7 +1228,7 @@
         if ($('calcTotal')) $('calcTotal').textContent = formatNum(total, 2);
         $('grandTotal').textContent = formatNum(total, 2);
         updateRoughBid();
-        return {
+        var result = {
           materials: materials,
           labor: labor,
           materialsMarkup: materialsMarkup,
@@ -1182,8 +1240,16 @@
           fixtureLaborMarkup: fixtureLaborMarkup,
           fixtureLaborSubtotal: fixtureLaborSubtotal,
           materialsSubtotal: materialsSubtotal,
-          laborSubtotal: laborSubtotal
+          laborSubtotal: laborSubtotal,
+          additionalLaborManhours: additionalLaborManhours,
+          fixtureCount: fixtureCount
         };
+        var previewEl = $('preview');
+        if (previewEl && previewEl.classList.contains('visible')) {
+          var data = collectFormData();
+          previewEl.innerHTML = buildPreviewHtml(data, result);
+        }
+        return result;
       }
 
       function updatePreview() {
@@ -1259,10 +1325,11 @@
         var fixtureRows = Object.keys(f).map(function(k) {
           var v = f[k];
           if (v == null || v === '') return '';
-          if ((parseInt(v, 10) || 0) <= 1) return '';
+          if ((parseInt(v, 10) || 0) < 1) return '';
           return '<tr><td>' + escapeHtml(k) + '</td><td>' + v + '</td></tr>';
         }).filter(Boolean).join('');
         if (!fixtureRows) fixtureRows = '<tr><td colspan="2">—</td></tr>';
+        var fixtureCountVal = (totals && totals.fixtureCount != null) ? totals.fixtureCount : Object.keys(f).reduce(function(sum, k) { return sum + (parseInt(f[k], 10) || 0); }, 0);
 
         var takeoffRows = (data.takeoff || []).map(function(t) {
           return '<tr><td>' + escapeHtml(t.desc) + '</td><td>' + escapeHtml(t.qty) + '</td></tr>';
@@ -1273,8 +1340,10 @@
           var rowCost = (t.rowCost != null && !isNaN(t.rowCost)) ? formatNum(t.rowCost, 2) : '—';
           return '<tr><td>' + descLabel + '</td><td>' + (t.hours != null ? t.hours : '').toString() + '</td><td>' + (t.crewSize != null ? escapeHtml(String(t.crewSize)) : '') + '</td><td>$' + (t.laborRate != null ? formatNum(Number(t.laborRate), 2) : '0.00') + '</td><td>$' + rowCost + '</td></tr>';
         }).join('');
+        var addlManhours = (totals && totals.additionalLaborManhours != null) ? totals.additionalLaborManhours : 0;
+        var addlCostVal = (totals && totals.labor != null) ? totals.labor : 0;
         var additionalLaborBlock = additionalLaborRows
-          ? '<div class="preview-section"><h3>Additional Labor</h3><table class="preview-table"><thead><tr><th>Description</th><th>Hours</th><th>Crew</th><th>Team Rate / Hr</th><th>Manpower Cost</th></tr></thead><tbody>' + additionalLaborRows + '</tbody></table><p>Additional labor total: ' + formatNum(data.laborHours != null ? data.laborHours : 0, 1) + ' hours</p></div>'
+          ? '<div class="preview-section"><h3>Additional Labor</h3><table class="preview-table"><thead><tr><th>Description</th><th>Hours</th><th>Crew</th><th>Team Rate / Hr</th><th>Manpower Cost</th></tr></thead><tbody>' + additionalLaborRows + '</tbody></table><p>' + formatNum(addlManhours, 1) + ' manhours / $' + formatNum(addlCostVal, 2) + '</p></div>'
           : '';
 
         var additionalMaterialsRows = (data.additionalMaterials || []).map(function(t) {
@@ -1296,16 +1365,17 @@
             '<h3>Customer &amp; Job</h3>' +
             '<p><strong>' + escapeHtml(data.customerName) + '</strong>' +
             (data.customerAddress ? '<br>' + escapeHtml(data.customerAddress) : '') +
-            (data.jobName ? '<br>' + escapeHtml(data.jobName) : '') +
+            (data.jobName ? '<br><strong>' + escapeHtml(data.jobName) + '</strong>' : '') +
             '<br>' + escapeHtml(data.jobAddress) +
-            (data.planTitle || data.planName || data.planIssueDate ? '<br>Plans: ' + [data.planTitle, data.planName, data.planIssueDate].filter(Boolean).map(escapeHtml).join(' — ') : '') + '</p>' +
+            (data.planTitle || data.planName || data.planIssueDate ? '<br><strong>Plans: ' + [data.planTitle, data.planName, data.planIssueDate].filter(Boolean).map(escapeHtml).join(' — ') + '</strong>' : '') + '</p>' +
           '</div>' +
           '<div class="preview-section">' +
             '<h3>Fixture Summary</h3>' +
             '<table class="preview-table"><thead><tr><th>Item</th><th>Qty</th></tr></thead><tbody>' + fixtureRows + '</tbody></table>' +
+            '<p>Total fixtures: ' + formatNum(fixtureCountVal, 0) + '</p>' +
           '</div>' +
           '<div class="preview-section">' +
-            '<h3>Fixture Materials</h3>' +
+            '<h3>Fixture Material Takeoffs</h3>' +
             '<table class="preview-table"><thead><tr><th>Item</th><th>Qty</th></tr></thead><tbody>' + takeoffRows + '</tbody></table>' +
           '</div>' +
           additionalLaborBlock +
@@ -1313,25 +1383,12 @@
           (function() {
             var fl = (totals && totals.fixtureLabor) || {};
             var flTotal = formatNum(fl.total != null ? fl.total : 0, 1);
-            var flRough = formatNum(fl.roughIn != null ? fl.roughIn : 0, 1);
-            var flTop = formatNum(fl.topOut != null ? fl.topOut : 0, 1);
-            var flTrim = formatNum(fl.trim != null ? fl.trim : 0, 1);
-            var fixtureCostVal = formatNum(totals && totals.fixtureCost != null ? totals.fixtureCost : 0, 2);
-            var addlHours = formatNum(data.laborHours != null ? data.laborHours : 0, 1);
-            var addlCost = formatNum(totals && totals.labor != null ? totals.labor : 0, 2);
-            var addlList = (data.additionalLabor || []).map(function(t) {
-              var descLabel = (t.desc != null && String(t.desc).trim() !== '') ? escapeHtml(String(t.desc).trim()) : '—';
-              var rc = (t.rowCost != null && !isNaN(t.rowCost)) ? formatNum(t.rowCost, 2) : '0.00';
-              var hrs = (t.hours != null && !isNaN(t.hours)) ? t.hours.toString() : '0';
-              return '<li>' + descLabel + ': ' + hrs + ' hrs, $' + rc + '</li>';
-            }).join('');
-            var addlBlock = addlList ? '<ul style="margin: 0.5rem 0;">' + addlList + '</ul>' : '';
+            var addlManhoursNum = (totals && totals.additionalLaborManhours != null) ? totals.additionalLaborManhours : 0;
+            var fixtureManhoursNum = fl.total != null ? fl.total : 0;
+            var totalManhours = fixtureManhoursNum + addlManhoursNum;
             return '<div class="preview-section">' +
               '<h3>Labor Summary</h3>' +
-              '<h4>Fixture and Set Labor</h4>' +
-              '<p>Total: ' + flTotal + ' hours (Rough in: ' + flRough + ', Top out: ' + flTop + ', Trim: ' + flTrim + '). Fixture labor cost: $' + fixtureCostVal + '</p>' +
-              '<h4>Additional Labor</h4>' +
-              addlBlock + '<p>' + addlHours + ' hours = $' + addlCost + '</p>' +
+              '<p>' + formatNum(fixtureCountVal, 0) + ' Fixtures at ' + flTotal + ' manhours and ' + formatNum(addlManhours, 1) + ' additional manhours for a total of <strong>' + formatNum(totalManhours, 1) + ' manhours</strong></p>' +
             '</div>';
           })() +
           '<div class="preview-section">' +
@@ -1340,19 +1397,21 @@
               '<tr><th>Item</th><th>Amount</th></tr>' +
               '<tr><td>Fixture and Set Labor</td><td>$' + formatNum(totals.fixtureCost || 0, 2) + '</td></tr>' +
               '<tr><td>Fixture and Set Labor Markup</td><td>$' + formatNum(totals.fixtureLaborMarkup != null ? totals.fixtureLaborMarkup : 0, 2) + '</td></tr>' +
-              '<tr style="font-weight: 600; border-top: 2px solid var(--border);"><td>Fixture and Set Labor Subtotal</td><td style="text-align: right;">$' + formatNum(totals.fixtureLaborSubtotal != null ? totals.fixtureLaborSubtotal : (totals.fixtureCost || 0), 2) + '</td></tr>' +
-              '<tr><td>Materials</td><td>$' + formatNum(totals.materials || 0, 2) + '</td></tr>' +
-              '<tr><td>Materials Markup</td><td>$' + formatNum(totals.materialsMarkup != null ? totals.materialsMarkup : 0, 2) + '</td></tr>' +
-              '<tr style="font-weight: 600; border-top: 2px solid var(--border);"><td>Materials Subtotal</td><td style="text-align: right;">$' + formatNum(totals.materialsSubtotal != null ? totals.materialsSubtotal : (totals.materials || 0) + (totals.materialsMarkup != null ? totals.materialsMarkup : 0), 2) + '</td></tr>' +
+              '<tr style="font-weight: 600; border-top: 2px solid var(--border);"><td style="text-align: right;">Fixture and Set Labor Subtotal</td><td style="text-align: right;">$' + formatNum(totals.fixtureLaborSubtotal != null ? totals.fixtureLaborSubtotal : (totals.fixtureCost || 0), 2) + '</td></tr>' +
               '<tr><td>Additional Labor</td><td>$' + formatNum(totals.labor || 0, 2) + '</td></tr>' +
               '<tr><td>Additional Labor Markup</td><td>$' + formatNum(totals.laborMarkup != null ? totals.laborMarkup : 0, 2) + '</td></tr>' +
-              '<tr style="font-weight: 600; border-top: 2px solid var(--border);"><td>Additional Labor Subtotal</td><td style="text-align: right;">$' + formatNum(totals.laborSubtotal != null ? totals.laborSubtotal : (totals.labor || 0) + (totals.laborMarkup != null ? totals.laborMarkup : 0), 2) + '</td></tr>' +
+              '<tr style="font-weight: 600; border-top: 2px solid var(--border);"><td style="text-align: right;">Additional Labor Subtotal</td><td style="text-align: right;">$' + formatNum(totals.laborSubtotal != null ? totals.laborSubtotal : (totals.labor || 0) + (totals.laborMarkup != null ? totals.laborMarkup : 0), 2) + '</td></tr>' +
+              '<tr><td>Materials</td><td>$' + formatNum(totals.materials || 0, 2) + '</td></tr>' +
+              '<tr><td>Materials Markup</td><td>$' + formatNum(totals.materialsMarkup != null ? totals.materialsMarkup : 0, 2) + '</td></tr>' +
+              '<tr style="font-weight: 600; border-top: 2px solid var(--border);"><td style="text-align: right;">Materials Subtotal</td><td style="text-align: right;">$' + formatNum(totals.materialsSubtotal != null ? totals.materialsSubtotal : (totals.materials || 0) + (totals.materialsMarkup != null ? totals.materialsMarkup : 0), 2) + '</td></tr>' +
             '</table>' +
           '</div>' +
           '<div class="preview-section">' +
             '<p class="grand-total">Grand Total: $' + formatNum(totals.total || 0, 2) + '</p>' +
           '</div>' +
-          (data.scopeNotes ? '<div class="preview-section"><h3>Exclusions and Scope</h3><p>' + escapeHtml(data.scopeNotes).replace(/\n/g, '<br>') + '</p></div>' : '')
+          (data.inclusions ? '<div class="preview-section"><h3>Inclusions</h3><p>' + escapeHtml(data.inclusions).replace(/\n/g, '<br>') + '</p></div>' : '') +
+          (data.scopeNotes ? '<div class="preview-section"><h3>Exclusions and Scope</h3><p>' + escapeHtml(data.scopeNotes).replace(/\n/g, '<br>') + '</p></div>' : '') +
+          (data.termsAndWarranty ? '<div class="preview-section"><h3>Terms and Warranty</h3><p>' + escapeHtml(data.termsAndWarranty).replace(/\n/g, '<br>') + '</p></div>' : '')
         );
       }
 
@@ -1427,8 +1486,15 @@
         var fxSub = totals.fixtureLaborSubtotal != null ? totals.fixtureLaborSubtotal : (fxBase + fxMarkup);
         var matSub = totals.materialsSubtotal != null ? totals.materialsSubtotal : ((totals.materials || 0) + (totals.materialsMarkup != null ? totals.materialsMarkup : 0));
         var labSub = totals.laborSubtotal != null ? totals.laborSubtotal : ((totals.labor || 0) + (totals.laborMarkup != null ? totals.laborMarkup : 0));
-        var planParts = [data.planTitle, data.planName, data.planIssueDate].filter(Boolean).map(escapeHtml);
-        var planLine = planParts.length ? 'Plans: ' + planParts.join(' — ') : '';
+        var planTitleLine = (data.planTitle && data.planTitle.trim()) ? 'Plan Title: ' + escapeHtml(data.planTitle.trim()) : '';
+        var planNameLine = (data.planName && data.planName.trim()) ? 'Plan Name: ' + escapeHtml(data.planName.trim()) : '';
+        var planIssueLine = (data.planIssueDate && data.planIssueDate.trim()) ? 'Plan Issue Date: ' + escapeHtml(data.planIssueDate.trim()) : '';
+        var headerLineStyle = 'margin: 0.25rem 0;';
+        var headerBlock = '<p style="font-size: 1.1rem; font-weight: 600; ' + headerLineStyle + '">Click Plumbing and Electrical</p>' +
+          '<p style="' + headerLineStyle + '">Bid # ' + escapeHtml(data.bidNumber || '') + ' \u2022 ' + escapeHtml(data.bidDate || '') + '</p>' +
+          (planTitleLine ? '<p style="' + headerLineStyle + '">' + planTitleLine + '</p>' : '') +
+          (planNameLine ? '<p style="' + headerLineStyle + '">' + planNameLine + '</p>' : '') +
+          (planIssueLine ? '<p style="' + headerLineStyle + '">' + planIssueLine + '</p>' : '');
         var custAddrLines = (data.customerAddress || '').split(/\r?\n/).map(function(s) { return s.trim(); }).filter(Boolean);
         var jobAddrLines = (data.jobAddress || '').split(/\r?\n/).map(function(s) { return s.trim(); }).filter(Boolean);
         var custBlock = '<p style="margin: 0 0 0.25rem 0;"><strong>' + escapeHtml(data.customerName) + '</strong></p>' +
@@ -1451,11 +1517,10 @@
             var incLines = (data.inclusions || '').trim().split(/\r?\n/).map(function(s) { return s.trim(); }).filter(Boolean);
             return incLines.length === 0 ? '' : '<ul style="margin: 0.5rem 0 0 0; padding-left: 1.25rem;">' + incLines.map(function(l) { return '<li>' + escapeHtml(l) + '</li>'; }).join('') + '</ul>';
           })();
-        return '<div class="preview-section">' +
+        return '<div class="preview-section" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 2rem;">' +
+          '<div style="flex: 1; min-width: 0;">' +
           '<div style="margin-bottom: 1rem;">' + custBlock + '</div>' +
           '<div style="margin-bottom: 1rem;">' + jobBlock + '</div>' +
-          '<p style="font-size: 1.1rem; font-weight: 600; margin: 0 0 0.5rem 0;">Click Plumbing and Electrical</p>' +
-          '<p class="preview-meta" style="margin: 0 0 0.75rem 0;">Bid # ' + escapeHtml(data.bidNumber) + ' \u2022 ' + escapeHtml(data.bidDate) + '</p>' +
           '<p style="margin: 0.75rem 0;">As per plumbing plans and specifications, we propose to do the plumbing in the amount of: <strong>' + formatProposalAmount(totals.total || 0) + '</strong></p>' +
           '<p style="margin: 0.5rem 0 0.25rem 0; font-weight: 600;">Inclusions:</p>' +
           inclusionBlock +
@@ -1465,7 +1530,8 @@
             return '<p style="margin: 0.5rem 0 0.25rem 0; font-weight: 600;">Exclusions and Scope:</p>' + scopeList;
           })() : '') +
           '<p style="margin: 0.5rem 0 0.25rem 0; font-weight: 600;">Terms and Warranty:</p><p style="margin: 0 0 0;">' + (data.termsAndWarranty && data.termsAndWarranty.trim() ? escapeHtml(data.termsAndWarranty.trim()).replace(/\n/g, '<br>') : '—') + '</p>' +
-          (planLine ? '<p style="margin: 0.75rem 0 0 0;">' + planLine + '</p>' : '') +
+          '</div>' +
+          '<div style="text-align: right; flex-shrink: 0;">' + headerBlock + '</div>' +
           '</div>' +
           '<div class="preview-section">' +
           '<p style="margin: 0.75rem 0 0.25rem 0;">No work shall commence until Click Plumbing has received acceptance of the estimate.</p>' +
@@ -1475,6 +1541,7 @@
           '<p style="margin: 0.75rem 0 0.25rem 0;">The above prices, specifications, and conditions are satisfactory and are hereby accepted. You are authorized to perform the work as specified.</p>' +
           '<p style="margin: 0.5rem 0 0.25rem 0; font-weight: 600;">Acceptance of estimate</p>' +
           '<p style="margin: 0.5rem 0 0.25rem 0;">General Contractor / Builder Signature:</p>' +
+          '<p style="margin: 0.25rem 0;">&nbsp;</p>' +
           '<p style="margin: 0.25rem 0 0.25rem 0;">____________________________________</p>' +
           '<p style="margin: 0.5rem 0 0.25rem 0;">&nbsp;</p>' +
           '<p style="margin: 0.5rem 0 0.25rem 0; text-align: right;">Date: ____________________________________</p>' +
@@ -2312,7 +2379,7 @@
         var ledger = getFixtureLedger();
         listEl.innerHTML = '';
         if (ledger.length === 0) {
-          listEl.innerHTML = '<p class="fixture-ledger-empty">No saved plan pages. Enter a plan page name and fixture counts, then click Save to ledger.</p>';
+          listEl.innerHTML = '<p class="fixture-ledger-empty">No saved plan pages. Enter a plan page name and fixture counts, then click Upload to Ledger.</p>';
           return;
         }
         ledger.forEach(function(entry) {
@@ -2673,33 +2740,6 @@
           }
         });
       }
-      document.addEventListener('keydown', function(e) {
-        if (e.key !== 'Delete' && e.key !== 'Backspace') return;
-        var el = document.activeElement;
-        if (!el) return;
-        if (takeoffRowsEl && takeoffRowsEl.contains(el) && el.nodeName === 'INPUT' && (el.classList.contains('takeoff-desc') || el.classList.contains('takeoff-qty'))) {
-          el.value = '';
-          e.preventDefault();
-          return;
-        }
-        var laborRows = $('additionalLaborRows');
-        if (laborRows && laborRows.contains(el)) {
-          if (el.classList.contains('additional-labor-desc') || el.classList.contains('additional-labor-hours') || el.classList.contains('additional-labor-rate')) {
-            el.value = '';
-            e.preventDefault();
-          } else if (el.classList.contains('additional-labor-crew') && el.nodeName === 'SELECT') {
-            el.selectedIndex = 0;
-            el.dispatchEvent(new Event('change', { bubbles: true }));
-            e.preventDefault();
-          }
-          return;
-        }
-        var materialRows = $('additionalMaterialRows');
-        if (materialRows && materialRows.contains(el) && (el.classList.contains('additional-material-desc') || el.classList.contains('additional-material-amount'))) {
-          el.value = '';
-          e.preventDefault();
-        }
-      }, true);
       if ($('fillSample')) $('fillSample').addEventListener('click', fillWithSampleData);
       if ($('shareViaUrlBtn')) $('shareViaUrlBtn').addEventListener('click', shareViaUrl);
       if ($('shareViaEmailBtn')) $('shareViaEmailBtn').addEventListener('click', shareViaEmail);
@@ -2719,6 +2759,12 @@
       if (shareUrlModalDialog) shareUrlModalDialog.addEventListener('click', function(e) { e.stopPropagation(); });
       if ($('addAdditionalLaborRow')) $('addAdditionalLaborRow').addEventListener('click', addAdditionalLaborRow);
       if ($('addAdditionalMaterialRow')) $('addAdditionalMaterialRow').addEventListener('click', addAdditionalMaterialRow);
+      if ($('crewPricingTrigger') && $('crewPricingDetails')) {
+        $('crewPricingTrigger').addEventListener('click', function() {
+          var d = $('crewPricingDetails');
+          d.open = !d.open;
+        });
+      }
       var additionalMaterialRowsEl = $('additionalMaterialRows');
       if (additionalMaterialRowsEl) {
         additionalMaterialRowsEl.addEventListener('click', function(e) {
@@ -2732,23 +2778,6 @@
               calculateTotals();
             }
           }
-        });
-      }
-      if ($('openCrewPricing')) {
-        $('openCrewPricing').addEventListener('click', function() {
-          var details = $('crewPricingDetails');
-          if (details) {
-            details.open = !details.open;
-            this.setAttribute('aria-expanded', details.open ? 'true' : 'false');
-            if (details.open) details.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-          }
-        });
-      }
-      var crewPricingDetailsEl = $('crewPricingDetails');
-      if (crewPricingDetailsEl) {
-        crewPricingDetailsEl.addEventListener('toggle', function() {
-          var btn = $('openCrewPricing');
-          if (btn) btn.setAttribute('aria-expanded', this.open ? 'true' : 'false');
         });
       }
       var additionalLaborRowsEl = $('additionalLaborRows');
@@ -2863,20 +2892,22 @@
         });
       }
 
+      var roughCalcContent = $('roughCalculatorContent');
       qsa('input, select, textarea').forEach(function(el) {
+        if (roughCalcContent && roughCalcContent.contains(el)) return;
         el.addEventListener('input', calculateTotals);
         el.addEventListener('change', calculateTotals);
       });
-      var roughCalcContent = $('roughCalculatorContent');
       if (roughCalcContent) {
         qsa('input', roughCalcContent).forEach(function(el) {
-          el.addEventListener('input', updateRoughBid);
-          el.addEventListener('change', updateRoughBid);
+          el.addEventListener('input', function(ev) { updateRoughBid(ev); });
+          el.addEventListener('change', function(ev) { updateRoughBid(ev); });
         });
       }
       var clearRoughCalculatorBtn = $('clearRoughCalculatorBtn');
       if (clearRoughCalculatorBtn) {
         clearRoughCalculatorBtn.addEventListener('click', function() {
+          roughSfManuallyEdited = false;
           var ids = ['roughLength', 'roughWidth', 'roughSfFromDimensions', 'roughCostPerSqFt', 'roughFixtureCountOverride', 'roughPricePerFixture'];
           ids.forEach(function(id) {
             var el = $(id);
