@@ -10,10 +10,11 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     :root {
-      --primary: #003366;
-      --secondary: #0066CC;
-      --bg: #F5F5F5;
-      --text: #333333;
+      --primary: #161617;
+      --secondary: #7a6200;
+      --accent: #e8c547;
+      --bg: #f6f5f1;
+      --text: #2b2a28;
       --card-bg: #ffffff;
       --border: #ddd;
       --error: #c00;
@@ -28,9 +29,30 @@
       padding: 1rem;
     }
     .container { max-width: 960px; margin: 0 auto; }
-    .app-top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    /* What the customer and the crew read keeps the letterhead's navy. */
+    #preview, #externalSummaryPreview { --primary: #003366; --secondary: #0066CC; }
+    .app-top-bar { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; padding: 0.75rem 1rem; background: var(--primary); color: #fff; border-radius: 10px; }
+    .app-mark { width: 40px; height: 40px; border-radius: 9px; flex-shrink: 0; }
+    .app-title { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+    .app-name { font-size: 1.125rem; font-weight: 700; }
+    .app-tag { font-size: 0.8125rem; color: #bdbbb3; }
+    .app-top-actions { margin-left: auto; display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end; }
+    .app-top-bar .btn-quiet { padding: 0.45rem 0.8rem; font-size: 0.875rem; font-weight: 500; background: transparent; color: #ecebe4; border: 1px solid #4a4a4d; border-radius: 8px; cursor: pointer; }
+    .app-top-bar .btn-quiet:hover { background: #2a2a2c; }
+    /* The running total: rides along the whole worksheet, with a pill per section. */
+    .app-summary-bar { position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 0.75rem 1rem; flex-wrap: wrap; margin: 0 0 1rem; padding: 0.5rem 0.75rem; background: #fff; border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .app-steps { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+    .app-step { padding: 0.3rem 0.7rem; border: 1px solid var(--border); border-radius: 999px; background: #fff; color: #6b6a66; font: inherit; font-size: 0.8125rem; cursor: pointer; }
+    .app-step:hover { border-color: #b9b6aa; }
+    .app-step.is-done::before { content: '\2713\00a0'; color: #2f7d4f; }
+    .app-step.is-current { background: var(--primary); border-color: var(--primary); color: var(--accent); font-weight: 600; }
+    .app-step.is-current.is-done::before { color: var(--accent); }
+    .app-totals { margin-left: auto; display: flex; align-items: baseline; gap: 1rem; font-size: 0.8125rem; color: #6b6a66; white-space: nowrap; }
+    .app-totals b { color: var(--primary); font-size: 0.9375rem; font-variant-numeric: tabular-nums; }
+    .app-totals .app-total-grand b { font-size: 1.25rem; }
+    .section, .actions { scroll-margin-top: 4rem; }
     h1, h2, h3 { color: var(--primary); margin-top: 0; }
-    h2 { font-size: 1.25rem; border-bottom: 2px solid var(--secondary); padding-bottom: 0.25rem; margin-bottom: 1rem; }
+    h2 { font-size: 1.25rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.25rem; margin-bottom: 1rem; }
     .section {
       background: var(--card-bg);
       border-radius: 8px;
@@ -60,12 +82,14 @@
       border: 1px solid var(--border);
       border-radius: 6px;
       font-size: 1rem;
+      font-family: inherit;
+      color: inherit;
       transition: border-color 0.2s;
     }
     input:focus, select:focus, textarea:focus {
       outline: none;
-      border-color: var(--secondary);
-      box-shadow: 0 0 0 2px rgba(0,102,204,0.2);
+      border-color: #b89b1f;
+      box-shadow: 0 0 0 2px rgba(232,197,71,0.45);
     }
     input.error, select.error, textarea.error { border-color: var(--error); }
     .form-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
@@ -253,6 +277,7 @@
     .fixture-mode-status-trace { color: #9a4a00; }
     @media print {
       body.print-external-summary .container .app-top-bar,
+      body.print-external-summary .container .app-summary-bar,
       body.print-external-summary .container form,
       body.print-external-summary .container #preview { display: none !important; }
       body.print-external-summary #externalSummaryPreview { display: block !important; }
@@ -264,6 +289,13 @@
       .number-input-wrap button { min-width: 44px; min-height: 44px; }
     }
     @media (max-width: 640px) {
+      .app-tag { display: none; }
+      .app-summary-bar { gap: 0.4rem; padding: 0.4rem 0.5rem; }
+      .app-steps { flex-wrap: nowrap; overflow-x: auto; width: 100%; scrollbar-width: none; }
+      .app-steps::-webkit-scrollbar { display: none; }
+      .app-step { flex-shrink: 0; }
+      .app-totals { margin-left: 0; width: 100%; justify-content: space-between; gap: 0.5rem; }
+      .app-totals .app-total-grand b { font-size: 1.0625rem; }
       .form-row { flex-direction: column; }
       .fixture-grid { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
       .takeoff-row { flex-wrap: wrap; }
@@ -288,12 +320,34 @@
 </head>
 <body>
   <div class="container">
-    <div class="app-top-bar no-print">
-      <button type="button" id="clearAllFieldsBtn" class="btn btn-outline" title="Viewing someone else's plan? Clear the form to start fresh.">Clear all fields</button>
-      <button type="button" id="fillSample" class="btn btn-outline">Fill with sample</button>
+    <header class="app-top-bar no-print">
+      <img class="app-mark" src="icons/favicon.svg" alt="" width="40" height="40">
+      <div class="app-title">
+        <span class="app-name">BidTooling</span>
+        <span class="app-tag">Plumbing bid worksheet · Click Plumbing and Electrical</span>
+      </div>
+      <div class="app-top-actions">
+        <button type="button" id="fillSample" class="btn-quiet">Fill with sample</button>
+        <button type="button" id="clearAllFieldsBtn" class="btn-quiet" title="Viewing someone else's plan? Clear the form to start fresh.">Clear…</button>
+      </div>
+    </header>
+    <div class="app-summary-bar no-print" id="appSummaryBar">
+      <nav class="app-steps" aria-label="Worksheet sections">
+        <button type="button" class="app-step" data-target="sectionJob">Job</button>
+        <button type="button" class="app-step" data-target="fixtureCountsSection">Fixtures</button>
+        <button type="button" class="app-step" data-target="sectionExtras">Extras</button>
+        <button type="button" class="app-step" data-target="sectionPricing">Pricing</button>
+        <button type="button" class="app-step" data-target="sectionScope">Scope</button>
+        <button type="button" class="app-step" data-target="sectionSend">Send</button>
+      </nav>
+      <div class="app-totals" aria-live="off">
+        <span><b id="barFixtures">0</b> fixtures</span>
+        <span><b id="barManhours">0.0</b> manhours</span>
+        <span class="app-total-grand">Grand total <b>$<span id="barGrandTotal">0.00</span></b></span>
+      </div>
     </div>
     <form id="bidForm" class="no-print">
-      <div class="section">
+      <div class="section" id="sectionJob">
         <h2>Job Information</h2>
         <div class="form-row">
           <div class="field">
@@ -601,7 +655,7 @@
         </details>
       </div>
 
-      <div class="section">
+      <div class="section" id="sectionExtras">
         <h2>Additional Labor and Materials</h2>
         <div class="fixture-labor-details" style="margin-bottom: 0.75rem;">
           <p class="block-heading">Fixtures and Set</p>
@@ -678,7 +732,7 @@
         </div>
       </div>
 
-      <div class="section">
+      <div class="section" id="sectionPricing">
         <h2>Pricing</h2>
         <div class="preview-section" style="margin-top: 1rem;">
           <table class="preview-table">
@@ -771,7 +825,7 @@
         </div>
       </div>
 
-      <div class="section">
+      <div class="section" id="sectionScope">
         <h2>Inclusions (each line is an item)</h2>
         <textarea id="inclusions" name="inclusions" rows="5" placeholder="Describe what is included (e.g. fixtures per plan, permits)...">Permits</textarea>
       </div>
@@ -786,7 +840,7 @@
         <textarea id="termsAndWarranty" name="termsAndWarranty" rows="8" placeholder="Terms and warranty..."></textarea>
       </div>
 
-      <div class="actions no-print">
+      <div class="actions no-print" id="sectionSend">
         <div class="internal-summary-box">
           <h3 class="internal-summary-title">Internal Summary</h3>
           <div class="internal-summary-actions">
@@ -2828,6 +2882,7 @@
       }
       $('clearBtn').addEventListener('click', clearForm);
       if ($('clearAllFieldsBtn')) $('clearAllFieldsBtn').addEventListener('click', function() {
+        if (!window.confirm('Clear every field on this worksheet? This cannot be undone.')) return;
         clearForm();
         var extEl = $('externalSummaryPreview');
         if (extEl) { extEl.classList.remove('visible'); extEl.innerHTML = ''; }
@@ -2939,6 +2994,59 @@
         if ($('scopeNotes') && !$('scopeNotes').value.trim()) $('scopeNotes').value = EXCLUSIONS_AND_SCOPE_DEFAULT;
         if ($('inclusions') && !$('inclusions').value.trim()) $('inclusions').value = INCLUSIONS_DEFAULT;
       });
+    })();
+  </script>
+  <script>
+    // The summary bar (the running total and the section pills). It only READS what the
+    // worksheet already writes — #totalFixtures, #fixtureLaborHours, #additionalLaborManhours,
+    // #grandTotal — so no calculation lives here.
+    (function() {
+      var bar = document.getElementById('appSummaryBar');
+      if (!bar) return;
+      var byId = function(id) { return document.getElementById(id); };
+      var num = function(id) { var el = byId(id); return el ? parseFloat(String(el.textContent).replace(/[^0-9.\-]/g, '')) || 0 : 0; };
+      var filled = function(id) { var el = byId(id); return !!(el && String(el.value).trim()); };
+      var steps = Array.prototype.slice.call(bar.querySelectorAll('.app-step'));
+      var markDone = function(target, done) {
+        steps.forEach(function(b) { if (b.getAttribute('data-target') === target) b.classList.toggle('is-done', !!done); });
+      };
+      function sync() {
+        var fixtures = num('totalFixtures');
+        var grand = num('grandTotal');
+        byId('barFixtures').textContent = String(Math.round(fixtures));
+        byId('barManhours').textContent = (num('fixtureLaborHours') + num('additionalLaborManhours')).toFixed(1);
+        byId('barGrandTotal').textContent = byId('grandTotal') ? byId('grandTotal').textContent : '0.00';
+        markDone('sectionJob', filled('customerName') && filled('jobAddress') && filled('bidDate') && filled('bidNumber'));
+        markDone('fixtureCountsSection', fixtures > 0);
+        markDone('sectionPricing', grand > 0);
+      }
+      ['totalFixtures', 'fixtureLaborHours', 'additionalLaborManhours', 'grandTotal'].forEach(function(id) {
+        var el = byId(id);
+        if (el && window.MutationObserver) new MutationObserver(sync).observe(el, { childList: true, characterData: true, subtree: true });
+      });
+      var form = byId('bidForm');
+      if (form) { form.addEventListener('input', sync); form.addEventListener('change', sync); }
+      steps.forEach(function(b) {
+        b.addEventListener('click', function() {
+          var el = byId(b.getAttribute('data-target'));
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+      function spy() {
+        var line = bar.getBoundingClientRect().bottom + 24;
+        var current = steps[0];
+        steps.forEach(function(b) {
+          var el = byId(b.getAttribute('data-target'));
+          if (el && el.getBoundingClientRect().top <= line) current = b;
+        });
+        // The last section can never reach the top of a page that ends under it.
+        if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) current = steps[steps.length - 1];
+        steps.forEach(function(b) { b.classList.toggle('is-current', b === current); });
+      }
+      window.addEventListener('scroll', spy, { passive: true });
+      window.addEventListener('resize', spy);
+      window.addEventListener('load', function() { sync(); spy(); });
+      sync(); spy();
     })();
   </script>
 </body>
