@@ -93,7 +93,7 @@ Opening a link with a `#...` hash restores the saved state (job info, fixtures, 
 ## Repository files
 
 - `index.html` — App (single file).
-- `favicon.svg` — Favicon.
+- `favicon.ico`, `icons/` — The app mark (the Tooling family's yellow tile; BidTooling is the price tag): `icons/favicon.svg` for browser tabs, `favicon.ico` for browsers that ask for it, `icons/apple-touch-180.png` for iOS home screens, `icons/icon.svg` the master.
 - `make-a-copy.png` — Google Doc step image.
 - `CNAME` — Custom domain (bidtooling.com).
 
